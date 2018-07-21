@@ -1,0 +1,1261 @@
+/*------------------------------------------------------------------
+
+    Main Style Stylesheet
+    Project:        legacy. |  Creative One Page Template
+    Version:        1.0
+    Author:         Gnawi Themes
+    Last change:    18/01/2016
+    Primary use:    Creative, Agency, personal and freelancer.
+
+-------------------------------------------------------------------*/
+
+
+/*-- about -> seg --*/
+
+/*-- Google Font --*/
+
+@import url(https://fonts.googleapis.com/css?family=Lato:400,300,300italic,400italic,700);
+
+/*-- Imports (only visible on scss file) --*/
+
+
+/*=======================================================
+			typography Style
+========================================================*/
+
+body {
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    color: #2c2c2c;
+    line-height: 24px;
+    overflow-x: hidden;
+}
+
+h1 {
+    font-size: 72px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+}
+
+h2 {
+    font-size: 48px;
+    color: #2c2c2c;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+}
+
+h3 {
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+h4 {
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+}
+
+h5 {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+h6 {
+    font-size: 20px;
+    letter-spacing: 0.1em;
+}
+
+p {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    line-height: 24px;
+}
+
+#userCompany{
+    font-size: 72px;
+    color: #fff;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+}
+
+.subtitle {
+    color: #393E42;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    font-style: italic;
+    text-align: center;
+    width: 70%;
+    margin: 0 auto;
+}
+
+.help-block with-errors {
+    color: #fff;
+}
+
+
+/*=======================================================
+			Buttons Style
+========================================================*/
+
+.btn-primary {
+    background: #F57280;
+    color: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    font-size: 18px;
+    padding: 20px 30px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+    border: none;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background: #C5C5BC;
+    color: #fff;
+}
+
+.btn-secondary {
+    background: #bdccd4;
+    color: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    font-size: 18px;
+    padding: 20px 30px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+    border: none;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+    background: #df8766;
+    color: #fff;
+}
+
+.btn-send {
+    background: #fff;
+    color: #2c2c2c;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+    border: none;
+}
+
+.btn-send:hover,
+.btn-send:focus,
+.btn-send:active {
+    background: #000;
+    color: #fff;
+}
+
+.primary-bg {
+    background: #C5C5BC;
+    padding: 60px 0;
+}
+
+
+/*=======================================================
+			Media Queries
+========================================================*/
+
+@media (max-width: 1198px) {
+    header .header-content .col-lg-6  img {
+        display: none;
+    }
+}
+
+@media (max-width: 992px) {
+    header .header-content h1 {
+        font-size: 48px;
+    }
+    header .header-content .btn {
+        margin-right: 0;
+    }
+    header .header-content .col-lg-6 img {
+        display: none;
+    }
+    #home .item .caption h1 {
+        font-size: 48px;
+    }
+    #home .item .caption .btn {
+        margin-right: 15px;
+    }
+    #text-rotator .banner-caption h1 {
+        font-size: 48px;
+    }
+    #text-rotator .banner-caption .btn {
+        margin-right: 15px;
+    }
+    #fun-facts .col-md-3 {
+        margin-bottom: 60px;
+    }
+    #services {
+        padding: 120px 0;
+        text-align: center;
+    }
+    #services .services-container img {
+        display: none;
+    }
+    #services .services-container ul {
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 767px) {
+    .navbar-default .navbar-toggle {
+        border: 2px solid #C5C5BC;
+        border-radius: 0;
+        margin-top: 25px;
+        margin-bottom: 25px;
+        -webkit-transition: all .3s ease-in-out;
+        transition: all .3s ease-in-out;
+    }
+    .navbar-default .navbar-toggle .icon-bar {
+        background: #C5C5BC;
+    }
+    .navbar-default .navbar-toggle:hover,
+    .navbar-default .navbar-toggle:focus,
+    .navbar-default .navbar-toggle:active {
+        background: #df8766;
+    }
+    .navbar-default .navbar-toggle:hover .icon-bar,
+    .navbar-default .navbar-toggle:focus .icon-bar,
+    .navbar-default .navbar-toggle:active .icon-bar {
+        background: #fff;
+    }
+    header .header-content .description .btn {
+        margin-bottom: 25px;
+    }
+    #home .item .caption h1 {
+        font-size: 38px;
+    }
+    #home .item .caption .btn {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    #home .owl-buttons {
+        display: none;
+    }
+    #text-rotator .banner-caption h1 {
+        font-size: 38px;
+    }
+    #text-rotator .banner-caption .btn {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+    #services {
+        padding: 120px 0;
+        text-align: center;
+    }
+    #services .services-container img {
+        display: none;
+    }
+    #services .services-container ul {
+        margin-top: 0;
+    }
+    #newsletter .form-inline .form-control {
+        border-radius: 4px;
+        width: 100%;
+    }
+    #newsletter .form-inline .btn {
+        margin-top: 35px;
+        border-radius: 4px;
+    }
+}
+
+
+/*=======================================================
+			Preloader
+========================================================*/
+
+.page-loader {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #C5C5BC;
+    z-index: 100000;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -25px 0 0 -25px;
+    font-size: 10px;
+    text-indent: -12345px;
+    border-top: 2px solid rgba(255, 255, 255, 0.09);
+    border-right: 2px solid rgba(255, 255, 255, 0.9);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.9);
+    border-left: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    -webkit-animation: spinner 700ms infinite linear;
+    -ms-animation: spinner 700ms infinite linear;
+    animation: spinner 700ms infinite linear;
+    z-index: 100001;
+}
+
+@-webkit-keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spinner {
+    0% {
+        -webkit-transform: rotate(0deg);
+        -ms-transform: rotate(0deg);
+        transform: rotate(0deg);
+    }
+    100% {
+        -webkit-transform: rotate(360deg);
+        -ms-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+
+/*=======================================================
+			Navbar
+========================================================*/
+
+.navbar {
+    background: #fff;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.navbar .nav {
+    padding: 20px 0;
+}
+
+.navbar .navbar-brand {
+    padding: 20px 15px;
+}
+
+.navbar .nav > li > a {
+    background: transparent;
+    font-weight: 700;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+
+.navbar .nav > li > a:hover,
+.navbar .nav > li > a:focus,
+.navbar .nav > li > a:active {
+    background: transparent;
+    color: #F57280;
+}
+
+.navbar .navbar-nav > .active > a {
+    background: transparent;
+    color: #F57280;
+}
+
+.navbar .navbar-nav > .active > a:hover,
+.navbar .navbar-nav > .active > a:focus,
+.navbar .navbar-nav > .active > a:active {
+    background: transparent;
+}
+
+
+/*=======================================================
+			Header
+========================================================*/
+
+header {
+    background-color: #C5C5BC;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+header .header-content {
+    position: absolute;
+    top: 35%;
+}
+
+header .header-content h6 {
+    color: #fff;
+    margin: 40px 0;
+    font-weight: 400;
+}
+
+header .header-content .btn {
+    margin: 0 40px 0 0;
+}
+
+
+/*=======================================================
+			OWl-Carousel Banner
+========================================================*/
+
+#owl-home {
+    overflow: hidden;
+}
+
+#owl-home .item {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+#owl-home .item .caption {
+    position: absolute;
+    top: 50%;
+    margin-top: -104px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 15;
+}
+
+#owl-home .item .caption h1 {
+    margin-bottom: 40px;
+}
+
+#owl-home .item .caption h6 {
+    color: #fff;
+}
+
+#owl-home .item .caption .btn {
+    margin-top: 40px;
+    margin-right: 25px;
+}
+
+#owl-home .owl-pagination {
+    position: absolute;
+    display: block;
+    text-align: center;
+    width: 100%;
+    bottom: 5%;
+}
+
+#owl-home .owl-pagination .owl-page.active span {
+    background: #df8766;
+}
+
+#owl-home .owl-pagination .owl-page span {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: transparent;
+    opacity: 1;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+}
+
+#owl-home .owl-buttons div {
+    font-size: 24px;
+    color: #fff;
+    opacity: 1;
+}
+
+#owl-home .owl-buttons .owl-prev {
+    left: -85px;
+}
+
+#owl-home .owl-buttons .owl-next {
+    right: -85px;
+}
+
+#owl-home .owl-buttons .owl-prev,
+#owl-home .owl-buttons .owl-next {
+    position: absolute;
+    background: #df8766;
+    top: 50%;
+    height: 80px;
+    width: 80px;
+    line-height: 85px;
+    border-radius: 0;
+    border: 1px solid #df8766;
+    z-index: 20;
+    text-align: center;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+}
+
+#home:hover .owl-prev {
+    left: -5px;
+}
+
+#home:hover .owl-next {
+    right: -5px;
+}
+
+
+/*=======================================================
+			Text-rotator
+========================================================*/
+
+#text-rotator {
+    background: url("bgimg.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
+#text-rotator .banner-caption {
+    position: absolute;
+    top: 50%;
+    margin-top: -104px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 15;
+}
+
+#text-rotator .banner-caption h1 {
+    margin-bottom: 40px;
+}
+
+#text-rotator .banner-caption h6 {
+    color: #fff;
+}
+
+#text-rotator .banner-caption .btn {
+    margin-top: 40px;
+    margin-right: 25px;
+}
+
+.typed-cursor {
+    padding: 10px 2px;
+    background: #ffffff;
+    margin: 10px;
+    opacity: 1;
+    -webkit-animation: blink 0.7s infinite;
+    animation: blink 0.7s infinite;
+}
+
+@keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes blink {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+
+/*=======================================================
+			About    -> seg1moncmd
+========================================================*/
+
+#seg1 {
+    background-color: #edeae3;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 120px 0;
+    text-align: center;
+
+}
+
+#seg1 {
+    padding: 120px 0;
+    text-align: center;
+}
+
+#seg1 .col-md-4 {
+    margin-bottom: 40px;
+}
+
+#seg1 h2 {
+    margin-bottom: 40px;
+}
+
+#seg1 h2 span {
+    font-weight: 700;
+    color: #F57280;
+}
+
+#seg1 .seg1-content {
+    margin-top: 80px;
+}
+
+#seg1 .seg1-content h5 {
+    margin: 35px 0;
+}
+
+/*=======================================================
+			About    -> seg2
+========================================================*/
+#seg2 {
+    background-color: #C5C5BC;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 120px 0;
+    text-align: center;
+}
+
+#seg2 {
+    padding: 120px 0;
+    text-align: center;
+}
+
+#seg2 .col-md-4 {
+    margin-bottom: 40px;
+}
+
+#seg2 h2 {
+    margin-bottom: 40px;
+}
+
+#seg2 h2 span {
+    font-weight: 700;
+    color: #F57280;
+}
+
+#seg2 .about-content {
+    margin-top: 80px;
+}
+
+#seg2 .about-content h5 {
+    margin: 35px 0;
+}
+
+/*=======================================================
+			About    -> seg3
+========================================================*/
+
+#seg3 {
+
+    background-color: #edeae3;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 120px 0;
+    text-align: center;
+}
+
+#seg3 {
+    padding: 120px 0;
+    text-align: center;
+}
+
+#seg3 .col-md-4 {
+    margin-bottom: 40px;
+}
+
+#seg3 h2 {
+    margin-bottom: 40px;
+}
+
+#seg3 h2 span {
+    font-weight: 700;
+    color: #F57280;
+}
+
+#seg3 .about-content {
+    margin-top: 80px;
+}
+
+#seg3 .about-content h5 {
+    margin: 35px 0;
+}
+
+/*=======================================================
+			About    -> seg4
+========================================================*/
+#seg4 {
+    background-color: #C5C5BC;
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 120px 0;
+    text-align: center;
+}
+
+#seg4 {
+    padding: 120px 0;
+    text-align: center;
+}
+
+#seg4 .col-md-4 {
+    margin-bottom: 40px;
+}
+
+#seg4 h2 {
+    margin-bottom: 40px;
+}
+
+#seg4 h2 span {
+    font-weight: 700;
+    color: #F57280;
+}
+
+#seg4 .about-content {
+    margin-top: 80px;
+}
+
+#seg4 .about-content h5 {
+    margin: 35px 0;
+}
+
+/*=======================================================
+			About    -> Myimg
+========================================================*/
+.Myimg {
+    width: 150px;
+    height:auto;
+}
+
+/*=======================================================
+			Fun-Facts
+========================================================*/
+
+#fun-facts {
+    padding: 120px 0;
+    background: #C5C5BC;
+    text-align: center;
+}
+
+#fun-facts h6 {
+    font-weight: 700;
+    color: #fff;
+    margin-top: 35px;
+}
+
+#fun-facts .timer {
+    font-size: 4rem;
+    color: #fff;
+    letter-spacing: 0.1em;
+}
+
+
+/*=======================================================
+			Portfolio
+========================================================*/
+
+#portfolio {
+    padding-top: 120px;
+    text-align: center;
+}
+
+#portfolio h2 span {
+    font-weight: 700;
+    color: #C5C5BC;
+}
+
+#portfolio .col-md-4 {
+    padding: 0;
+}
+
+#portfolio .portfolio-filtres {
+    margin: 80px 0;
+}
+
+#portfolio .portfolio-filtres li {
+    display: inline-block;
+    margin: 20px 25px;
+}
+
+#portfolio .portfolio-filtres li a {
+    background: #C5C5BC;
+    color: #fff;
+    text-decoration: none;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16), 0 2px 10px 0 rgba(0, 0, 0, 0.12);
+    padding: 15px 20px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#portfolio .portfolio-filtres li .active {
+    background: #df8766;
+}
+
+#portfolio .portfolio-filtres li a:hover,
+#portfolio .portfolio-filtres li a:focus,
+#portfolio .portfolio-filtres li a:active {
+    background: #df8766;
+}
+
+#portfolio #Container .mix {
+    display: none;
+}
+
+#portfolio .portfolio-box {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+}
+
+#portfolio .portfolio-box .portfolio-box-caption {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    color: #fff;
+    opacity: 0;
+    background: rgba(76, 215, 255, 0.7);
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+}
+
+#portfolio .portfolio-box .portfolio-box-caption .portfolio-box-caption-content {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
+#portfolio .portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-category {
+    font-size: 30px;
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+}
+
+#portfolio .portfolio-box .portfolio-box-caption .portfolio-box-caption-content .project-name {
+    font-size: 20px;
+    letter-spacing: 0.1em;
+}
+
+#portfolio .portfolio-box:hover .portfolio-box-caption {
+    opacity: 1;
+}
+
+
+/*=======================================================
+			NewsLetter
+========================================================*/
+
+#newsletter {
+    background: url("bgimg.jpg");
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 120px 0;
+    text-align: center;
+}
+
+#newsletter h3 {
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 35px;
+}
+
+#newsletter h3 span {
+    font-weight: 700;
+}
+
+#newsletter h6 {
+    color: #fff;
+}
+
+#newsletter .form-control::-webkit-input-placeholder {
+    color: #fff;
+}
+
+#newsletter .form-control:-moz-placeholder {
+    color: #fff;
+}
+
+#newsletter .form-control::-moz-placeholder {
+    color: #fff;
+}
+
+#newsletter .form-control:-ms-input-placeholder {
+    color: #fff;
+}
+
+#newsletter .form-inline {
+    margin-top: 35px;
+}
+
+#newsletter .form-control {
+    background: transparent;
+    color: #fff;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    border: 1px solid #fff;
+    width: 60%;
+    height: 50px;
+}
+
+#newsletter .btn {
+    padding: 12.5px 35px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    margin-left: -2px;
+}
+
+
+/*=======================================================
+			Services
+========================================================*/
+
+#services {
+    padding-top: 120px;
+}
+
+#services h2 {
+    margin-bottom: 40px;
+}
+
+#services h2 span {
+    color: #C5C5BC;
+    font-weight: 700;
+}
+
+#services h2,
+#services p {
+    text-align: center;
+}
+
+#services .services-container {
+    margin-top: 80px;
+}
+
+#services ul {
+    margin-top: 30%;
+    padding-left: 40px;
+}
+
+#services ul li {
+    margin-top: 40px;
+}
+
+#services ul li span {
+    font-size: 2.8rem;
+    color: #C5C5BC;
+    font-weight: 700;
+}
+
+#services ul li h5 {
+    font-weight: 400;
+}
+
+
+/*=======================================================
+			Work Process
+========================================================*/
+
+#process {
+    background: #C5C5BCb0;
+    padding: 120px 0;
+    text-align: center;
+}
+
+#process .col-md-3 {
+    margin-bottom: 40px;
+}
+
+#process h3 {
+    margin-bottom: 80px;
+    font-weight: 400;
+    color: #fff;
+}
+
+#process h3 span {
+    font-weight: 700;
+}
+
+#process h6 {
+    font-weight: 700;
+    color: #fff;
+    margin-top: 35px;
+}
+
+
+/*=======================================================
+			Team
+========================================================*/
+
+#team {
+    padding: 120px 0;
+    text-align: center;
+}
+
+#team .col-md-4 {
+    margin-bottom: 40px;
+}
+
+#team h2 {
+    margin-bottom: 80px;
+}
+
+#team h2 span {
+    font-weight: 700;
+    color: #C5C5BCb0;
+}
+
+#team .team-caption {
+    background: #C5C5BCb0;
+    padding: 40px;
+}
+
+#team .team-caption a {
+    font-size: 18px;
+    padding-right: 10px;
+    color: #fff;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+
+#team .team-caption h5 {
+    color: #fff;
+    font-weight: 700;
+}
+
+#team .team-caption h6 {
+    color: #fff;
+    font-weight: 400;
+    margin: 15px 0;
+}
+
+
+/*=======================================================
+			Testimonials
+========================================================*/
+
+#testimonials {
+    background: url("bgimg.jpg");
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 120px 0;
+    text-align: center;
+}
+
+#testimonials h3 {
+    font-weight: 400;
+    margin-bottom: 80px;
+    color: #fff;
+}
+
+#testimonials h3 span {
+    font-weight: 700;
+}
+
+#testimonials p {
+    color: #fff;
+    width: 50%;
+    margin: 25px auto;
+}
+
+#testimonials h6 {
+    color: #fff;
+}
+
+#testimonials #owl-testimonials .owl-pagination .owl-page.active span {
+    background: #fff;
+}
+
+#testimonials #owl-testimonials .owl-pagination .owl-page span {
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: transparent;
+    opacity: 1;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+}
+
+
+/*=======================================================
+			Blog
+========================================================*/
+
+#blog {
+    padding: 120px 0;
+}
+
+#blog .col-md-4 {
+    margin-bottom: 40px;
+}
+
+#blog h2 {
+    text-align: center;
+    margin-bottom: 80px;
+}
+
+#blog h2 span {
+    font-weight: 700;
+    color: #C5C5BCb0;
+}
+
+#blog .blog-caption {
+    background: #C5C5BC;
+    max-width: 600px;
+    padding: 30px;
+}
+
+#blog .blog-caption h5 {
+    color: #fff;
+    margin-bottom: 25px;
+}
+
+#blog .blog-caption .date {
+    font-size: 2rem;
+    color: #fff;
+    letter-spacing: 0.1rem;
+    font-weight: 300;
+    margin: 25px 0;
+}
+
+#blog .blog-caption p {
+    margin: 25px 0;
+    color: #fff;
+}
+
+#blog .blog-caption .blog-link {
+    color: #fff;
+    font-size: 2rem;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    text-decoration: none;
+    margin-top: 25px;
+}
+
+
+/*=======================================================
+			Contact
+========================================================*/
+
+#contact #map {
+    width: 100%;
+    height: 600px;
+    background: rgba(0, 0, 0, 0.16);
+}
+
+#contact .col-md-6 {
+    padding: 0;
+}
+
+#contact .contact-forms {
+    background: url("bgimg.jpg");
+    background-attachment: fixed;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 600px;
+    text-align: center;
+}
+
+#contact .contact-forms .contact-content {
+    padding: 100px 70px;
+}
+
+#contact .contact-forms .contact-content .form-control::-webkit-input-placeholder {
+    color: #fff;
+}
+
+#contact .contact-forms .contact-content .form-control:-moz-placeholder {
+    color: #fff;
+}
+
+#contact .contact-forms .contact-content .form-control::-moz-placeholder {
+    color: #fff;
+}
+
+#contact .contact-forms .contact-content .form-control:-ms-input-placeholder {
+    color: #fff;
+}
+
+#contact .contact-forms .contact-content .form-inline {
+    margin-top: 35px;
+}
+
+#contact .contact-forms .contact-content .form-control {
+    background: transparent;
+    color: #fff;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    border: 1px solid #fff;
+    min-height: 45px;
+    margin-bottom: 35px;
+}
+
+#contact .contact-forms .contact-content textarea {
+    height: 140px;
+    resize: none;
+}
+
+
+/*=======================================================
+			Footer
+========================================================*/
+
+footer {
+    padding: 60px 0;
+    background: #C5C5BC;
+    text-align: center;
+}
+
+footer .social-media {
+    margin: 40px 0;
+}
+
+footer .social-media a {
+    font-size: 3rem;
+    margin-right: 25px;
+    color: #fff;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+}
+
+footer h6 {
+    color: #fff;
+    font-weight: 400;
+}
+
+
+/*# sourceMappingURL=main.css.map */

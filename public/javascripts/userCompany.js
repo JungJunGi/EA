@@ -1,0 +1,1 @@
+document.getElementById("userCompany").innerHTML ='코비스';

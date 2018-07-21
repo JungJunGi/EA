@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="kr">
+	<head>
+	<meta charset="UTF-8">
+    <title>My Login</title>
+    
+	<link rel="stylesheet" type="text/css" href="/stylesheets/login.css" />
+	<script src = "/javascript/user.js"></script>
+</head>
+
+<body>
+<section class="container">
+		    <article class="half">
+			        <h1>Energy Assistant</h1>
+			        <div class="tabs">
+				            <span class="tab signin active"><a href="#signin">Sign in</a></span>
+				            <span class="tab signup"><a href="#signup">Sign up</a></span>
+			        </div>
+			        <div class="content">
+				            <div class="signin-cont cont">
+					                <form action="/process/login" method="post">
+						                    <input type="text" name="id" id="id" class="inpt" required="required" placeholder="ID">
+                                            <label for="id">ID</label>
+                                            
+						                    <input type="password" name="password" id="password" class="inpt" required="required" placeholder="PW">
+                                            <label for="password">PW</label>
+                                            
+						                    <!--<input type="checkbox" id="remember" class="checkbox" checked>
+						                    <label for="remember">Remember me</label>-->
+						                    <div class="submit-wrap">
+							                        <input type="submit" value="Sign in" class="submit">
+						                    </div>
+        					        </form>
+    				        </div>
+    				        <div class="signup-cont cont">
+                                    <form action="/process/adduser" method="post">
+						                    <input type="text" name="id" id="id" class="inpt" required="required" placeholder="ID">
+                                            <label for="id">ID</label>
+                                            
+						                    <input type="password" name="password" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" class="inpt" required="required" placeholder="PW (숫자, 대·소문자 포함 8자리 이상)">
+                                            <label for="password">PW</label>
+                                            
+                                            <input type="text" name="company" id="company" class="inpt" required="required" placeholder="Company">
+											<label for="company">Company</label>
+
+											<p>※ID중복 또는 가입되어 있지 않은 회사명 입력시 가입이 불가능할 수 있습니다.</p>
+						                    <div class="submit-wrap">
+							                        <input type="submit" value="Sign up" class="submit">
+						                    </div>
+        					        </form>
+            </div>
+			        </div>
+		    </article>
+		    <div class="half bg"></div>
+	</section>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script> 
+<script type="text/javascript">
+$('.tabs .tab').click(function(){
+    if ($(this).hasClass('signin')) {
+        $('.tabs .tab').removeClass('active');
+        $(this).addClass('active');
+        $('.cont').hide();
+        $('.signin-cont').show();
+    } 
+    if ($(this).hasClass('signup')) {
+        $('.tabs .tab').removeClass('active');
+        $(this).addClass('active');
+        $('.cont').hide();
+        $('.signup-cont').show();
+    }
+});
+
+</script>
+</body>
+</html>
