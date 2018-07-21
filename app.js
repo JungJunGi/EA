@@ -7,7 +7,7 @@ var logger = require('morgan');
 var userRouter = require('./routes/user');
 var segRouter = require('./routes/segData');
 
-//전기요금 - line chart
+// 전기요금 - line chart
 var inha_main = require('./routes/inha_main');
 var moneyLine_sub = require('./routes/moneyLine_sub').router;
 

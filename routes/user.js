@@ -1,5 +1,5 @@
-var express = require('express')
-, fs = require('fs');
+var express = require('express');
+var fs = require('fs');
 var router = express.Router();
 
 const request = require('request');
