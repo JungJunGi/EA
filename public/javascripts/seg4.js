@@ -11,20 +11,22 @@ var tooltip = d3.select("body")
 
 var svg_1 = d3.select('.seg4_chart_1') //d3.select("body").select("svg")
 //.attr("width", 1500).attr("height", 350)
-//.attr("transform", "translate(150, 50)")
+.attr("transform", "translate(0, 50)")
 .append('g');
 var svg_2 = d3.select('.seg4_chart_2') //d3.select("body").select("svg")
+.attr("transform", "translate(0, 50)")
 .append('g');
 var svg_3 = d3.select('.seg4_chart_3') //d3.select("body").select("svg")
+.attr("transform", "translate(0, 50)")
 .append('g');
-var svg_4 = d3.select('.seg4_chart_4') //d3.select("body").select("svg")
-.append('g');
+//var svg_4 = d3.select('.seg4_chart_4') //d3.select("body").select("svg")
+//.append('g');
 
 //pie chart
 pie("/segData/seg4_data1", "금일 총 사용량", svg_1);
 pie("/segData/seg4_data2", "금일 피크전력", svg_2);
 pie("/segData/seg4_data3", "금일 유효전력", svg_3);
-pie("/segData/seg4_data4", "금일 역률", svg_4);
+//pie("/segData/seg4_data4", "금일 역률", svg_4);
 
 //json
 function classes_4(root, label) {
@@ -164,9 +166,9 @@ d3.json(fileName, function (error, data) {
 
         //var lx = (180 * num) + 150;
         mysvg.append('text')
-        //.attr("transform", function (d, i) {
-        //    return 'translate('+ lx + ', 320)';
-       // })
+        .attr("transform", function (d, i) {
+            return 'translate(70, 280)';
+        })
             .text(label).style("fill", 'black')
             .style("font", "18px sans-serif");
     };
