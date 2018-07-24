@@ -21,10 +21,10 @@ var svg_4 = d3.select('.seg4_chart_4') //d3.select("body").select("svg")
 .append('g');
 
 //pie chart
-pie("/segData/seg4_data1", "금일 총 사용량", 0);
-pie("/segData/seg4_data2", "금일 피크전력", 2);
-pie("/segData/seg4_data3", "금일 유효전력", 4);
-pie("/segData/seg4_data4", "금일 역률", 6);
+pie("/segData/seg4_data1", "금일 총 사용량", svg_1);
+pie("/segData/seg4_data2", "금일 피크전력", svg_2);
+pie("/segData/seg4_data3", "금일 유효전력", svg_3);
+pie("/segData/seg4_data4", "금일 역률", svg_4);
 
 //json
 function classes_4(root, label) {
