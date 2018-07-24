@@ -11,6 +11,22 @@ var segRouter = require('./routes/segData');
 var inha_main = require('./routes/inha_main');
 var moneyLine_sub = require('./routes/moneyLine_sub').router;
 
+
+// 스케줄링 모듈
+var schedule = require('node-schedule');
+
+// 스케줄링 정보
+var scheduleinfo = require('./module/scheduleinfo');
+
+// 매일 23시59분30초에 스케줄링
+var j = schedule.scheduleJob('30 59 23 * * *', function(){
+  console.log("scheduling start!");
+  //scheduleinfo.initscore();
+  //scheduleinfo.contentsscore();
+  console.log("scheduling finish!");
+});
+
+
 var app = express();
 
 // view engine setup
