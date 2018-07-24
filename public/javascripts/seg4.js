@@ -9,16 +9,24 @@ var tooltip = d3.select("body")
 .style("border-radius", "6px")
 .style("font", "12px sans-serif");
 
-var svg = d3.select('.seg4_chart') //d3.select("body").select("svg")
-.attr("width", 1500).attr("height", 350)
-.attr("transform", "translate(150, 50)")
+var svg_1 = d3.select('.seg4_chart_1') //d3.select("body").select("svg")
+//.attr("width", 1500).attr("height", 350)
+.attr("transform", "translate(0, 50)")
 .append('g');
+var svg_2 = d3.select('.seg4_chart_2') //d3.select("body").select("svg")
+.attr("transform", "translate(0, 50)")
+.append('g');
+var svg_3 = d3.select('.seg4_chart_3') //d3.select("body").select("svg")
+.attr("transform", "translate(0, 50)")
+.append('g');
+//var svg_4 = d3.select('.seg4_chart_4') //d3.select("body").select("svg")
+//.append('g');
 
 //pie chart
-pie("/segData/seg4_data1", "금일 총 사용량", 0);
-pie("/segData/seg4_data2", "금일 피크전력", 2);
-pie("/segData/seg4_data3", "금일 유효전력", 4);
-pie("/segData/seg4_data4", "금일 역률", 6);
+pie("/segData/seg4_data1", "금일 총 사용량", svg_1);
+pie("/segData/seg4_data2", "금일 피크전력", svg_2);
+pie("/segData/seg4_data3", "금일 유효전력", svg_3);
+//pie("/segData/seg4_data4", "금일 역률", svg_4);
 
 //json
 function classes_4(root, label) {
@@ -46,7 +54,7 @@ return { children: classes };
 }
 
 // chart function
-function pie(fileName, label, num) {
+function pie(fileName, label, mysvg) {
 var w = 300; var h = 250;
 
 var outerRadius = (w - 50) / 2;
@@ -77,8 +85,8 @@ d3.json(fileName, function (error, data) {
 
     var sData = root.children.slice(0, 10);
 
-    var arcs = svg.append('g')
-        .attr("transform", "translate(" + 180 * num + ", 10)")
+    var arcs = mysvg.append('g')
+        //.attr("transform", "translate(" + 180 * num + ", 10)")
         .selectAll(".arc")
         .data(pie(sData)).enter().append("g")
         .attr("class", "arc")
@@ -129,8 +137,8 @@ d3.json(fileName, function (error, data) {
         return 0;
         })*/
 
-        var legend = svg.append('g')
-            .attr("transform", "translate(" + (180 * num) + ", 10)")
+        var legend = mysvg.append('g')
+           // .attr("transform", "translate(" + (180 * num) + ", 10)")
             .selectAll('.legend')
             .data(sData).enter().append('g')
             .attr("class", 'legend')
@@ -156,10 +164,10 @@ d3.json(fileName, function (error, data) {
             .text(function (d) { return d.data.siteName; })
             .style("fill", 'black').style("font_size", '14px');
 
-        var lx = (180 * num) + 150;
-        svg.append('text')
+        //var lx = (180 * num) + 150;
+        mysvg.append('text')
         .attr("transform", function (d, i) {
-            return 'translate('+ lx + ', 320)';
+            return 'translate(70, 280)';
         })
             .text(label).style("fill", 'black')
             .style("font", "18px sans-serif");

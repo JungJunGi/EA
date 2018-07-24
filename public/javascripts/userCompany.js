@@ -1,1 +1,1 @@
-document.getElementById("userCompany").innerHTML ='코비스';
+document.getElementById("userCompany").innerHTML ='우리황토';
