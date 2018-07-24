@@ -9,9 +9,15 @@ var tooltip = d3.select("body")
 .style("border-radius", "6px")
 .style("font", "12px sans-serif");
 
-var svg = d3.select('.seg4_chart') //d3.select("body").select("svg")
-.attr("width", 1500).attr("height", 350)
-.attr("transform", "translate(150, 50)")
+var svg_1 = d3.select('.seg4_chart_1') //d3.select("body").select("svg")
+//.attr("width", 1500).attr("height", 350)
+//.attr("transform", "translate(150, 50)")
+.append('g');
+var svg_2 = d3.select('.seg4_chart_2') //d3.select("body").select("svg")
+.append('g');
+var svg_3 = d3.select('.seg4_chart_3') //d3.select("body").select("svg")
+.append('g');
+var svg_4 = d3.select('.seg4_chart_4') //d3.select("body").select("svg")
 .append('g');
 
 //pie chart
