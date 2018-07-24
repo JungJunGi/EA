@@ -18,6 +18,30 @@ MongoClient.connect(databaseUrl, function(err, db) {
 });
 
 
+//===== 회사명 가져오기 =====//
+var maindata = new Set(); //회사명 중복 제거.
+
+request("http://165.246.39.81:54231/", (error, response, body) => {
+    if (error) throw error;
+
+    let $ = cheerio.load(body);
+
+    try {
+      $('a').each(function(i, e){
+          let s = e.attribs.href;
+          s = s.split("?");
+          s = s[1].split("&");
+
+          let company = s[0].split("=");
+
+          maindata.add(company[1]);
+      });
+
+    } catch (error){
+      console.error(error);
+    }
+});
+
 
 /*
 module.exports = {
@@ -100,20 +124,14 @@ module.exports = {
 
     // 데이터베이스 객체가 초기화된 경우, addUser 함수 호출하여 사용자 추가
     if (database) {
-        addUser(database, paramId, paramPassword, paramCompany, function(err, result) {
+      insertData(database, company, function(err, result) {
             if (err) {throw err;}
 
             // 결과 객체 확인하여 추가된 데이터 있으면 성공 응답 전송
             if (result && result.insertedCount > 0) {
-                console.dir(result);
-
-                res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
-                res.write('<head><script type="text/javascript">alert("가입을 축하드립니다. 로그인하세요."); window.location="/login/#signin"</script></head>');
-                res.end();
+                
             } else {  // 결과 객체가 없으면 실패 응답 전송
-              res.writeHead('200', {'Content-Type':'text/html;charset=utf8'});
-              res.write('<head><script type="text/javascript">alert("회원가입에 실패하였습니다. 다시 시도하세요."); window.location="/login/#signup"</script></head>');
-              res.end();
+              
             }
         });
     } else {  // 데이터베이스 객체가 초기화되지 않은 경우 실패 응답 전송
@@ -126,41 +144,45 @@ module.exports = {
 }
 
 
-//사용자를 추가 함수
-var addUser = function(database, id, password, company, callback) {
-  console.log('addUser 호출됨 : ' + id + ', ' + password + ', ' + company);
+// 과거데이터 삽입 함수
+var insertData = function(database, company, callback) {
 
-  // users 컬렉션 참조
-  var users = database.collection('users');
+  // money 컬렉션 참조
+  var money = database.collection('money');
 
-  //id 중복확인 후 사용자 추가
-  users.find({"id":id}).toArray(function(err, docs) {
-    if (err) { // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
+  // company 확인
+  money.find({"company":company}).toArray(function(err, docs) {
+
+    // 에러 발생
+    if (err) {
         callback(err, null);
         return;
-    }
-
-    if (docs.length > 0 || !maindata.has(company)) {
-        callback(null, null);
-
-    } else { //중복된 id가 없거나 가입된 회사일 경우 사용자 추가
-        users.insertMany([{"id":id, "password":password, "company":company}], function(err, result) {
-            if (err) {  // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
-                callback(err, null);
-                return;
-            }
-          
-            // 에러 아닌 경우, 콜백 함수를 호출하면서 결과 객체 전달
-            if (result.insertedCount > 0) {
-                console.log("사용자 레코드 추가됨 : " + result.insertedCount);
-            } else {
-                console.log("추가된 레코드가 없음.");
-            }
-            callback(null, result);
-          
-           });
-        }
         
-    });
+    // 몽고디비에 해당 회사가 존재하면 그 객체에 과거데이터를 추가하여 갱신
+    } else if (docs.length > 0) {
+      // 
+      // 
+      callback(null, null);
+
+    // 몽고디비에 해당 회사가 존재하지 않지만 유효한 회사라면 새로운 객체 생성하여 과거데이터 삽입
+    } else if (maindata.has(company)){
+      money.insertMany([{"company":company}], function(err, result) {
+        if (err) {
+            callback(err, null);
+            return;
+        }
+      
+        // 에러 아닌 경우, 콜백 함수를 호출하면서 결과 객체 전달
+        if (result.insertedCount > 0) {
+            console.log("레코드 추가됨 : " + result.insertedCount);
+        } else {
+            console.log("추가된 레코드가 없음.");
+        }
+        callback(null, result);
+      
+      });
+    }
+        
+  });
   
 }
