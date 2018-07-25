@@ -4,6 +4,7 @@ var router = express.Router();
 
 const request = require('request');
 const cheerio = require('cheerio');
+const crawling = require('../module/datacrawling_main');
 
 var MongoClient = require('mongodb').MongoClient;
 var database;
@@ -74,6 +75,9 @@ router.route('/process/login').post(function(req, res) {
                 if (err) throw err;
                 
               });
+
+              // 회사명으로 data crawling 하기 by jiyeon
+              crawling.datacrawling(userCompany);
               
               res.render('ourindex', { title: 'home page' });
 
