@@ -19,8 +19,7 @@ var svg_2 = d3.select('.seg4_chart_2') //d3.select("body").select("svg")
 var svg_3 = d3.select('.seg4_chart_3') //d3.select("body").select("svg")
 .attr("transform", "translate(0, 50)")
 .append('g');
-//var svg_4 = d3.select('.seg4_chart_4') //d3.select("body").select("svg")
-//.append('g');
+
 
 //pie chart
 pie("/segData/seg4_data1", "금일 총 사용량", svg_1);
