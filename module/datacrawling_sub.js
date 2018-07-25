@@ -8,6 +8,8 @@ const express = require("express");
 var urlencode = require('urlencode');
 var router = express.Router();
 
+const crawling = require('./datacrawling_main').datacrawling;
+
 var res = new Array;
 
 var company;    // company name
@@ -17,10 +19,37 @@ var depart = new Array;     // departs name
 var myDate = new Array;     // date string
 
 
-module.exports.findData = function (maindata, categoryNumber, companyName){
+
+/* 
+
+data category
+
+3: 누적전력량
+5: 주파수
+6: 선간전압
+7: 상전류
+8: 상전압
+9: 부스바온도
+10: 전기요금
+11: 인버터효율
+12: RS간 선간전압
+13: ST간 선간전압
+14: TR간 선간전압
+15: 역률
+16: 유효전력
+17: 피상전력
+21: 무효전력 
+
+*/
+
+
+module.exports = function (categoryNumber, companyName){
 
     company = companyName;
     category = categoryNumber;
+
+    // from datacrawling_main.js
+    maindata = crawling(company);
 
     maindata.forEach(function(d, i){
         if (company == d[0]) {
@@ -50,11 +79,14 @@ module.exports.findData = function (maindata, categoryNumber, companyName){
         leapyear = false;
     }
 
+    
     // 최근 6개월 간의 전기요금 차트 
-    forlinechart(today, m)
+    if (category == 10)
+        forlinechart(today, m)
 
     // 회사당 부서별 유효 전력량 차트
-    forstackedareachart(today, y, m-1, d, leapyear)
+    else if (category == 16)
+        forstackedareachart(today, y, m-1, d, leapyear)
 
 }
 
