@@ -28,6 +28,7 @@ pie("/segData/seg4_data3", "금일 유효전력", svg_3);
 //pie("/segData/seg4_data4", "금일 역률", svg_4);
 
 //json
+
 function classes_4(root, label) {
 var classes = [];
 
