@@ -8,7 +8,7 @@ const cheerio = require('cheerio');
 
 var maindata = new Array();
 
-module.exports.datacrawling = function (category, company){
+module.exports.datacrawling = function (company){
 
 request("http://165.246.39.81:54231/", (error, response, body) => {
         if (error) throw error;
@@ -40,31 +40,6 @@ request("http://165.246.39.81:54231/", (error, response, body) => {
             console.error(error);
         }
 
-        findData(maindata, category, company);  // category, company
-        
-
+        return maindata;
     });
 }
-
-
-/* 
-
-data category
-
-3: 누적전력량
-5: 주파수
-6: 선간전압
-7: 상전류
-8: 상전압
-9: 부스바온도
-10: 전기요금
-11: 인버터효율
-12: RS간 선간전압
-13: ST간 선간전압
-14: TR간 선간전압
-15: 역률
-16: 유효전력
-17: 피상전력
-21: 무효전력 
-
-*/
