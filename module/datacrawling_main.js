@@ -24,7 +24,7 @@ request("http://165.246.39.81:54231/", (error, response, body) => {
                 maindata.push(s);
 
                 let company = s[0].split("=");
-                s[0] = company[1];
+                s[0] = company[1]; 
 
                 let depart = s[1].split("=");
                 s[1] = depart[1];

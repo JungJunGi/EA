@@ -1,0 +1,16 @@
+body{
+    background-color: #edeae3;
+}
+
+.tooltip2 {
+    fill: white;
+    stroke: #000;
+}
+
+text {
+    fill: black;
+}
+
+.tooltip-date, .tooltip-money {
+    font-weight: bold;
+}
