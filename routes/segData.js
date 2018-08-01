@@ -12,7 +12,7 @@ MongoClient.connect(url, function (err, database) {
       return;
    }
    console.log('seg data 연결되었습니다.');
-   var db = database.db('jsonEx');
+   var db = database.db('exp');
    
   db.collection('money').findOne({}, function (findErr, data) {
     if (findErr) throw findErr;
