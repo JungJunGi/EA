@@ -1,23 +1,31 @@
-import pymongo
+#import pymongo
 import time
 import sys
 import pymysql
 import json
  
 ### Ready for data ###
-group_companyID = [] 
+group_companyId = [] 
 group_companyName = []
 group_companyDepart=[]
+companyDict = {}
+
 group_date = []
 group_value = []
 row = []
-companyDict = {}
+
+companyNum = 0
+departNum = 0
+itemNum = 0
 
 year = {}
+print("year ? ::: " + type(year))
+
 data_2017 = [201706,201707,201708,201709,201710,201711,201712]
 data_2018 = [201801,201802,201803,201804,201805,201806,201807]
 year["2017"] = data_2017
 year["2018"] = data_2018
+print("year ? ::: " + type(year))
  
 db = pymysql.connect(
                         host = "www.lems.mbz.kr",
@@ -30,46 +38,44 @@ db = pymysql.connect(
     
 cursor = db.cursor()
 
-# sql = "SELECT MDATETIME, DSITEMVAL FROM DATA_MEASURE_201707 A, INFO_DS125_WebVersion B "
-# sql += "WHERE B.FromDSID = A.DSID AND COMPANY_ID = 27 AND A.DSID = 89 AND A.DISTBDID = 3 AND DSITEMID =3 AND B.FromDISTBDID = 3 ORDER BY MDATETIME"
- 
-### Read companyID & companyName from sql ###
-sql = "SELECT COMPANY_ID, COMPANY_NAME FROM INFO_COMPANY"
+
+### Read COMPANY id & name ###
+sql = "SELECT COMPANY_ID, COMPANY_NAME  FROM INFO_COMPANY"
 companyNum = cursor.execute(sql)
 row = [item for item in cursor.fetchall()]
-group_companyID, group_companyName = zip(*row)
-comNameDict = dict(zip(group_companyID, group_companyName))
-# print(companyDict)
+group_companyId, group_companyName = zip(*row)
+comNameDict = dict(zip(group_companyId, group_companyName))
+
+print("comNameDict ::: " + comNameDict)
 
 
-### Init ###
-row = []
  
-### Read depart info ###
+### Read DEPART info ###
 for i in range(0, companyNum):
-    sql = "SELECT FromDSID, FromDISTBDID, DSNAME  FROM INFO_DS125_WebVersion WHERE COMPANY_ID = %s AND FromDSID IS NOT NULL"
-    departNum = cursor.execute(sql, (group_companyID[i]))
+    sql = "SELECT FromDSID, FromDISTBDID, DSNAME  FROM INFO_DS125_WebVersion  WHERE COMPANY_ID = %s AND FromDSID IS NOT NULL"
+    departNum = cursor.execute(sql, (group_companyId[i]))
     row = [item for item in cursor.fetchall()]
     group_companyDepart.append(list(row))
-companyDict = dict(zip(group_companyID, group_companyDepart))
+companyDict = dict(zip(group_companyId, group_companyDepart))
+
 # print(companyDict.get(27)[0])
-# print(companyDict)
+print("companyDict ::: " + companyDict)
 
 
 
-### Init ###
-row = []
  
-### Read DSITEM ###
-sql = "SELECT DSITEMID, DSITEMNAMEENG FROM INFO_DS125_ITEM ORDER BY DSITEMID"
+### Read DSITEM id & name ###
+sql = "SELECT DSITEMID, DSITEMNAMEENG  FROM INFO_DS125_ITEM  ORDER BY DSITEMID"
 itemNum = cursor.execute(sql)
 row = [item for item in cursor.fetchall()]
-group_dsitemID, group_dsitemNAME = zip(*row)
-dsitemDict = dict(zip(group_dsitemID, group_dsitemNAME))
-# print(dsitemDict)
- 
+group_dsitemId, group_dsitemName = zip(*row)
+dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
+
+print("dsitemDict ::: " + dsitemDict)
+
+
 # print(group_companyDepart)
-# print(group_companyID)
+# print(group_companyId)
 # print(group_companyName)
 # print(dsitemDict)
 # print(group_companyDepart[0][0][1])
