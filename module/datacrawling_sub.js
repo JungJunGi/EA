@@ -19,6 +19,8 @@ var depart = new Array;     // departs name
 var myDate = new Array;     // date string
 
 
+/// test
+
 
 /* 
 
