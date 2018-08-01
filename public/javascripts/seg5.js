@@ -9,6 +9,7 @@ d3.json('/moneyData/money', function (error, data) {
 
 });//json
 
+
 function Line_chart(meta, sData) {
 
     var svg5 = d3.select('.seg5_chart');//.attr("transform", "translate(400, 10)");
