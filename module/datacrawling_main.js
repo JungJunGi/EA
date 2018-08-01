@@ -16,6 +16,9 @@ request("http://165.246.39.81:54231/", (error, response, body) => {
         let $ = cheerio.load(body);
 
         try {
+
+
+            
             $('a').each(function(i, e){
                 let s = e.attribs.href;
                 s = s.split("?");
