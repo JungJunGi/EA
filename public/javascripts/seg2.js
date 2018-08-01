@@ -70,9 +70,6 @@ function drawChart(dataSet) {
     var newRamp = d3.scaleLinear().domain([0, 1, 2])
         .range(["limegreen", "green", "darkgreen"]);
 
-
-
-
     // ON svg
     var svg = d3.select('.seg2_chart') //d3.select("svg")
         .attr("width", width + 200)

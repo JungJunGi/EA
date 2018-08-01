@@ -11,7 +11,7 @@ var segRouter = require('./routes/segData');
 var inha_main = require('./routes/inha_main');
 var moneyLine_sub = require('./routes/moneyLine_sub').router;
 
-
+/*
 // 스케줄링 모듈
 var schedule = require('node-schedule');
 
@@ -25,7 +25,7 @@ var j = schedule.scheduleJob('30 59 23 * * *', function(){
   //scheduleinfo.contentsscore();
   console.log("scheduling finish!");
 });
-
+*/
 
 var app = express();
 

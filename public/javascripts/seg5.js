@@ -45,9 +45,6 @@ function Line_chart(meta, sData) {
 
     var yAxis = d3.axisLeft(yScale);
 
-    // 회사 이름
-    var name = svg5.append("g")
-
     var g = svg5.append("g")
         .attr("width", width)
         .attr("height", height)
@@ -75,10 +72,6 @@ function Line_chart(meta, sData) {
         .attr('fill', 'black')
         .style("font", "11px open-sans")
         .text("Price");
-
-    var line = d3.line()
-        .x(function (d) { return xScale(d.date); })
-        .y(function (d) { return yScale(d.money); });
 
     var lineFunction = d3.line()
         .x(function (d) { return xScale(d.date); })
