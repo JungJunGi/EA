@@ -79,13 +79,13 @@ print("dsitemDict ::: " + dsitemDict)
 # print(group_companyName)
 # print(dsitemDict)
 # print(group_companyDepart[0][0][1])
- 
-row = []
+
+
 dsitemD = {}
 dsitemL = []
 docD = {}
 metaD = {}
-
+dataNum = 0
 
 ### MongoDB access ###
 '''
@@ -96,40 +96,40 @@ for com in companyDict.keys():
     for dept in companyDict.get(com):
         for item in dsitemDict.keys():
             for year_n in year.keys():
+
                 for y in year.get(year_n):
-                    sql = "SELECT MDATETIME, DSITEMVAL FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B WHERE B.FromDSID = A.DSID AND A.DSID=%s AND A.DISTBDID=%s AND DSITEMID=%s"
-                    dataNum = cursor.execute(sql,(y,dept[0],dept[1],item))
+                    sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B  WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s"
+                    dataNum = cursor.execute(sql, (y, dept[0], dept[1], item))
                     row = [item for item in cursor.fetchall()]
                     for r in row:
-                        r=list(r)
-                        r[0]=str(r[0])
-                        r[1]=str(r[1])
-                        dsitemD["date"]=r[0]
-                        dsitemD["value"]=r[1]
+                        r = list(r)
+                        r[0] = str(r[0])
+                        r[1] = str(r[1])
+                        dsitemD["date"] = r[0]
+                        dsitemD["value"] = r[1]
                         dsitem = json.dumps(dsitemD)
                         dsitemL.append(dsitem)
-                metaD["company"]=comNameDict.get(com)
-                metaD["year"]=year_n
-                metaD["item"]=dsitemDict.get(item)
-                metaD["depart"]=dept[2]
-                docD["meta"]=metaD
-                docD["data"]=dsitemL
+
+                metaD["company"] = comNameDict.get(com)
+                metaD["year"] = year_n
+                metaD["item"] = dsitemDict.get(item)
+                metaD["depart"] = dept[2]
+                docD["meta"] = metaD
+                docD["data"] = dsitemL
                 docD = str(docD)
-                if len(dsitemL)!=0:
-                    filename='c:\\Users\\duksung1\\Desktop\\H\\LAB\\json\\'+comNameDict.get(com)+'\\'+str(dept[0])+'_'+str(dept[1])+'_'+str(item)+'_'+str(year_n)+'.json'
+                if len(dsitemL) != 0:
+                    filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
                     os.makedirs(os.path.dirname(filename), exist_ok=True)
                     f = open(filename, 'wt')
                     f.write(docD)
                 col = db[%s], comNameDict
-                dsitemD={}
-                dsitemL=[]
-                docD={}
-                metaD={}
-        
+                dsitemD = {}
+                dsitemL = []
+                docD = {}
+                metaD = {}
  
- 
- 
-#print(row)
-#print(group_date)
-#print(group_value)
+# print(row)
+# print(group_date)
+# print(group_value)
+
 '''
