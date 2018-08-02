@@ -1,6 +1,7 @@
 #import pymongo
 import time
 import sys
+import os
 import pymysql
 import json
  
@@ -15,18 +16,16 @@ group_value = []
 row = []
 
 companyNum = 0
-departNum = 0
+departNum = {}
 itemNum = 0
 
 year = {}
-print("year ? ::: " + type(year))
-
-data_2017 = [201706,201707,201708,201709,201710,201711,201712]
-data_2018 = [201801,201802,201803,201804,201805,201806,201807]
+data_2017 = [201706, 201707, 201708, 201709, 201710, 201711, 201712]
+data_2018 = [201801, 201802, 201803, 201804, 201805, 201806, 201807]
 year["2017"] = data_2017
 year["2018"] = data_2018
-print("year ? ::: " + type(year))
- 
+
+
 db = pymysql.connect(
                         host = "www.lems.mbz.kr",
                         user = "lems_user",
@@ -46,8 +45,6 @@ row = [item for item in cursor.fetchall()]
 group_companyId, group_companyName = zip(*row)
 comNameDict = dict(zip(group_companyId, group_companyName))
 
-print("comNameDict ::: " + comNameDict)
-
 
  
 ### Read DEPART info ###
@@ -57,9 +54,6 @@ for i in range(0, companyNum):
     row = [item for item in cursor.fetchall()]
     group_companyDepart.append(list(row))
 companyDict = dict(zip(group_companyId, group_companyDepart))
-
-# print(companyDict.get(27)[0])
-print("companyDict ::: " + companyDict)
 
 
 
@@ -71,15 +65,6 @@ row = [item for item in cursor.fetchall()]
 group_dsitemId, group_dsitemName = zip(*row)
 dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
-print("dsitemDict ::: " + dsitemDict)
-
-
-# print(group_companyDepart)
-# print(group_companyId)
-# print(group_companyName)
-# print(dsitemDict)
-# print(group_companyDepart[0][0][1])
-
 
 dsitemD = {}
 dsitemL = []
@@ -88,10 +73,10 @@ metaD = {}
 dataNum = 0
 
 ### MongoDB access ###
-'''
-client = pymongo.MongoClient('203.252.208.247',27017)
-db = client['349']
- 
+
+# client = pymongo.MongoClient('203.252.208.247',27017)
+# db = client['349']
+
 for com in companyDict.keys():
     for dept in companyDict.get(com):
         for item in dsitemDict.keys():
@@ -122,14 +107,15 @@ for com in companyDict.keys():
                     os.makedirs(os.path.dirname(filename), exist_ok=True)
                     f = open(filename, 'wt')
                     f.write(docD)
-                col = db[%s], comNameDict
+                    print(filename)
+                # col = db[%s], comNameDict
                 dsitemD = {}
                 dsitemL = []
                 docD = {}
                 metaD = {}
- 
+
+
 # print(row)
 # print(group_date)
 # print(group_value)
 
-'''
