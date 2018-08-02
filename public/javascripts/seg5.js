@@ -19,8 +19,8 @@ function Line_chart(meta, sData) {
 
     var my_format = d3.timeFormat("%m/%Y");
     Money_format = d3.format(",");
-    
-    var bisectDate = d3.bisector(function(d) { return d.date; }).left;
+
+    var bisectDate = d3.bisector(function (d) { return d.date; }).left;
 
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
@@ -98,6 +98,20 @@ function Line_chart(meta, sData) {
         })
         .attr('r', 5)
         .style("fill", "blue");
+    //money text
+    g.append("g")
+        .attr("class", "circle_text")
+        .selectAll('.circle_text')
+        .data(sData).enter().append('text')
+        .attr('x', function (d) {
+            return xScale(d.date) + 10;
+        })
+        .attr('y', function (d) {
+            return yScale(d.money) + 10;
+        })
+        .text(function (d) { return Money_format(Math.floor(d.money / 10) * 10) + "원" })
+        .style("fill", 'black').style("font_size", '14px');
+
 
     var focus = svg5.append("g")
         .attr("class", "focus")
@@ -143,12 +157,12 @@ function Line_chart(meta, sData) {
 
     svg5.append("rect")
         .attr("class", "overlay")
-        .attr("width", width+500)
-        .attr("height", height+500)
+        .attr("width", width + 500)
+        .attr("height", height + 500)
         .style("fill", "none")
         .style("pointer-events", "all")
-        .on("mouseover", function() { focus.style("display", null); })
-        .on("mouseout", function() { focus.style("display", "none"); })
+        .on("mouseover", function () { focus.style("display", null); })
+        .on("mouseout", function () { focus.style("display", "none"); })
         .on("mousemove", mousemove);
 
     function mousemove(d) {
@@ -163,7 +177,7 @@ function Line_chart(meta, sData) {
 
         focus.attr("transform", "translate(" + LineX + "," + LineY + ")");
         focus.select(".tooltip-date").text(my_format(d.date));
-        focus.select(".tooltip-money").text(Money_format(Math.round(d.money/10)*10)+"원"); //일의 자리 반올림
+        focus.select(".tooltip-money").text(Money_format(Math.round(d.money / 10) * 10) + "원"); //일의 자리 반올림
         focus.select(".x").attr("y2", height - yScale(d.money));
         focus.select(".y").attr("x2", width + width);
     }
