@@ -1,4 +1,4 @@
-# import pymongo
+#import pymongo
 import time
 import sys
 import os
@@ -19,51 +19,9 @@ companyNum = 0
 departNum = {}
 itemNum = 0
 
-year = {}
-data_2017 = [201706, 201707, 201708, 201709, 201710, 201711, 201712]
-data_2018 = [201801, 201802, 201803, 201804, 201805, 201806, 201807]
-year["2017"] = data_2017
-year["2018"] = data_2018
 
+filepath = "C:\Users\DS\Documents\mydata"
 
-db = pymysql.connect(
-                        host = "www.lems.mbz.kr",
-                        user = "lems_user",
-                        passwd = "Pass_%$#@",
-                        db = "POWERMON",
-                        port = 10336,
-                        charset = "euckr"
-                    )
-    
-cursor = db.cursor()
-
-
-### Read COMPANY id & name ###
-sql = "SELECT COMPANY_ID, COMPANY_NAME  FROM INFO_COMPANY"
-companyNum = cursor.execute(sql)
-row = [item for item in cursor.fetchall()]
-group_companyId, group_companyName = zip(*row)
-comNameDict = dict(zip(group_companyId, group_companyName))
-
-
- 
-### Read DEPART info ###
-for i in range(0, companyNum):
-    sql = "SELECT FromDSID, FromDISTBDID, DSNAME  FROM INFO_DS125_WebVersion  WHERE COMPANY_ID = %s AND FromDSID IS NOT NULL"
-    departNum = cursor.execute(sql, (group_companyId[i]))
-    row = [item for item in cursor.fetchall()]
-    group_companyDepart.append(list(row))
-companyDict = dict(zip(group_companyId, group_companyDepart))
-
-
-
- 
-### Read DSITEM id & name ###
-sql = "SELECT DSITEMID, DSITEMNAMEENG  FROM INFO_DS125_ITEM  ORDER BY DSITEMID"
-itemNum = cursor.execute(sql)
-row = [item for item in cursor.fetchall()]
-group_dsitemId, group_dsitemName = zip(*row)
-dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
 
 dsitemD = {}
@@ -73,9 +31,15 @@ metaD = {}
 dataNum = 0
 
 ### MongoDB access ###
+MONGO_HOST = "203.252.208.247"
+MONGO_PORT = 22
+MONGO_DB = "ourdb"
+MONGO_USER = "elec"
+MONGO_PASS = "vmlab347!"
 
-# client = pymongo.MongoClient('203.252.208.247',27017)
-# db = client['elec']
+con = pymongo.MongoClient(MONGO_HOST, MONGO_PORT)
+db = con[MONGO_DB]
+db.authenticate(MONGO_USER, MONGO_PASS)
 
 for com in companyDict.keys():
     for dept in companyDict.get(com):
@@ -105,17 +69,21 @@ for com in companyDict.keys():
                 if len(dsitemL) != 0:
                     filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
                     os.makedirs(os.path.dirname(filename), exist_ok=True)
-                    f = open(filename, 'wt')
-                    f.write(docD)
-                    print(filename)
+                    # f = open(filename, 'wt')
+                    # f.write(docD)
+                    # print(filename)
                 # col = db[%s], comNameDict
+                col = db[comNameDict]
+                post_id = col.insert_one(docD).inserted_id
+                print(post_id)
+
                 dsitemD = {}
                 dsitemL = []
                 docD = {}
                 metaD = {}
 
 
-# print(row)
-# print(group_date)
-# print(group_value)
 
+collection = db.collection_names(include_system_collections=False)
+for collect in collection:
+    print collect
