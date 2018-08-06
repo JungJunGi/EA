@@ -27,18 +27,17 @@ server = SSHTunnelForwarder(
 ### start ssh tunnel
 server.start()
 
-client = pymongo.MongoClient('127.0.0.1', 27017)
-print(client)
-
+client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
-print(db)
 
-# collection = db[MONGO_COLLECTION]
-collection = db.collection_names()
-print(collection)
 
-for collect in collection:
-    print(collect)
+collection = db[MONGO_COLLECTION]
+# collection.insert_one({"number":0})
+
+result = collection.find()
+for r in result:
+    print(r)
+
 
 ### close ssh tunnel
 server.stop()

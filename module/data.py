@@ -1,4 +1,6 @@
-# import pymongo
+
+from sshtunnel import SSHTunnelForwarder
+import pymongo
 import time
 import sys
 import os
@@ -65,19 +67,39 @@ row = [item for item in cursor.fetchall()]
 group_dsitemId, group_dsitemName = zip(*row)
 dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
-
 dsitemD = {}
 dsitemL = []
 docD = {}
 metaD = {}
 dataNum = 0
 
-### MongoDB access ###
 
-# client = pymongo.MongoClient('203.252.208.247',27017)
-# db = client['elec']
+
+### ready for mongodb access
+MONGO_HOST = "203.252.208.247"
+MONGO_PORT = 22
+MONGO_USER = "elec"
+MONGO_PASS = "vmlab347!"
+MONGO_DB = "Elec"
+MONGO_COLLECTION = ""
+
+### define ssh tunnel
+server = SSHTunnelForwarder(
+    MONGO_HOST,
+    ssh_username = MONGO_USER,
+    ssh_password = MONGO_PASS,
+    remote_bind_address = ('127.0.0.1', 27017)
+)
+
+### start ssh tunnel
+server.start()
+
+client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
+db = client[MONGO_DB]
 
 for com in companyDict.keys():
+    MONGO_COLLECTION = comNameDict.get(com)
+    collection = db[MONGO_COLLECTION]
     for dept in companyDict.get(com):
         for item in dsitemDict.keys():
             for year_n in year.keys():
@@ -105,17 +127,21 @@ for com in companyDict.keys():
                 if len(dsitemL) != 0:
                     filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
                     os.makedirs(os.path.dirname(filename), exist_ok=True)
-                    f = open(filename, 'wt')
-                    f.write(docD)
-                    print(filename)
-                # col = db[%s], comNameDict
+                    # f = open(filename, 'wt')
+                    # f.write(docD)
+                    # print(filename)
+                    collection.insert_one(docD)
+
                 dsitemD = {}
                 dsitemL = []
                 docD = {}
                 metaD = {}
 
 
-# print(row)
-# print(group_date)
-# print(group_value)
+collections = db.collection_names()
+for collect in collections:
+    print(collect)
 
+
+### close ssh tunnel
+server.stop()
