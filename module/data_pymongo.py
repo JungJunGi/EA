@@ -1,29 +1,89 @@
-#import pymongo
+# http://brownbears.tistory.com/282 #
+
+
+
+from sshtunnel import SSHTunnelForwarder
+import pymongo
 import time
 import sys
 import os
 import pymysql
 import json
- 
-### Ready for data ###
-group_companyId = [] 
-group_companyName = []
-group_companyDepart=[]
-companyDict = {}
-
-group_date = []
-group_value = []
-row = []
-
-companyNum = 0
-departNum = {}
-itemNum = 0
-
-
-filepath = "C:\Users\DS\Documents\mydata"
 
 
 
+MONGO_HOST = "203.252.208.247"
+MONGO_PORT = 22
+MONGO_USER = "elec"
+MONGO_PASS = "vmlab347!"
+MONGO_DB = "test"
+MONGO_COLLECTION = "t"
+
+# define ssh tunnel
+server = SSHTunnelForwarder(
+    MONGO_HOST,
+    ssh_username = MONGO_USER,
+    ssh_password = MONGO_PASS,
+    remote_bind_address = ('127.0.0.1', 27017)
+)
+
+# start ssh tunnel
+server.start()
+
+connection = pymongo.MongoClient(MONGO_HOST, MONGO_PORT)
+db = connection[MONGO_DB]
+collection = db[MONGO_COLLECTION]
+
+print(collection)
+
+#collection.insert({"number":0})
+
+collentionList = db.collection_names(include_system_collections=False)
+for c in collentionList:
+    print(c)
+
+result = collection.find()
+for r in result:
+    print(r)
+
+
+# collection = db.collection_names(include_system_collections=False)
+# for collect in collection:
+#     print(collect)
+
+# select collection
+# collection = db[MONGO_COLLECTION]
+
+
+
+# close ssh tunnel
+server.stop()
+
+
+
+
+
+'''
+company = []
+
+fpath = "C:\\Users\\DS\\Documents\\mydata"
+
+# 현재 폴더명, 현재폴더의 하위 디렉터리 목록, 파일명 목록
+for dirName, subDirList, fnames in os.walk(fpath) :
+    for subDir in subDirList :
+        company.append(subDir)
+
+# print(company)
+
+# for dirName, subDirList, fnames in os.walk(fpath) :
+#     for fname in fnames :
+#         myfile = os.path.join(dirName, fname)
+#         jsonfiles.append(myfile)
+
+# print(jsonfiles)
+'''
+
+'''
 dsitemD = {}
 dsitemL = []
 docD = {}
@@ -31,6 +91,7 @@ metaD = {}
 dataNum = 0
 
 ### MongoDB access ###
+
 MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_DB = "ourdb"
@@ -40,6 +101,8 @@ MONGO_PASS = "vmlab347!"
 con = pymongo.MongoClient(MONGO_HOST, MONGO_PORT)
 db = con[MONGO_DB]
 db.authenticate(MONGO_USER, MONGO_PASS)
+
+
 
 for com in companyDict.keys():
     for dept in companyDict.get(com):
@@ -83,7 +146,8 @@ for com in companyDict.keys():
                 metaD = {}
 
 
-
 collection = db.collection_names(include_system_collections=False)
 for collect in collection:
-    print collect
+    print(collect)
+
+'''
