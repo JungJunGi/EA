@@ -123,10 +123,10 @@ for com in companyDict.keys():
                 metaD["depart"] = dept[2]
                 docD["meta"] = metaD
                 docD["data"] = dsitemL
-                docD = str(docD)
+                # docD = str(docD)
                 if len(dsitemL) != 0:
-                    filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
-                    os.makedirs(os.path.dirname(filename), exist_ok=True)
+                    # filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
+                    # os.makedirs(os.path.dirname(filename), exist_ok=True)
                     # f = open(filename, 'wt')
                     # f.write(docD)
                     # print(filename)
