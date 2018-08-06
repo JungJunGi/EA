@@ -1,7 +1,5 @@
 # http://brownbears.tistory.com/282 #
 
-
-
 from sshtunnel import SSHTunnelForwarder
 import pymongo
 import time
@@ -10,16 +8,15 @@ import os
 import pymysql
 import json
 
-
-
+### ready for mongodb access
 MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "test"
-MONGO_COLLECTION = "t"
+MONGO_DB = "MongoTest"
+MONGO_COLLECTION = "test"
 
-# define ssh tunnel
+### define ssh tunnel
 server = SSHTunnelForwarder(
     MONGO_HOST,
     ssh_username = MONGO_USER,
@@ -27,36 +24,23 @@ server = SSHTunnelForwarder(
     remote_bind_address = ('127.0.0.1', 27017)
 )
 
-# start ssh tunnel
+### start ssh tunnel
 server.start()
 
-connection = pymongo.MongoClient(MONGO_HOST, MONGO_PORT)
-db = connection[MONGO_DB]
-collection = db[MONGO_COLLECTION]
+client = pymongo.MongoClient('127.0.0.1', 27017)
+print(client)
 
+db = client[MONGO_DB]
+print(db)
+
+# collection = db[MONGO_COLLECTION]
+collection = db.collection_names()
 print(collection)
 
-#collection.insert({"number":0})
+for collect in collection:
+    print(collect)
 
-collentionList = db.collection_names(include_system_collections=False)
-for c in collentionList:
-    print(c)
-
-result = collection.find()
-for r in result:
-    print(r)
-
-
-# collection = db.collection_names(include_system_collections=False)
-# for collect in collection:
-#     print(collect)
-
-# select collection
-# collection = db[MONGO_COLLECTION]
-
-
-
-# close ssh tunnel
+### close ssh tunnel
 server.stop()
 
 
