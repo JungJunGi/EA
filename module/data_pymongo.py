@@ -1,4 +1,3 @@
-# http://brownbears.tistory.com/282 #
 
 from sshtunnel import SSHTunnelForwarder
 import pymongo
