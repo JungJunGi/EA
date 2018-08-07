@@ -1,13 +1,15 @@
+
 var margin = { top: 50, right: 0, bottom: 100, left: 30 },
     width = 960,
     height = 330,
     gridSize = Math.floor(width / 24),
     legendElementWidth = gridSize * 2,
     buckets = 9,
-    colors = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"], // alternatively colorbrewer.YlGnBu[9]
+    colors = ["#ffff9b", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"], // alternatively colorbrewer.YlGnBu[9]
     days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
     times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 //datasets = ["data.tsv", "data2.tsv"];
+//ffffaa f9f986 ffffd9
 
 var m_svg = d3.select(".m_chart")
     .attr("width", width + margin.left + margin.right)
@@ -46,6 +48,7 @@ var heatmapChart = function (jsonFile) {
             .domain([0, buckets - 1, d3.max(data.data, (d) => d.value)])
             .range(colors);
 
+        //chart
         var cards = m_svg.append('g').selectAll(".hour")
             .data(data.data, function (d) { return d.day + ':' + d.hour; });
 
@@ -60,15 +63,26 @@ var heatmapChart = function (jsonFile) {
             .attr("width", gridSize)
             .attr("height", gridSize)
             .style("fill", colors[0])
+            .style('opacity', 0.7)
             .merge(cards)
+            
+            .on("mouseover", function(d){
+                d3.select(this)
+                //.style("stroke","black").style("stroke-width","2.7px")
+                .style('opacity', 1);
+            })
+            .on("mouseout", function (d) {
+                d3.select(this)
+                .style("stroke","#E6E6E6").style('opacity', 0.7);})
+
             .transition()
             .duration(1000)
             .style("fill", (d) => colorScale(d.value));
 
         cards.select("title").text((d) => d.value);
-
         cards.exit().remove();
 
+        //legend
         const legend = m_svg.append("g").selectAll(".legend")
             .data([0].concat(colorScale.quantiles()), (d) => d);
 
@@ -76,16 +90,17 @@ var heatmapChart = function (jsonFile) {
             .attr("class", "legend");
 
         legend_g.append("rect")
-            .attr("x", (d, i) => legendElementWidth * i+30)
+            .attr("x", (d, i) => legendElementWidth * i + 30)
             .attr("y", height)
             .attr("width", legendElementWidth)
             .attr("height", gridSize / 2)
-            .style("fill", (d, i) => colors[i]);
+            .style("fill", (d, i) => colors[i])
+            .style('opacity', 0.8);
 
         legend_g.append("text")
             .attr("class", "mono")
             .text((d) => "≥ " + Math.round(d))
-            .attr("x", (d, i) => legendElementWidth * i+30)
+            .attr("x", (d, i) => legendElementWidth * i + 30)
             .attr("y", height + gridSize);
 
         legend.exit().remove();
