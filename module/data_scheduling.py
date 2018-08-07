@@ -80,7 +80,7 @@ MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "Elec"
+MONGO_DB = "companyData"
 MONGO_COLLECTION = ""
 
 ### define ssh tunnel
@@ -97,6 +97,8 @@ server.start()
 client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
 
+
+'''
 for com in companyDict.keys():
     MONGO_COLLECTION = comNameDict.get(com)
     collection = db[MONGO_COLLECTION]
@@ -136,6 +138,21 @@ for com in companyDict.keys():
                 dsitemL = []
                 docD = {}
                 metaD = {}
+
+'''
+
+collections = db.collection_names()
+
+for collect in collections:
+    MONGO_COLLECTION = collect
+    collection = db[MONGO_COLLECTION]
+    result = collection.find({"meta.year":"2018"}, {"meta":1, "_id":0})
+
+    print(collect)
+    for r in result:
+        print(r) # dict
+    print()
+
 
 
 ### close ssh tunnel
