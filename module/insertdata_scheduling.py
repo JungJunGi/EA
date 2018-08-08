@@ -6,6 +6,20 @@ import sys
 import os
 import pymysql
 import json
+
+
+### Today ###
+today = time.localtime(time.time())
+
+year = str(today.tm_year)
+month = str(today.tm_mon)
+
+if month.__len__()<2:
+    month = "0" + month
+
+date = year + month
+
+
  
 ### Ready for data ###
 group_companyId = [] 
@@ -28,6 +42,8 @@ year["2017"] = data_2017
 year["2018"] = data_2018
 
 
+
+### Ready for mariadb connect ###
 db = pymysql.connect(
                         host = "www.lems.mbz.kr",
                         user = "lems_user",
@@ -40,6 +56,7 @@ db = pymysql.connect(
 cursor = db.cursor()
 
 
+
 ### Read COMPANY id & name ###
 sql = "SELECT COMPANY_ID, COMPANY_NAME  FROM INFO_COMPANY"
 companyNum = cursor.execute(sql)
@@ -48,7 +65,6 @@ group_companyId, group_companyName = zip(*row)
 comNameDict = dict(zip(group_companyId, group_companyName))
 
 
- 
 ### Read DEPART info ###
 for i in range(0, companyNum):
     sql = "SELECT FromDSID, FromDISTBDID, DSNAME  FROM INFO_DS125_WebVersion  WHERE COMPANY_ID = %s AND FromDSID IS NOT NULL"
@@ -58,8 +74,6 @@ for i in range(0, companyNum):
 companyDict = dict(zip(group_companyId, group_companyDepart))
 
 
-
- 
 ### Read DSITEM id & name ###
 sql = "SELECT DSITEMID, DSITEMNAMEENG  FROM INFO_DS125_ITEM  ORDER BY DSITEMID"
 itemNum = cursor.execute(sql)
@@ -67,23 +81,25 @@ row = [item for item in cursor.fetchall()]
 group_dsitemId, group_dsitemName = zip(*row)
 dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
+
+
+
+
 dsitemD = {}
 dsitemL = []
 docD = {}
 metaD = {}
 dataNum = 0
 
-
-
-### ready for mongodb access
+### Ready for mongodb access ###
 MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "Elec"
+MONGO_DB = "company_monthly"
 MONGO_COLLECTION = ""
 
-### define ssh tunnel
+### Define ssh tunnel ###
 server = SSHTunnelForwarder(
     MONGO_HOST,
     ssh_username = MONGO_USER,
@@ -91,11 +107,13 @@ server = SSHTunnelForwarder(
     remote_bind_address = ('127.0.0.1', 27017)
 )
 
-### start ssh tunnel
+### Start ssh tunnel ###
 server.start()
 
 client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
+
+
 
 for com in companyDict.keys():
     MONGO_COLLECTION = comNameDict.get(com)
@@ -119,6 +137,8 @@ for com in companyDict.keys():
 
                 metaD["company"] = comNameDict.get(com)
                 metaD["year"] = year_n
+                month = str(y)
+                metaD["month"] = month[4:]
                 metaD["item"] = dsitemDict.get(item)
                 metaD["depart"] = dept[2]
                 docD["meta"] = metaD
@@ -138,5 +158,6 @@ for com in companyDict.keys():
                 metaD = {}
 
 
-### close ssh tunnel
+
+### Close ssh tunnel ###
 server.stop()
