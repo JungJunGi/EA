@@ -35,13 +35,13 @@ companyNum = 0
 departNum = {}
 itemNum = 0
 
+'''
 year = {}
 data_2017 = [201706, 201707, 201708, 201709, 201710, 201711, 201712]
 data_2018 = [201801, 201802, 201803, 201804, 201805, 201806, 201807]
 year["2017"] = data_2017
 year["2018"] = data_2018
-
-
+'''
 
 ### Ready for mariadb connect ###
 db = pymysql.connect(
@@ -120,42 +120,38 @@ for com in companyDict.keys():
     collection = db[MONGO_COLLECTION]
     for dept in companyDict.get(com):
         for item in dsitemDict.keys():
-            for year_n in year.keys():
+            sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B  WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s"
+            dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item))
+            row = [item for item in cursor.fetchall()]
+            for r in row:
+                r = list(r)
+                r[0] = str(r[0])
+                r[1] = str(r[1])
+                dsitemD["date"] = r[0]
+                dsitemD["value"] = r[1]
+                dsitem = json.dumps(dsitemD)
+                dsitemL.append(dsitem)
 
-                for y in year.get(year_n):
-                    sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B  WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s"
-                    dataNum = cursor.execute(sql, (y, dept[0], dept[1], item))
-                    row = [item for item in cursor.fetchall()]
-                    for r in row:
-                        r = list(r)
-                        r[0] = str(r[0])
-                        r[1] = str(r[1])
-                        dsitemD["date"] = r[0]
-                        dsitemD["value"] = r[1]
-                        dsitem = json.dumps(dsitemD)
-                        dsitemL.append(dsitem)
+        metaD["company"] = comNameDict.get(com)
+        metaD["year"] = date[:4]
+        metaD["month"] = date[4:]
+        metaD["item"] = dsitemDict.get(item)
+        metaD["depart"] = dept[2]
+        docD["meta"] = metaD
+        docD["data"] = dsitemL
+        docD = str(docD)
+        if len(dsitemL) != 0:
+            filename = 'C:\\Users\\DS\\Documents\\mydata_monthly\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(date) + '.json'
+            os.makedirs(os.path.dirname(filename), exist_ok=True)
+            f = open(filename, 'wt')
+            f.write(docD)
+            print(filename)
+            # collection.insert_one(docD)
 
-                metaD["company"] = comNameDict.get(com)
-                metaD["year"] = year_n
-                month = str(y)
-                metaD["month"] = month[4:]
-                metaD["item"] = dsitemDict.get(item)
-                metaD["depart"] = dept[2]
-                docD["meta"] = metaD
-                docD["data"] = dsitemL
-                # docD = str(docD)
-                if len(dsitemL) != 0:
-                    # filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
-                    # os.makedirs(os.path.dirname(filename), exist_ok=True)
-                    # f = open(filename, 'wt')
-                    # f.write(docD)
-                    # print(filename)
-                    collection.insert_one(docD)
-
-                dsitemD = {}
-                dsitemL = []
-                docD = {}
-                metaD = {}
+        dsitemD = {}
+        dsitemL = []
+        docD = {}
+        metaD = {}
 
 
 

@@ -6,6 +6,7 @@ import sys
 import os
 import pymysql
 import json
+import datetime
 
 
  
@@ -25,10 +26,13 @@ itemNum = 0
 
 year = {}
 data_2017 = [201706, 201707, 201708, 201709, 201710, 201711, 201712]
-data_2018 = [201801, 201802, 201803, 201804, 201805, 201806, 201807]
+data_2018 = [201801, 201802, 201803, 201804, 201805, 201806, 201807, 201808]
 year["2017"] = data_2017
 year["2018"] = data_2018
 
+
+print("## Start !! ##")
+print(datetime.datetime.today())
 
 
 ### Ready for mariadb connect ###
@@ -84,7 +88,7 @@ MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "company_monthly"
+MONGO_DB = "companyData_monthly"
 MONGO_COLLECTION = ""
 
 ### Define ssh tunnel ###
@@ -149,3 +153,7 @@ for com in companyDict.keys():
 
 ### Close ssh tunnel ###
 server.stop()
+
+
+print("## Successfully Insert Data !! ##")
+print(datetime.datetime.today())
