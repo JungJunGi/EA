@@ -1,9 +1,14 @@
 var format = d3.timeFormat("%Y");
 
-var svg = d3.select(".area"),
+var svg = d3.select(".areaChart"),
     margin = { top: 20, right: 30, bottom: 30, left: 60 },
     width = +svg.attr("width"),
     height = +svg.attr("height");
+
+
+var bisectDate = d3.bisector(function (d) {
+    return d.date;
+}).left;
 
 d3.json('new.json', function (error, data) {
     var sData = data.data;
@@ -15,7 +20,7 @@ d3.json('new.json', function (error, data) {
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
 
-    var newD = new Date(x_min.getYear() + 1900,  0);
+    var newD = new Date(x_min.getYear() + 1900, 0);
 
     var series = d3.stack()
         .keys(data.depart)
@@ -33,10 +38,9 @@ d3.json('new.json', function (error, data) {
         .rangeRound([margin.left, width - margin.right])
         .padding(0.1);
     */
-
     var y = d3.scaleLinear()
         .domain([d3.min(series, stackMin), d3.max(series, stackMax)])
-        .range([height - margin.bottom, margin.top]);
+        .range([height - margin.bottom, margin.top]).nice();
 
     var z = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -52,12 +56,103 @@ d3.json('new.json', function (error, data) {
         .enter().append("g")
         .attr("fill", function (d) { return z(d.key); })
         .append('path')
-        .attr('class', 'area')
-        .attr('d', area);
+        .attr('class', "area")
+        .attr('d', area)
+        .on("mouseover", function (d) {
+
+            d3.select(this)                          //on mouseover of each line, give it a nice thick stroke
+                .style("stroke-width", '6px');
+
+            var selectthegraphs = $('.area').not(this);     //select all the rest of the lines, except the one you are hovering on and drop their opacity
+            d3.selectAll(selectthegraphs)
+                .style("opacity", 0.2);
+
+            var getname = document.getElementById(d.key);   //use get element cause the ID names have spaces in them
+            var selectlegend = $('.legend').not(getname);    //grab all the legend items that match the line you are on, except the one you are hovering on
+
+            d3.selectAll(selectlegend)    // drop opacity on other legend names
+                .style("opacity", .2);
+
+            d3.select(getname)
+                .attr("class", "legend-select");  //change the class on the legend name that corresponds to hovered line to be bolder    
+
+            focus.style("display", null);
+            tooltip.style("visibility", "visible");
+
+        }).on("mouseout", function (d) {        //undo everything on the mouseout
+            d3.select(this)
+                .style("stroke-width", '2.5px');
+
+            var selectthegraphs = $('.area').not(this);
+            d3.selectAll(selectthegraphs)
+                .style("opacity", 1);
+
+            var getname = document.getElementById(d.key);
+            var getname2 = $('.legend[fakeclass="fakelegend"]')
+            var selectlegend = $('.legend').not(getname2).not(getname);
+
+            d3.selectAll(selectlegend)
+                .style("opacity", 1);
+
+            d3.select(getname)
+                .attr("class", "legend");
+
+            focus.style("display", "none");
+            tooltip.style("visibility", "hidden");
+
+        }).on("mousemove", mousemove);
+
+    function mousemove(d) {
+        var key = d.key;
+
+        var x0 = x.invert(d3.mouse(this)[0]),
+            i = bisectDate(sData, x0, 1),
+            d0 = sData[i - 1],
+            d1 = sData[i],
+            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+
+        focus.attr("transform", "translate(" + x(d.date) + "," + y(sum(d, key)) + ")");
+ 
+        tooltip.style("top", y(sum(d, key)) + "px").style("left", (x(d.date) + 20) + "px");
+        tooltip.html("Date: " + format(d.date) + "<hr>" + text(d, key));
+
+    }
+
+    function sum(d, key) {
+        var sumd = 0;
+        for (var i = 0; i < data.depart.length; i++) {
+            if (key == data.depart[i]) {
+                sumd += d[data.depart[i]];
+                return sumd;
+            }
+            sumd += d[data.depart[i]];
+        }
+        return sumd;
+    }
+
+    function text(d,key) {
+        var text = "";
+        var sum = 0;
+        for (var i = 0; i < data.depart.length; i++) {
+            if (key == data.depart[i]) {
+                text += "<font color="+z(key)+"><b>"+data.depart[i] + "=" + d[data.depart[i]] + "</b></font></br>";
+            }
+            else{
+                text += data.depart[i] + "=" + d[data.depart[i]] + "</br>";
+            }
+           
+            sum += d[data.depart[i]];
+            console.log(data.depart[i])
+        }
+
+        text += "<hr><b>Total=" + sum + "</b>";
+        return text;
+    }
+
 
     var xAxis = d3.axisBottom(x)
-    //.tickFormat(format)
-    //.ticks(d3.timeYear);
+        .tickFormat(format)
+        .ticks(d3.timeYear);
 
     var yAxis = d3.axisLeft(y);
 
@@ -77,9 +172,34 @@ d3.json('new.json', function (error, data) {
         return d3.max(serie, function (d) { return d[1]; });
     }
 
-    //tooltip 추가
-    
-    
+    //toopltip 추가
+    var focus = svg.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+    focus.append("circle")
+        .attr("r", 5);
+
+    /*focus.append("line")
+        .attr("class", "x")
+        .style("stroke", "black")
+        .style("stroke-dasharray", "3,3")
+        .style("opacity", 1)
+        .attr("y1", 0)
+        .attr("y2", height);*/
+
+    var tooltip = d3.select("body")
+        .append("div")
+        .style("position", "absolute")
+        .style("z-index", "10")
+        .style("visibility", "hidden")
+        .style("color", "white")
+        .style("padding", "8px")
+        .style("background-color", "rgba(0, 0, 0, 0.75)")
+        .style("border-radius", "6px")
+        .style("font", "12px sans-serif")
+        .text("tooltip");
+
     //legend 추가
     var legendRectSize = 20;
     var legendSpacing = 1;
@@ -89,6 +209,7 @@ d3.json('new.json', function (error, data) {
         .selectAll('.legend')
         .data(series).enter().append('g')
         .attr("class", 'legend')
+        .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
             return 'translate(860,' + (((i + 5) * legendHeight) + (-45 * i)) + ')';
         });
@@ -102,6 +223,6 @@ d3.json('new.json', function (error, data) {
         .attr("x", 30).attr("y", 15)
         .text(function (d) { return d.key; })
         .style("fill", 'black').style("font_size", '14px');
-    
+
 
 });
