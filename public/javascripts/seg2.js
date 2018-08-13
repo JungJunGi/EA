@@ -1,7 +1,8 @@
+var svg2Size = d3.select('.seg2_chart');
 
 var margin = { top: 50, right: 40, bottom: 60, left: 50 },
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    width = +svg2Size.attr("width") - margin.left - margin.right,
+    height = +svg2Size.attr("height") - margin.top - margin.bottom;
 
 var xScale, xScale2, yScaleB, yScaleA;
 
