@@ -24,15 +24,17 @@ companyNum = 0
 departNum = {}
 itemNum = 0
 
+dsitemD = {}
+dsitemL = []
+docD = {}
+metaD = {}
+dataNum = 0
+
 year = {}
 data_2017 = [201706, 201707, 201708, 201709, 201710, 201711, 201712]
 data_2018 = [201801, 201802, 201803, 201804, 201805, 201806, 201807, 201808]
 year["2017"] = data_2017
 year["2018"] = data_2018
-
-
-print("## Start !! ##")
-print(datetime.datetime.today())
 
 
 ### Ready for mariadb connect ###
@@ -75,14 +77,6 @@ dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
 
 
-
-
-dsitemD = {}
-dsitemL = []
-docD = {}
-metaD = {}
-dataNum = 0
-
 ### Ready for mongodb access ###
 MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
@@ -102,14 +96,19 @@ server = SSHTunnelForwarder(
 ### Start ssh tunnel ###
 server.start()
 
+print("## Start !! ##")
+print(datetime.datetime.today())
+
+
+
 client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
-
 
 
 for com in companyDict.keys():
     MONGO_COLLECTION = comNameDict.get(com)
     collection = db[MONGO_COLLECTION]
+    print(MONGO_COLLECTION)
     for dept in companyDict.get(com):
         for item in dsitemDict.keys():
             for year_n in year.keys():
@@ -127,33 +126,33 @@ for com in companyDict.keys():
                         dsitem = json.dumps(dsitemD)
                         dsitemL.append(dsitem)
 
-                metaD["company"] = comNameDict.get(com)
-                metaD["year"] = year_n
-                month = str(y)
-                metaD["month"] = month[4:]
-                metaD["item"] = dsitemDict.get(item)
-                metaD["depart"] = dept[2]
-                docD["meta"] = metaD
-                docD["data"] = dsitemL
-                # docD = str(docD)
-                if len(dsitemL) != 0:
-                    # filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
-                    # os.makedirs(os.path.dirname(filename), exist_ok=True)
-                    # f = open(filename, 'wt')
-                    # f.write(docD)
-                    # print(filename)
-                    collection.insert_one(docD)
+                    metaD["company"] = comNameDict.get(com)
+                    metaD["year"] = year_n
+                    month = str(y)
+                    metaD["month"] = month[4:]
+                    metaD["item"] = dsitemDict.get(item)
+                    metaD["depart"] = dept[2]
+                    docD["meta"] = metaD
+                    docD["data"] = dsitemL
+                    if len(dsitemL) != 0:
+                        filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\'
+                        filename += str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '_' + str(month[4:]) + '.json'
+                        os.makedirs(os.path.dirname(filename), exist_ok=True)
+                        f = open(filename, 'wt')
+                        f.write(str(docD))
+                        # print(filename)
+                        collection.insert_one(docD)
 
-                dsitemD = {}
-                dsitemL = []
-                docD = {}
-                metaD = {}
+                    dsitemD = {}
+                    dsitemL = []
+                    docD = {}
+                    metaD = {}
 
-
-
-### Close ssh tunnel ###
-server.stop()
 
 
 print("## Successfully Insert Data !! ##")
 print(datetime.datetime.today())
+
+### Close ssh tunnel ###
+server.stop()
+
