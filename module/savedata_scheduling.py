@@ -10,29 +10,30 @@ import datetime
 import schedule
 
  
-### Ready for data ###
-group_companyId = [] 
-group_companyName = []
-group_companyDepart=[]
-companyDict = {}
-
-group_date = []
-group_value = []
-row = []
-
-companyNum = 0
-departNum = {}
-itemNum = 0
-
-dsitemD = {}
-dsitemL = []
-docD = {}
-metaD = {}
-dataNum = 0
-
-
 
 def job():
+
+    ### Ready for data ###
+    group_companyId = [] 
+    group_companyName = []
+    group_companyDepart=[]
+    companyDict = {}
+
+    group_date = []
+    group_value = []
+    row = []
+
+    companyNum = 0
+    departNum = {}
+    itemNum = 0
+
+    dsitemD = {}
+    dsitemL = []
+    docD = {}
+    metaD = {}
+    dataNum = 0
+
+
 
     ### Today is ... ###
     today = time.localtime(time.time())
@@ -158,7 +159,7 @@ def job():
 
 
 
-schedule.every().day.at("18:30").do(job)
+schedule.every().day.at("19:10").do(job)
 
 while True:
     schedule.run_pending()
