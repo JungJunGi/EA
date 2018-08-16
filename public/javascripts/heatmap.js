@@ -152,6 +152,7 @@ var heatmapChart = function (jsonFile) {
                 .style("fill", "white")
                 .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.name; });
+                
             node.append("text")
                 .attr("class", "label")
                 .attr("dy", ".4em")
