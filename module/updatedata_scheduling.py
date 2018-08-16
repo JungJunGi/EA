@@ -1,4 +1,7 @@
 
+### 매일 23시 59분에 해당날짜 데이터를 몽고디비에 !! ###
+### 김지연 ###
+
 from sshtunnel import SSHTunnelForwarder
 import pymongo
 import time
@@ -32,6 +35,7 @@ def job():
     docD = {}
     metaD = {}
     dataNum = 0
+    dd = {}
 
 
 
@@ -89,7 +93,7 @@ def job():
     MONGO_PORT = 22
     MONGO_USER = "elec"
     MONGO_PASS = "vmlab347!"
-    MONGO_DB = "companyData_20180813"
+    MONGO_DB = "mongo"
     MONGO_COLLECTION = ""
 
     ### Define ssh tunnel ###
@@ -104,19 +108,23 @@ def job():
     server.start()
 
     print("## Start !! ##")
-    print(datetime.datetime.today())
+    print("## ", datetime.datetime.today(), " ##")
 
     client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
     db = client[MONGO_DB]
 
+
+
     for com in companyDict.keys():
         MONGO_COLLECTION = comNameDict.get(com)
         collection = db[MONGO_COLLECTION]
-        print(MONGO_COLLECTION)
+        print(MONGO_COLLECTION, datetime.datetime.today())
+
         for dept in companyDict.get(com):
             for item in dsitemDict.keys():
-                sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B  WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s"
-                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item))
+                sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B "
+                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = CURDATE()"
+                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
                 row = [item for item in cursor.fetchall()]
                 for r in row:
                     r = list(r)
@@ -134,22 +142,26 @@ def job():
                 metaD["depart"] = dept[2]
                 docD["meta"] = metaD
                 docD["data"] = dsitemL
+                dd["meta"] = metaD
+
                 if len(dsitemL) != 0:
-                    # filename = 'C:\\Users\\DS\\Documents\\mydata_20180813\\' + comNameDict.get(com) + '\\'
-                    # filename += str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(date[:4]) + '_' + str(date[4:]) + '.json'
-                    # os.makedirs(os.path.dirname(filename), exist_ok=True)
-                    # f = open(filename, 'wt')
-                    # f.write(str(docD))
-                    # print(filename)
-                    collection.save(docD)
+                    d = collection.find_one(dd)
+
+                    if(d) :
+                        for i in dsitemL:
+                            collection.update({"_id":d["_id"]}, {"$push":{"data":i}})
+                    else :
+                        collection.insert_one(docD)
 
                 dsitemD = {}
                 dsitemL = []
                 docD = {}
                 metaD = {}
 
+
+
     print("## Successfully Insert Data !! ##")
-    print(datetime.datetime.today())
+    print("## ", datetime.datetime.today(), " ##")
 
     ### Close ssh tunnel ###
     server.stop()
@@ -157,9 +169,8 @@ def job():
 
 
 
-
-
-schedule.every().day.at("19:10").do(job)
+schedule.every().day.at("23:59").do(job)
+# schedule.every().hour.do(job)
 
 while True:
     schedule.run_pending()
