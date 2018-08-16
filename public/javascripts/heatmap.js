@@ -17,8 +17,8 @@ var margin = { top: 20, right: 0, bottom: 100, left: 30 },
 //#edf8b1
 
 var m_svg = d3.select(".m_chart")
-    //.attr("width", width + margin.left + margin.right)
-    //.attr("height", height + margin.top + margin.bottom)
+    .attr("width", 1300)
+    .attr("height", 480)
     .attr("transform", "translate(10,10)")
     .append('g');
 
