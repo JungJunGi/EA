@@ -127,7 +127,6 @@ var heatmapChart = function (jsonFile) {
             .ease(d3.easeBounce);
 
         function bubble_chart(d) {
-
             var root = d3.hierarchy(Hclasses(d))//data.data[0]
                 .sum(function (d) { return d.value; })
                 .sort(function (a, b) { return b.value - a.value; });//데이터 내림차수 정렬
