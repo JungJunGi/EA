@@ -17,8 +17,8 @@ var margin = { top: 20, right: 0, bottom: 100, left: 30 },
 //#edf8b1
 
 var m_svg = d3.select(".m_chart")
-    //.attr("width", width + margin.left + margin.right)
-    //.attr("height", height + margin.top + margin.bottom)
+    .attr("width", 1300)
+    .attr("height", 480)
     .attr("transform", "translate(10,10)")
     .append('g');
 
@@ -127,7 +127,6 @@ var heatmapChart = function (jsonFile) {
             .ease(d3.easeBounce);
 
         function bubble_chart(d) {
-
             var root = d3.hierarchy(Hclasses(d))//data.data[0]
                 .sum(function (d) { return d.value; })
                 .sort(function (a, b) { return b.value - a.value; });//데이터 내림차수 정렬
@@ -153,6 +152,7 @@ var heatmapChart = function (jsonFile) {
                 .style("fill", "white")
                 .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.name; });
+                
             node.append("text")
                 .attr("class", "label")
                 .attr("dy", ".4em")
