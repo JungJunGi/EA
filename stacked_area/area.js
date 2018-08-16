@@ -112,12 +112,11 @@ d3.json('new.json', function (error, data) {
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
         focus.attr("transform", "translate(" + x(d.date) + "," + y(sum(d, key)) + ")");
- 
+
         tooltip.style("top", y(sum(d, key)) + "px").style("left", (x(d.date) + 20) + "px");
         tooltip.html("Date: " + format(d.date) + "<hr>" + text(d, key));
 
     }
-
     function sum(d, key) {
         var sumd = 0;
         for (var i = 0; i < data.depart.length; i++) {
@@ -130,19 +129,18 @@ d3.json('new.json', function (error, data) {
         return sumd;
     }
 
-    function text(d,key) {
+    function text(d, key) {
         var text = "";
         var sum = 0;
         for (var i = 0; i < data.depart.length; i++) {
             if (key == data.depart[i]) {
-                text += "<font color="+z(key)+"><b>"+data.depart[i] + "=" + d[data.depart[i]] + "</b></font></br>";
+                text += "<font color=" + z(key) + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";
             }
-            else{
+            else {
                 text += data.depart[i] + "=" + d[data.depart[i]] + "</br>";
             }
-           
+
             sum += d[data.depart[i]];
-            console.log(data.depart[i])
         }
 
         text += "<hr><b>Total=" + sum + "</b>";

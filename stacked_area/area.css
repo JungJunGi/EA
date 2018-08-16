@@ -1,0 +1,8 @@
+body {
+    font: 10px sans-serif;
+}
+
+.focus circle {
+    fill: black;
+    stroke: white;
+}
