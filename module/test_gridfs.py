@@ -7,6 +7,7 @@ import os
 import pymysql
 import json
 import gridfs
+import datetime
  
 ### Ready for data ###
 group_companyId = [] 
@@ -21,6 +22,12 @@ row = []
 companyNum = 0
 departNum = {}
 itemNum = 0
+
+dsitemD = {}
+dsitemL = []
+docD = {}
+metaD = {}
+dataNum = 0
 
 year = {}
 data_2017 = [201706, 201707, 201708, 201709, 201710, 201711, 201712]
@@ -49,7 +56,6 @@ group_companyId, group_companyName = zip(*row)
 comNameDict = dict(zip(group_companyId, group_companyName))
 
 
- 
 ### Read DEPART info ###
 for i in range(0, companyNum):
     sql = "SELECT FromDSID, FromDISTBDID, DSNAME  FROM INFO_DS125_WebVersion  WHERE COMPANY_ID = %s AND FromDSID IS NOT NULL"
@@ -57,8 +63,6 @@ for i in range(0, companyNum):
     row = [item for item in cursor.fetchall()]
     group_companyDepart.append(list(row))
 companyDict = dict(zip(group_companyId, group_companyDepart))
-
-
 
  
 ### Read DSITEM id & name ###
@@ -68,12 +72,6 @@ row = [item for item in cursor.fetchall()]
 group_dsitemId, group_dsitemName = zip(*row)
 dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
-dsitemD = {}
-dsitemL = []
-docD = {}
-metaD = {}
-dataNum = 0
-
 
 
 ### ready for mongodb access
@@ -81,7 +79,7 @@ MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "Elec"
+MONGO_DB = "companyData"
 MONGO_COLLECTION = ""
 
 ### define ssh tunnel
@@ -95,18 +93,19 @@ server = SSHTunnelForwarder(
 ### start ssh tunnel
 server.start()
 
+print("## Start !! ##")
+print("##", datetime.datetime.today(), "##")
+
 client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
 
 
 
-
-com = 33 # 시흥해담채
+com = 40 # 신화개발
 MONGO_COLLECTION = comNameDict.get(com)
 collection = db[MONGO_COLLECTION]
 fs = gridfs.GridFS(db)
 
-print()
 
 for dept in companyDict.get(com):
     for item in dsitemDict.keys():
@@ -146,6 +145,8 @@ for dept in companyDict.get(com):
             docD = {}
             metaD = {}
 
+print("## Successfully Insert Data !! ##")
+print("##", datetime.datetime.today(), "##")
 
 
 ### close ssh tunnel

@@ -108,7 +108,7 @@ def job():
     server.start()
 
     print("## Start !! ##")
-    print("## ", datetime.datetime.today(), " ##")
+    print("##", datetime.datetime.today(), "##")
 
     client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
     db = client[MONGO_DB]
@@ -123,8 +123,8 @@ def job():
         for dept in companyDict.get(com):
             for item in dsitemDict.keys():
                 sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B "
-                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = CURDATE()"
-                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
+                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = %s"
+                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", "2018-08-18"))
                 row = [item for item in cursor.fetchall()]
                 for r in row:
                     r = list(r)
@@ -161,7 +161,7 @@ def job():
 
 
     print("## Successfully Insert Data !! ##")
-    print("## ", datetime.datetime.today(), " ##")
+    print("##", datetime.datetime.today(), "##")
 
     ### Close ssh tunnel ###
     server.stop()
@@ -169,7 +169,7 @@ def job():
 
 
 
-schedule.every().day.at("23:59").do(job)
+schedule.every().day.at("12:52").do(job)
 # schedule.every().hour.do(job)
 
 while True:
