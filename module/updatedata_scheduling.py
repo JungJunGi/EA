@@ -124,8 +124,8 @@ def job():
         for dept in companyDict.get(com):
             for item in dsitemDict.keys():
                 sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B "
-                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = %s"
-                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", "2018-08-18"))
+                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = CURDATE()"
+                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
                 row = [item for item in cursor.fetchall()]
                 for r in row:
                     r = list(r)
