@@ -20,21 +20,22 @@ def job():
     group_companyId = [] 
     group_companyName = []
     group_companyDepart=[]
-    companyDict = {}
 
-    group_date = []
-    group_value = []
+    comNameDict = {}
+    companyDict = {}
+    dsitemDict ={}
+
     row = []
 
     companyNum = 0
-    departNum = {}
+    departNum = 0
     itemNum = 0
+    dataNum = 0
 
     dsitemD = {}
     dsitemL = []
     docD = {}
     metaD = {}
-    dataNum = 0
     dd = {}
 
 
@@ -169,8 +170,8 @@ def job():
 
 
 
-schedule.every().day.at("12:52").do(job)
-# schedule.every().hour.do(job)
+
+schedule.every().day.at("23:59").do(job)
 
 while True:
     schedule.run_pending()
