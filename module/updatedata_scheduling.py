@@ -12,9 +12,31 @@ import json
 import datetime
 import schedule
 
+
  
+### Ready for mongodb access ###
+MONGO_HOST = "203.252.208.247"
+MONGO_PORT = 22
+MONGO_USER = "elec"
+MONGO_PASS = "vmlab347!"
+MONGO_DB = "companyData"
+MONGO_COLLECTION = ""
+
+### Define ssh tunnel ###
+server = SSHTunnelForwarder(
+    MONGO_HOST,
+    ssh_username = MONGO_USER,
+    ssh_password = MONGO_PASS,
+    remote_bind_address = ('127.0.0.1', 27017)
+)
+
+
 
 def job():
+
+    print("## Start !! ##")
+    print("##", datetime.datetime.today(), "##")
+
 
     ### Ready for data ###
     group_companyId = [] 
@@ -89,32 +111,8 @@ def job():
 
 
 
-    ### Ready for mongodb access ###
-    MONGO_HOST = "203.252.208.247"
-    MONGO_PORT = 22
-    MONGO_USER = "elec"
-    MONGO_PASS = "vmlab347!"
-    MONGO_DB = "companyData"
-    MONGO_COLLECTION = ""
-
-    ### Define ssh tunnel ###
-    server = SSHTunnelForwarder(
-        MONGO_HOST,
-        ssh_username = MONGO_USER,
-        ssh_password = MONGO_PASS,
-        remote_bind_address = ('127.0.0.1', 27017)
-    )
-
-    ### Start ssh tunnel ###
-    server.start()
-
-    print("## Start !! ##")
-    print("##", datetime.datetime.today(), "##")
-
     client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
     db = client[MONGO_DB]
-
-
 
     for com in companyDict.keys():
         MONGO_COLLECTION = comNameDict.get(com)
@@ -160,20 +158,30 @@ def job():
                 metaD = {}
 
 
-
     print("## Successfully Insert Data !! ##")
     print("##", datetime.datetime.today(), "##")
 
-    ### Close ssh tunnel ###
-    server.stop()
 
 
 
+def test():
+    print(datetime.datetime.today())
+
+
+
+
+
+
+### Start ssh tunnel ###
+server.start()
 
 
 schedule.every().day.at("23:59").do(job)
 
 while True:
     schedule.run_pending()
-    time.sleep(1)  # 1초마다 실행
+    time.sleep(1)
  
+
+### Close ssh tunnel ###
+server.stop()
