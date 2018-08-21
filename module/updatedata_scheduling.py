@@ -19,7 +19,7 @@ MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "companyData_"
+MONGO_DB = "companyData"
 MONGO_COLLECTION = ""
 
 ### Define ssh tunnel ###
