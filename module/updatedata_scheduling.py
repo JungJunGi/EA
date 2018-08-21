@@ -63,15 +63,19 @@ def job():
 
 
     ### Today is ... ###
-    today = time.localtime(time.time())
+    curtime = time.localtime(time.time())
 
-    year = str(today.tm_year)
-    month = str(today.tm_mon)
+    year = str(curtime.tm_year)
+    month = str(curtime.tm_mon)
+    mday = str(curtime.tm_mday)
 
     if month.__len__()<2:
         month = "0" + month
+    if mday.__len__()<2:
+        mday = "0" + mday
 
     date = year + month
+    today = year + "-" + month + "-" + mday
 
 
 
@@ -117,13 +121,12 @@ def job():
     for com in companyDict.keys():
         MONGO_COLLECTION = comNameDict.get(com)
         collection = db[MONGO_COLLECTION]
-        print(MONGO_COLLECTION, datetime.datetime.today())
 
         for dept in companyDict.get(com):
             for item in dsitemDict.keys():
                 sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B "
-                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = CURDATE()"
-                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
+                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = %s"
+                dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
                 row = [item for item in cursor.fetchall()]
                 for r in row:
                     r = list(r)
@@ -131,8 +134,7 @@ def job():
                     r[1] = str(r[1])
                     dsitemD["date"] = r[0]
                     dsitemD["value"] = r[1]
-                    dsitem = json.dumps(dsitemD)
-                    dsitemL.append(dsitem)
+                    dsitemL.append(dsitemD)
 
                 metaD["company"] = comNameDict.get(com)
                 metaD["year"] = date[:4]
@@ -144,6 +146,7 @@ def job():
                 dd["meta"] = metaD
 
                 if len(dsitemL) != 0:
+                    print(MONGO_COLLECTION, datetime.datetime.today())
                     d = collection.find_one(dd)
 
                     if(d) :
@@ -151,6 +154,7 @@ def job():
                             collection.update({"_id":d["_id"]}, {"$push":{"data":i}})
                     else :
                         collection.insert_one(docD)
+
 
                 dsitemD = {}
                 dsitemL = []
@@ -160,13 +164,6 @@ def job():
 
     print("## Successfully Insert Data !! ##")
     print("##", datetime.datetime.today(), "##")
-
-
-
-
-def test():
-    print(datetime.datetime.today())
-
 
 
 
