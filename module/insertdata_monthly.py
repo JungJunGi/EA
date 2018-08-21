@@ -82,7 +82,7 @@ MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "companyData_"
+MONGO_DB = "companyData__"
 MONGO_COLLECTION = ""
 
 ### Define ssh tunnel ###
@@ -112,7 +112,6 @@ for com in companyDict.keys():
     for dept in companyDict.get(com):
         for item in dsitemDict.keys():
             for year_n in year.keys():
-
                 for y in year.get(year_n):
                     sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B  WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) != CURDATE()"
                     dataNum = cursor.execute(sql, (y, dept[0], dept[1], item, "%Y-%m-%d"))
@@ -134,13 +133,7 @@ for com in companyDict.keys():
                     docD["meta"] = metaD
                     docD["data"] = dsitemL
                     if len(dsitemL) != 0:
-                        # filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\'
-                        # filename += str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '_' + str(month[4:]) + '.json'
-                        # os.makedirs(os.path.dirname(filename), exist_ok=True)
-                        # f = open(filename, 'wt')
-                        # f.write(str(docD))
-                        # print(filename)
-                        print(docD["meta"])
+                        print(docD["data"][0], docD["data"][1], docD["data"][2])
                         collection.insert_one(docD)
 
                     dsitemD = {}

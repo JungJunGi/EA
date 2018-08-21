@@ -76,7 +76,7 @@ def job():
 
     date = year + month
     today = year + "-" + month + "-" + mday
-
+    # today = "2018-08-19"
 
 
     ### Ready for mariadb connect ###
@@ -134,7 +134,7 @@ def job():
                     r[1] = str(r[1])
                     dsitemD["date"] = r[0]
                     dsitemD["value"] = r[1]
-                    dsitemL.append(dsitemD)
+                    dsitemL.append(json.dumps(dsitemD))
 
                 metaD["company"] = comNameDict.get(com)
                 metaD["year"] = date[:4]
