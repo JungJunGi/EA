@@ -107,7 +107,8 @@ db = client[MONGO_DB]
 for com in companyDict.keys():
     MONGO_COLLECTION = comNameDict.get(com)
     collection = db[MONGO_COLLECTION]
-    
+    print(MONGO_COLLECTION, datetime.datetime.today())
+
     for dept in companyDict.get(com):
         for item in dsitemDict.keys():
             for year_n in year.keys():
@@ -133,13 +134,13 @@ for com in companyDict.keys():
                     docD["meta"] = metaD
                     docD["data"] = dsitemL
                     if len(dsitemL) != 0:
-                        print(MONGO_COLLECTION, datetime.datetime.today())
                         # filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\'
                         # filename += str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '_' + str(month[4:]) + '.json'
                         # os.makedirs(os.path.dirname(filename), exist_ok=True)
                         # f = open(filename, 'wt')
                         # f.write(str(docD))
                         # print(filename)
+                        print(docD["meta"])
                         collection.insert_one(docD)
 
                     dsitemD = {}
