@@ -86,11 +86,14 @@ dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
 
 ### Data Format ###
-for com in companyDict.keys():  # 원하는 company name
+for com in companyDict.keys():  # 원하는 company
     for dept in companyDict.get(com):  # 원하는 company의 depart
         for item in dsitemDict.keys():  # 원하는 data item
-            sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B "
-            sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = CURDATE()"
+            sql = """
+            SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B 
+            WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
+            AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
+            """
             dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
             row = [item for item in cursor.fetchall()]
             for r in row:
