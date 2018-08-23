@@ -10,6 +10,9 @@ import json
 import datetime
 
 
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
+
 
 ### Ready for data ###
 group_companyId = [] 
@@ -35,17 +38,22 @@ metaD = {}
 dd = {}
 
 
-
 ### Today is ... ###
-today = time.localtime(time.time())
+curtime = time.localtime(time.time())
 
-year = str(today.tm_year)
-month = str(today.tm_mon)
+year = str(curtime.tm_year)
+month = str(curtime.tm_mon)
+mday = str(curtime.tm_mday)
 
 if month.__len__()<2:
     month = "0" + month
+if mday.__len__()<2:
+    mday = "0" + mday
 
 date = year + month
+today = year + "-" + month + "-" + mday
+# today = "2018-08-22"
+
 
 
 
@@ -85,10 +93,20 @@ row = [item for item in cursor.fetchall()]
 group_dsitemId, group_dsitemName = zip(*row)
 dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
+
+
+c = sys.argv[1]
+# print(c)
+
 for k in comNameDict.keys():
-    if comNameDict.get(k) == sys.argv[1]:
-        com = comNameDict.get(k)
+    if comNameDict.get(k) == c:
+        com = k
         break
+
+# c = c.encode('utf-8')
+# print(c)
+
+# print(com)
 
 ### Data Format ###
 for dept in companyDict.get(com):  # 원하는 company의 depart
@@ -98,7 +116,7 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
         WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
         AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
         """
-        dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
+        dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
         row = [item for item in cursor.fetchall()]
         for r in row:
             r = list(r)
@@ -106,8 +124,8 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
             r[1] = str(r[1])
             dsitemD["date"] = r[0]
             dsitemD["value"] = r[1]
-            dsitem = json.dumps(dsitemD)
-            dsitemL.append(dsitem)
+            # dsitem = json.dumps(dsitemD)
+            dsitemL.append(dsitemD)
 
         metaD["company"] = comNameDict.get(com)
         metaD["year"] = date[:4]
@@ -118,8 +136,10 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
         docD["data"] = dsitemL
         dd["meta"] = metaD
 
-        if len(dsitemL) != 0:
-            print(docD)
+        print(dd)
+
+        # if len(dsitemL) != 0:
+        #     print(docD)
 
         dsitemD = {}
         dsitemL = []
