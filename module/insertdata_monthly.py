@@ -113,7 +113,11 @@ for com in companyDict.keys():
         for item in dsitemDict.keys():
             for year_n in year.keys():
                 for y in year.get(year_n):
-                    sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B  WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) != CURDATE()"
+                    sql = """
+                    SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B 
+                    WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
+                    AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) != CURDATE()
+                    """
                     dataNum = cursor.execute(sql, (y, dept[0], dept[1], item, "%Y-%m-%d"))
                     row = [item for item in cursor.fetchall()]
                     for r in row:
@@ -122,7 +126,7 @@ for com in companyDict.keys():
                         r[1] = str(r[1])
                         dsitemD["date"] = r[0]
                         dsitemD["value"] = r[1]
-                        dsitemL.append(dsitemD)
+                        dsitemL.append(json.dumps(dsitemD))
 
                     metaD["company"] = comNameDict.get(com)
                     metaD["year"] = year_n
@@ -133,7 +137,7 @@ for com in companyDict.keys():
                     docD["meta"] = metaD
                     docD["data"] = dsitemL
                     if len(dsitemL) != 0:
-                        print(docD["data"][0], docD["data"][1], docD["data"][2])
+                        print(docD["meta"])
                         collection.insert_one(docD)
 
                     dsitemD = {}

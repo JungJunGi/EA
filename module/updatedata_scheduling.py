@@ -76,7 +76,7 @@ def job():
 
     date = year + month
     today = year + "-" + month + "-" + mday
-    # today = "2018-08-19"
+    # today = "2018-08-22"
 
 
     ### Ready for mariadb connect ###
@@ -124,8 +124,11 @@ def job():
 
         for dept in companyDict.get(com):
             for item in dsitemDict.keys():
-                sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B "
-                sql += "WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s AND DATE_FORMAT(MDATETIME, %s) = %s"
+                sql = """
+                SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B 
+                WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
+                AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
+                """
                 dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
                 row = [item for item in cursor.fetchall()]
                 for r in row:
@@ -146,7 +149,7 @@ def job():
                 dd["meta"] = metaD
 
                 if len(dsitemL) != 0:
-                    print(MONGO_COLLECTION, datetime.datetime.today())
+                    print(docD["meta"])
                     d = collection.find_one(dd)
 
                     if(d) :
@@ -173,7 +176,7 @@ def job():
 server.start()
 
 
-schedule.every().day.at("23:59").do(job)
+schedule.every().day.at("13:19").do(job)
 
 while True:
     schedule.run_pending()

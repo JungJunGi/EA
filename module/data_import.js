@@ -20,10 +20,16 @@ var server = tunnel(config, function (error, data) {
         if (err) {
             return;
         }
-        var db = database.db('mongo');
-        db.collection('신화개발').findOne({}, function (findErr, data) {
+        var db = database.db('companyData');
+        var query = {"meta.year":"2018", "meta.month":"08", "meta.item":"ELECTRIC_CHARGE"};
+        db.collection('(주)에이엔씨코리아').findOne(query, function (findErr, data) {
             if (findErr) throw findErr;
             console.log(data);
+            
+            data.forEach(function(element){
+                console.log(element);
+            });
+            
         });
     });
 });
