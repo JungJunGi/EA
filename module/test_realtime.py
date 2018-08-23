@@ -85,6 +85,13 @@ group_dsitemId, group_dsitemName = zip(*row)
 dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
 
+
+for k in comNameDict.keys():
+    if comNameDict.get(k) == '코비스':
+        print(k, comNameDict.get(k))
+        break
+
+'''
 ### Data Format ###
 for com in companyDict.keys():  # 원하는 company
     for dept in companyDict.get(com):  # 원하는 company의 depart
@@ -121,3 +128,4 @@ for com in companyDict.keys():  # 원하는 company
             dsitemL = []
             docD = {}
             metaD = {}
+'''

@@ -105,6 +105,9 @@ client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
 
 for com in companyDict.keys():
+    if com < 69:
+        continue
+        
     MONGO_COLLECTION = comNameDict.get(com)
     collection = db[MONGO_COLLECTION]
     print(MONGO_COLLECTION, datetime.datetime.today())
