@@ -40,6 +40,18 @@ var server = tunnel(config, function (error, data) {
             if (findErr) throw findErr;
             /*console.log(data);
             
+            //data parsing
+            /*var mapdata = data.map(v => mymap(v));
+            
+            function mymap(v) {
+                var data = v.data.map(function (v2) { return JSON.parse(v2);});
+                var meta = v.meta;
+                var result = {meta, data}
+                
+                return result;
+            }
+            */
+            
             data.forEach(function(element){
                 console.log(element);
             });*/
