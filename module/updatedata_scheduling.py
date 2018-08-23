@@ -176,7 +176,7 @@ def job():
 server.start()
 
 
-schedule.every().day.at("13:19").do(job)
+schedule.every().day.at("23:58").do(job)
 
 while True:
     schedule.run_pending()

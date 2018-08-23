@@ -10,6 +10,9 @@ import json
 import datetime
 
 
+# reload(sys)
+# sys.setdefaultencoding('utf-8')
+
 
 ### Ready for data ###
 group_companyId = [] 
@@ -34,17 +37,22 @@ metaD = {}
 dd = {}
 
 
-
 ### Today is ... ###
-today = time.localtime(time.time())
+curtime = time.localtime(time.time())
 
-year = str(today.tm_year)
-month = str(today.tm_mon)
+year = str(curtime.tm_year)
+month = str(curtime.tm_mon)
+mday = str(curtime.tm_mday)
 
 if month.__len__()<2:
     month = "0" + month
+if mday.__len__()<2:
+    mday = "0" + mday
 
 date = year + month
+today = year + "-" + month + "-" + mday
+# today = "2018-08-22"
+
 
 
 
@@ -86,46 +94,51 @@ dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
 
 
+### Company name -> id ###
+c = sys.argv[1]
+com = ""
+
 for k in comNameDict.keys():
-    if comNameDict.get(k) == '코비스':
-        print(k, comNameDict.get(k))
+    if comNameDict.get(k) == c:
+        com = k
         break
 
-'''
-### Data Format ###
-for com in companyDict.keys():  # 원하는 company
-    for dept in companyDict.get(com):  # 원하는 company의 depart
-        for item in dsitemDict.keys():  # 원하는 data item
-            sql = """
-            SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B 
-            WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
-            AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
-            """
-            dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
-            row = [item for item in cursor.fetchall()]
-            for r in row:
-                r = list(r)
-                r[0] = str(r[0])
-                r[1] = str(r[1])
-                dsitemD["date"] = r[0]
-                dsitemD["value"] = r[1]
-                dsitem = json.dumps(dsitemD)
-                dsitemL.append(dsitem)
 
-            metaD["company"] = comNameDict.get(com)
-            metaD["year"] = date[:4]
-            metaD["month"] = date[4:]
-            metaD["item"] = dsitemDict.get(item)
-            metaD["depart"] = dept[2]
-            docD["meta"] = metaD
-            docD["data"] = dsitemL
-            dd["meta"] = metaD
 
-            if len(dsitemL) != 0:
-                print(docD)
+### Get Company Data ###
+for dept in companyDict.get(com):  # 원하는 company의 depart
+    for item in dsitemDict.keys():  # 원하는 data item
+        sql = """
+        SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B 
+        WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
+        AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
+        """
+        dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
+        row = [item for item in cursor.fetchall()]
+        for r in row:
+            r = list(r)
+            r[0] = str(r[0])
+            r[1] = str(r[1])
+            dsitemD["date"] = r[0]
+            dsitemD["value"] = r[1]
+            # dsitem = json.dumps(dsitemD)
+            dsitemL.append(dsitemD)
 
-            dsitemD = {}
-            dsitemL = []
-            docD = {}
-            metaD = {}
-'''
+        metaD["company"] = comNameDict.get(com)
+        metaD["year"] = date[:4]
+        metaD["month"] = date[4:]
+        metaD["item"] = dsitemDict.get(item)
+        metaD["depart"] = dept[2]
+        docD["meta"] = metaD
+        docD["data"] = dsitemL
+        dd["meta"] = metaD
+
+        print(dd)
+
+        # if len(dsitemL) != 0:
+        #     print(docD)
+
+        dsitemD = {}
+        dsitemL = []
+        docD = {}
+        metaD = {}
