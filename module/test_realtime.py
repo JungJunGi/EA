@@ -26,6 +26,7 @@ companyNum = 0
 departNum = 0
 itemNum = 0
 dataNum = 0
+com = ""
 
 dsitemD = {}
 dsitemL = []
@@ -84,40 +85,43 @@ row = [item for item in cursor.fetchall()]
 group_dsitemId, group_dsitemName = zip(*row)
 dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
+for k in comNameDict.keys():
+    if comNameDict.get(k) == sys.argv[1]:
+        com = comNameDict.get(k)
+        break
 
 ### Data Format ###
-for com in companyDict.keys():  # 원하는 company
-    for dept in companyDict.get(com):  # 원하는 company의 depart
-        for item in dsitemDict.keys():  # 원하는 data item
-            sql = """
-            SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B 
-            WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
-            AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
-            """
-            dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
-            row = [item for item in cursor.fetchall()]
-            for r in row:
-                r = list(r)
-                r[0] = str(r[0])
-                r[1] = str(r[1])
-                dsitemD["date"] = r[0]
-                dsitemD["value"] = r[1]
-                dsitem = json.dumps(dsitemD)
-                dsitemL.append(dsitem)
+for dept in companyDict.get(com):  # 원하는 company의 depart
+    for item in dsitemDict.keys():  # 원하는 data item
+        sql = """
+        SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B 
+        WHERE A.DSID = B.FromDSID    AND A.DISTBDID = B.FromDISTBDID 
+        AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
+        """
+        dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d"))
+        row = [item for item in cursor.fetchall()]
+        for r in row:
+            r = list(r)
+            r[0] = str(r[0])
+            r[1] = str(r[1])
+            dsitemD["date"] = r[0]
+            dsitemD["value"] = r[1]
+            dsitem = json.dumps(dsitemD)
+            dsitemL.append(dsitem)
 
-            metaD["company"] = comNameDict.get(com)
-            metaD["year"] = date[:4]
-            metaD["month"] = date[4:]
-            metaD["item"] = dsitemDict.get(item)
-            metaD["depart"] = dept[2]
-            docD["meta"] = metaD
-            docD["data"] = dsitemL
-            dd["meta"] = metaD
+        metaD["company"] = comNameDict.get(com)
+        metaD["year"] = date[:4]
+        metaD["month"] = date[4:]
+        metaD["item"] = dsitemDict.get(item)
+        metaD["depart"] = dept[2]
+        docD["meta"] = metaD
+        docD["data"] = dsitemL
+        dd["meta"] = metaD
 
-            if len(dsitemL) != 0:
-                print(docD)
+        if len(dsitemL) != 0:
+            print(docD)
 
-            dsitemD = {}
-            dsitemL = []
-            docD = {}
-            metaD = {}
+        dsitemD = {}
+        dsitemL = []
+        docD = {}
+        metaD = {}
