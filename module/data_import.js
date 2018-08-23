@@ -20,20 +20,6 @@ var server = tunnel(config, function (error, data) {
         if (err) {
             return;
         }
-
-        
-         //data parsing
-         /*var mapdata = data.map(v => mymap(v));
-            
-         function mymap(v) {
-             var data = v.data.map(function (v2) { return JSON.parse(v2);});
-             var meta = v.meta;
-             var result = {meta, data}
-             
-             return result;
-         }*/
-
-
         var db = database.db('mongo');
         db.collection('신화개발').findOne({}, function (findErr, data) {
             if (findErr) throw findErr;

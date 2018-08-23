@@ -135,14 +135,14 @@ var heatmapChart = function (jsonFile) {
             node = m_svg.append('g')
                 .attr("transform", "translate(1000, 00)")
                 .selectAll(".node")
-                .data(root.children)
+                .data(root.children) //데이터 최대 10만 가져오기
                 .enter().append("g")
                 .attr("class", "node")
                 .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
 
             node.append("circle")
                 .transition(trans) //transition적용
-                .attr("r", function (d) { if (d.value != 0) return d.r; })
+                .attr("r", function (d) { return d.r; })
                 .style("fill", (d) => colorScale(d.value));
 
             node.append("text")
@@ -150,15 +150,15 @@ var heatmapChart = function (jsonFile) {
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
                 .style("fill", "white")
-                .attr("transform", "translate(0,-10)")
+                .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.name; });
-
+                
             node.append("text")
                 .attr("class", "label")
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
                 .style("fill", "white")
-                .attr("transform", "translate(0,10)")
+                .attr("transform", function (d) { return "translate(0,10)"; })
                 .text(function (d) { if (d.value != 0) return d.value; });
         }
     });
