@@ -4,6 +4,8 @@ var url = 'mongodb://localhost:27017';
 
 var tunnel = require('tunnel-ssh'); //ssh-tunneling
 var PythonShell  = require('python-shell'); //python 호출
+// var iconv  = require('iconv').Iconv; //인코딩 관련
+var urlencode  = require('urlencode') //인코딩 관련
 
 var config = {
     username: 'elec',
@@ -23,7 +25,29 @@ var options = {
 PythonShell.run('test_realtime.py', options, function (err, results) {
     if (err) throw err;
     // results is an array consisting of messages collected during execution
-    console.log('results: %j', results);
+    //e = JSON.parse(results[0])
+    r = JSON.parse(results[0].replace(/\'/gi, "\""))
+    console.log(r);
+    console.log(typeof(r));
+
+
+    // console.log("From Python ::: ")
+    // results.forEach(element => {
+    // el = '{"meta":"100"}'
+
+    // //     //console.log(typeof(el))
+    // e = JSON.parse(el)
+    // console.log(e)
+    // console.log(typeof(e))
+       
+        
+    //     //console.log(urlencode.decode(el))
+
+    //     // console.log(encodeURI(el))
+    //     // console.log(decodeURI(el))
+        
+        
+    // });
 });
 
 var server = tunnel(config, function (error, data) {
@@ -50,7 +74,7 @@ var server = tunnel(config, function (error, data) {
                 
                 return result;
             }
-            */
+            
             
             data.forEach(function(element){
                 console.log(element);
@@ -60,6 +84,6 @@ var server = tunnel(config, function (error, data) {
     });
 });
 
-setTimeout(function () {
-    server.close();
-}, 2000)
+// setTimeout(function () {
+//     server.close();
+// }, 2000)
