@@ -13,24 +13,6 @@ import datetime
 import schedule
 
 
- 
-### Ready for mongodb access ###
-MONGO_HOST = "203.252.208.247"
-MONGO_PORT = 22
-MONGO_USER = "elec"
-MONGO_PASS = "vmlab347!"
-MONGO_DB = "companyData"
-MONGO_COLLECTION = ""
-
-### Define ssh tunnel ###
-server = SSHTunnelForwarder(
-    MONGO_HOST,
-    ssh_username = MONGO_USER,
-    ssh_password = MONGO_PASS,
-    remote_bind_address = ('127.0.0.1', 27017)
-)
-
-
 
 def job():
 
@@ -173,10 +155,25 @@ def job():
 
 
 
+### Ready for mongodb access ###
+MONGO_HOST = "203.252.208.247"
+MONGO_PORT = 22
+MONGO_USER = "elec"
+MONGO_PASS = "vmlab347!"
+MONGO_DB = "companyData"
+MONGO_COLLECTION = ""
+
+### Define ssh tunnel ###
+server = SSHTunnelForwarder(
+    MONGO_HOST,
+    ssh_username = MONGO_USER,
+    ssh_password = MONGO_PASS,
+    remote_bind_address = ('127.0.0.1', 27017)
+)
+
 
 ### Start ssh tunnel ###
 server.start()
-
 
 schedule.every().day.at("23:58").do(job)
 
@@ -184,6 +181,5 @@ while True:
     schedule.run_pending()
     time.sleep(1)
  
-
 ### Close ssh tunnel ###
 server.stop()
