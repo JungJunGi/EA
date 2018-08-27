@@ -121,7 +121,6 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
             r[1] = str(r[1])
             dsitemD["date"] = r[0]
             dsitemD["value"] = r[1]
-            # dsitem = json.dumps(dsitemD)
             dsitemL.append(dsitemD)
 
         metaD["company"] = comNameDict.get(com)
@@ -131,12 +130,8 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
         metaD["depart"] = dept[2]
         docD["meta"] = metaD
         docD["data"] = dsitemL
-        dd["meta"] = metaD
 
-        print(dd)
-
-        # if len(dsitemL) != 0:
-        #     print(docD)
+        print(docD)  # 내보내기
 
         dsitemD = {}
         dsitemL = []

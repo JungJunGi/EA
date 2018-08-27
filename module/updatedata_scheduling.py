@@ -55,7 +55,6 @@ def job():
     dataNum = 0
 
     dsitemD = {}
-    dsitemL = []
     docD = {}
     metaD = {}
     dd = {}
@@ -76,7 +75,6 @@ def job():
 
     date = year + month
     today = year + "-" + month + "-" + mday
-    # today = "2018-08-22"
 
 
     ### Ready for mariadb connect ###
@@ -165,7 +163,6 @@ def job():
                 
                 # 초기화
                 dsitemD = {}
-                dsitemL = []
                 docD = {}
                 metaD = {}
 
