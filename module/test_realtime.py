@@ -51,8 +51,6 @@ if mday.__len__()<2:
 
 date = year + month
 today = year + "-" + month + "-" + mday
-# today = "2018-08-22"
-
 
 
 
