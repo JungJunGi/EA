@@ -119,6 +119,7 @@ def job():
     db = client[MONGO_DB]
 
     for com in companyDict.keys():
+
         MONGO_COLLECTION = comNameDict.get(com)
         collection = db[MONGO_COLLECTION]
 
@@ -130,14 +131,10 @@ def job():
                 AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
                 """
                 dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
-                row = [item for item in cursor.fetchall()]
-                for r in row:
-                    r = list(r)
-                    r[0] = str(r[0])
-                    r[1] = str(r[1])
-                    dsitemD["date"] = r[0]
-                    dsitemD["value"] = r[1]
-                    dsitemL.append(json.dumps(dsitemD))
+
+                # 데이터가 존재하지 않으면 continue
+                if dataNum == 0:
+                    continue
 
                 metaD["company"] = comNameDict.get(com)
                 metaD["year"] = date[:4]
@@ -145,20 +142,28 @@ def job():
                 metaD["item"] = dsitemDict.get(item)
                 metaD["depart"] = dept[2]
                 docD["meta"] = metaD
-                docD["data"] = dsitemL
-                dd["meta"] = metaD
+                docD["data"] = []
 
-                if len(dsitemL) != 0:
-                    print(docD["meta"])
+                dd["meta"] = metaD
+                d = collection.find_one(dd)
+
+                # 해당 meta data가 존재하지 않으면 생성
+                if(not(d)) :
+                    collection.insert_one(docD)
                     d = collection.find_one(dd)
 
-                    if(d) :
-                        for i in dsitemL:
-                            collection.update({"_id":d["_id"]}, {"$push":{"data":i}})
-                    else :
-                        collection.insert_one(docD)
+                print(docD["meta"])
 
-
+                row = [item for item in cursor.fetchall()]
+                for r in row:
+                    r = list(r)
+                    r[0] = str(r[0])
+                    r[1] = str(r[1])
+                    dsitemD["date"] = r[0]
+                    dsitemD["value"] = r[1]
+                    collection.update({"_id":d["_id"]}, {"$push":{"data":dsitemD}})
+                
+                # 초기화
                 dsitemD = {}
                 dsitemL = []
                 docD = {}

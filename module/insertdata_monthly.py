@@ -26,12 +26,13 @@ row = []
 companyNum = 0
 departNum = {}
 itemNum = 0
+dataNum = 0
 
 dsitemD = {}
 dsitemL = []
 docD = {}
 metaD = {}
-dataNum = 0
+dd = {}
 
 year = {}
 data_2017 = [201706, 201707, 201708, 201709, 201710, 201711, 201712]
@@ -105,9 +106,7 @@ client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
 
 for com in companyDict.keys():
-    if com < 69:
-        continue
-        
+
     MONGO_COLLECTION = comNameDict.get(com)
     collection = db[MONGO_COLLECTION]
     print(MONGO_COLLECTION, datetime.datetime.today())
@@ -122,14 +121,10 @@ for com in companyDict.keys():
                     AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) != CURDATE()
                     """
                     dataNum = cursor.execute(sql, (y, dept[0], dept[1], item, "%Y-%m-%d"))
-                    row = [item for item in cursor.fetchall()]
-                    for r in row:
-                        r = list(r)
-                        r[0] = str(r[0])
-                        r[1] = str(r[1])
-                        dsitemD["date"] = r[0]
-                        dsitemD["value"] = r[1]
-                        dsitemL.append(json.dumps(dsitemD))
+
+                    # 데이터가 존재하지 않으면 continue
+                    if dataNum == 0:
+                        continue
 
                     metaD["company"] = comNameDict.get(com)
                     metaD["year"] = year_n
@@ -138,11 +133,29 @@ for com in companyDict.keys():
                     metaD["item"] = dsitemDict.get(item)
                     metaD["depart"] = dept[2]
                     docD["meta"] = metaD
-                    docD["data"] = dsitemL
-                    if len(dsitemL) != 0:
-                        print(docD["meta"])
-                        collection.insert_one(docD)
+                    docD["data"] = []
 
+                    dd["meta"] = metaD
+                    d = collection.find_one(dd)
+
+                    # 해당 meta data가 존재하지 않으면 생성
+                    if(not(d)) :
+                        collection.insert_one(docD)
+                        d = collection.find_one(dd)
+
+                    print(docD["meta"])
+
+                    row = [item for item in cursor.fetchall()]
+                    for r in row:
+                        r = list(r)
+                        r[0] = str(r[0])
+                        r[1] = str(r[1])
+                        dsitemD["date"] = r[0]
+                        dsitemD["value"] = r[1]
+                        collection.update({"_id":d["_id"]}, {"$push":{"data":dsitemD}})
+                
+
+                    # 초기화
                     dsitemD = {}
                     dsitemL = []
                     docD = {}
