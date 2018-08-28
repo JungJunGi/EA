@@ -112,6 +112,11 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
         AND A.DSID = %s   AND A.DISTBDID = %s   AND DSITEMID = %s   AND DATE_FORMAT(MDATETIME, %s) = %s
         """
         dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
+
+
+        if dataNum == 0:
+            continue
+
         row = [item for item in cursor.fetchall()]
         for r in row:
             r = list(r)
