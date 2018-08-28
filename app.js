@@ -5,11 +5,13 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var userRouter = require('./routes/user');
-var segRouter = require('./routes/segData');
+var areaRouter = require('./routes/AreaData');
 
 // 전기요금 - line chart
+var moneyLine = require('./routes/MoneyData');
+/*
 var inha_main = require('./routes/inha_main');
-var moneyLine_sub = require('./routes/moneyLine_sub').router;
+var moneyLine_sub = require('./routes/moneyLine_sub').router;*/
 
 /*
 // 스케줄링 모듈
@@ -41,8 +43,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', userRouter);
-app.use('/segData', segRouter);
-app.use('/moneyData', moneyLine_sub);
+app.use('/segData', areaRouter);
+app.use('/moneyData', moneyLine);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

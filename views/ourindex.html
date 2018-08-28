@@ -39,8 +39,12 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/seg5.css" />
     <script type="text/javascript" src="/javascripts/seg5.js" defer></script>
 
+    <link rel="stylesheet" type="text/css" href="/stylesheets/area.css" />
+    <script type="text/javascript" src="/javascripts/area.js" defer></script>
+
     <link rel="stylesheet" type="text/css" href="/stylesheets/heatmap.css" />
     <script type="text/javascript" src="/javascripts/heatmap.js" defer></script>
+
 
 </head>
 
@@ -107,9 +111,26 @@
                                         <div class="stats">
                                             <details>
                                                 <summary>펼치기</summary>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <div class="card ">
+                                                            <div class="header">
+                                                                <h4 class="title">누적전력량</h4>
+                                                                <p class="category">차트설명</p>
+                                                            </div>
+                                                            <br>
+                                                            <div class="content">
+                                                                <svg class="areaChart" width="1000" height="500"></svg>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!--<div class="area">
+                                                    <svg class="areaChart" width="1000" height="500"></svg>
+                                                </div>
                                                 <div class="heatmap">
                                                     <svg class="m_chart"></svg>
-                                                </div>
+                                                </div>-->
                                             </details>
                                         </div>
                                     </div>

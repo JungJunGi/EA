@@ -1,6 +1,6 @@
 
 
-d3.json('/moneyData/money', function (error, data) {
+d3.json('/MoneyData/money', function (error, data) {
     if (error) throw error;
 
     //data sort
@@ -31,7 +31,7 @@ function Line_chart(meta, sData) {
         .domain([newD, x_max])
         .range([0, width]);
 
-    var y_max = d3.max(sData, function (d) { return d.money; });
+    var y_max = d3.max(sData, function (d) { return d.value; });
     y_max = y_max + 20000;
 
     console.log(y_max);
@@ -75,7 +75,7 @@ function Line_chart(meta, sData) {
 
     var lineFunction = d3.line()
         .x(function (d) { return xScale(d.date); })
-        .y(function (d) { return yScale(d.money); });
+        .y(function (d) { return yScale(d.value); });
     //.curve(d3.curveLinear);
 
     var path = g.append("path");
@@ -94,7 +94,7 @@ function Line_chart(meta, sData) {
             return xScale(d.date);
         })
         .attr('cy', function (d) {
-            return yScale(d.money);
+            return yScale(d.value);
         })
         .attr('r', 5)
         .style("fill", "blue");
@@ -107,9 +107,9 @@ function Line_chart(meta, sData) {
             return xScale(d.date) + 10;
         })
         .attr('y', function (d) {
-            return yScale(d.money) + 10;
+            return yScale(d.value) + 10;
         })
-        .text(function (d) { return Money_format(Math.floor(d.money / 10) * 10) + "원" })
+        .text(function (d) { return Money_format(Math.floor(d.value / 10) * 10) + "원" })
         .style("fill", 'black').style("font_size", '14px');
 
 
@@ -149,7 +149,7 @@ function Line_chart(meta, sData) {
 
 
     focus.append("text")
-        .attr("class", "tooltip-money")
+        .attr("class", "tooltip-value")
         .attr("x", 90)
         .attr("y", 18)
         .style("font", "18px sans-serif")
@@ -173,12 +173,12 @@ function Line_chart(meta, sData) {
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
         console.log(x0, i, d0, d1, d)
         var LineX = xScale(d.date) + 60;
-        var LineY = yScale(d.money) + 50;
+        var LineY = yScale(d.value) + 50;
 
         focus.attr("transform", "translate(" + LineX + "," + LineY + ")");
         focus.select(".tooltip-date").text(my_format(d.date));
-        focus.select(".tooltip-money").text(Money_format(Math.round(d.money / 10) * 10) + "원"); //일의 자리 반올림
-        focus.select(".x").attr("y2", height - yScale(d.money));
+        focus.select(".tooltip-value").text(Money_format(Math.round(d.value / 10) * 10) + "원"); //일의 자리 반올림
+        focus.select(".x").attr("y2", height - yScale(d.value));
         focus.select(".y").attr("x2", width + width);
     }
 }
@@ -188,7 +188,7 @@ function sortByData(data) {
     var sData = data.sort(function (x, y) {
         return d3.descending(x.date, y.date);
     })
-    sData = sData.slice(0, 6);
+    sData = sData.slice(0, 12);
 
     sData = sData.sort(function (x, y) {
         return d3.ascending(x.date, y.date);
@@ -196,7 +196,7 @@ function sortByData(data) {
 
     sData.forEach(e => {
         e.date = new Date(e.date);
-        e.money = Number(e.money);
+        e.value = Number(e.value);
     });
 
     return sData;

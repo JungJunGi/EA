@@ -1,17 +1,16 @@
-var format = d3.timeFormat("%Y");
+var format = d3.timeFormat("%m/%Y");
 
-var svg = d3.select(".areaChart"),
-    margin = { top: 20, right: 30, bottom: 30, left: 60 },
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
-
+var areaSvg = d3.select(".areaChart"),
+    area_margin = { top: 20, right: 30, bottom: 30, left: 60 },
+    area_width = +areaSvg.attr("width"),
+    area_height = +areaSvg.attr("height");
 
 var bisectDate = d3.bisector(function (d) {
     return d.date;
 }).left;
 
-d3.json('new.json', function (error, data) {
-    var sData = data.data;
+d3.json('/segData/area', function (error, data) {
+    var sData = sortByData(data.data);
 
     sData.forEach(e => {
         e.date = new Date(e.date);
@@ -20,7 +19,7 @@ d3.json('new.json', function (error, data) {
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
 
-    var newD = new Date(x_min.getYear() + 1900, 0);
+    var newD = new Date(x_min.getYear() + 1900, x_min.getMonth(), 1);
 
     var series = d3.stack()
         .keys(data.depart)
@@ -29,18 +28,18 @@ d3.json('new.json', function (error, data) {
         (data.data);
 
     var x = d3.scaleTime()
-        .range([margin.left, width - margin.right])
+        .range([area_margin.left, area_width - area_margin.right])
         .domain([newD, x_max]);
 
     /*
      var x = d3.scaleBand()
         .domain(data.data.map(function (d) { return d.date; }))
-        .rangeRound([margin.left, width - margin.right])
+        .rangeRound([area_margin.left, area_width - area_margin.right])
         .padding(0.1);
     */
     var y = d3.scaleLinear()
         .domain([d3.min(series, stackMin), d3.max(series, stackMax)])
-        .range([height - margin.bottom, margin.top]).nice();
+        .range([area_height - area_margin.bottom, area_margin.top]).nice();
 
     var z = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -50,7 +49,7 @@ d3.json('new.json', function (error, data) {
         .y0(function (d) { return y(d[0]); })
         .y1(function (d) { return y(d[1]); });
 
-    svg.append("g")
+    areaSvg.append("g")
         .selectAll("g")
         .data(series)
         .enter().append("g")
@@ -71,7 +70,7 @@ d3.json('new.json', function (error, data) {
             var selectlegend = $('.legend').not(getname);    //grab all the legend items that match the line you are on, except the one you are hovering on
 
             d3.selectAll(selectlegend)    // drop opacity on other legend names
-                .style("opacity", .2);
+                .style("opacity", 0.2);
 
             d3.select(getname)
                 .attr("class", "legend-select");  //change the class on the legend name that corresponds to hovered line to be bolder    
@@ -112,11 +111,11 @@ d3.json('new.json', function (error, data) {
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
         focus.attr("transform", "translate(" + x(d.date) + "," + y(sum(d, key)) + ")");
-
-        tooltip.style("top", y(sum(d, key)) + "px").style("left", (x(d.date) + 20) + "px");
+        tooltip.style("top", (y(sum(d, key)) + 1120) + "px").style("left", x(d.date) + "px");
         tooltip.html("Date: " + format(d.date) + "<hr>" + text(d, key));
 
     }
+
     function sum(d, key) {
         var sumd = 0;
         for (var i = 0; i < data.depart.length; i++) {
@@ -147,19 +146,18 @@ d3.json('new.json', function (error, data) {
         return text;
     }
 
-
     var xAxis = d3.axisBottom(x)
         .tickFormat(format)
-        .ticks(d3.timeYear);
+        .ticks(d3.timeMonth);
 
     var yAxis = d3.axisLeft(y);
 
-    svg.append("g")
+    areaSvg.append("g")
         .attr("transform", "translate(0," + y(0) + ")")
         .call(xAxis);
 
-    svg.append("g")
-        .attr("transform", "translate(" + margin.left + ",0)")
+    areaSvg.append("g")
+        .attr("transform", "translate(" + area_margin.left + ",0)")
         .call(yAxis);
 
     function stackMin(serie) {
@@ -171,7 +169,7 @@ d3.json('new.json', function (error, data) {
     }
 
     //toopltip 추가
-    var focus = svg.append("g")
+    var focus = areaSvg.append("g")
         .attr("class", "focus")
         .style("display", "none");
 
@@ -179,12 +177,12 @@ d3.json('new.json', function (error, data) {
         .attr("r", 5);
 
     /*focus.append("line")
-        .attr("class", "x")
-        .style("stroke", "black")
-        .style("stroke-dasharray", "3,3")
-        .style("opacity", 1)
-        .attr("y1", 0)
-        .attr("y2", height);*/
+    .attr("class", "x")
+    .style("stroke", "black")
+    .style("stroke-dasharray", "3,3")
+    .style("opacity", 1)
+    .attr("y1", 0)
+    .attr("y2", area_height);*/
 
     var tooltip = d3.select("body")
         .append("div")
@@ -203,7 +201,7 @@ d3.json('new.json', function (error, data) {
     var legendSpacing = 1;
     var legendHeight = legendRectSize + legendSpacing;
 
-    var legend = svg.append('g')
+    var legend = areaSvg.append('g')
         .selectAll('.legend')
         .data(series).enter().append('g')
         .attr("class", 'legend')
@@ -224,3 +222,22 @@ d3.json('new.json', function (error, data) {
 
 
 });
+
+function sortByData(data) {
+
+    var sData = data.sort(function (x, y) {
+        return d3.descending(x.date, y.date);
+    })
+    sData = sData.slice(0, 12);
+
+    sData = sData.sort(function (x, y) {
+        return d3.ascending(x.date, y.date);
+    })
+
+    sData.forEach(e => {
+        e.date = new Date(e.date);
+        e.value = Number(e.value);
+    });
+
+    return sData;
+}

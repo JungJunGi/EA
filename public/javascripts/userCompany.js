@@ -1,1 +1,1 @@
-document.getElementById("userCompany").innerHTML ='우리황토';
+document.getElementById("userCompany").innerHTML ='신화개발';

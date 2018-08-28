@@ -7,6 +7,7 @@ var PythonShell  = require('python-shell'); //python 호출
 // var iconv  = require('iconv').Iconv; //인코딩 관련
 var urlencode  = require('urlencode') //인코딩 관련
 
+//mongo ssh-tunneling option
 var config = {
     username: 'elec',
     password: 'vmlab347!',
@@ -15,6 +16,7 @@ var config = {
     dstPort: 27017
 };
 
+//python options
 var options = {
     mode:'text',
     pythonPath: '',
