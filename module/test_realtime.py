@@ -124,7 +124,7 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
             r[1] = str(r[1])
             dsitemD["date"] = r[0]
             dsitemD["value"] = r[1]
-            dsitemL.append(dsitemD)
+            dsitemL.append(json.dumps(dsitemD))
 
         metaD["company"] = comNameDict.get(com)
         metaD["year"] = date[:4]

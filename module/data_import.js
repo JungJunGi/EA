@@ -2,12 +2,14 @@
 var MongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017';
 
-var tunnel = require('tunnel-ssh'); //ssh-tunneling
+var tunnel = require('tunnel-ssh'); // ssh-tunneling
 var PythonShell  = require('python-shell'); //python 호출
 // var iconv  = require('iconv').Iconv; //인코딩 관련
 var urlencode  = require('urlencode') //인코딩 관련
 
-//mongo ssh-tunneling option
+
+
+/** Mmongo ssh-tunneling Options **/
 var config = {
     username: 'elec',
     password: 'vmlab347!',
@@ -16,7 +18,8 @@ var config = {
     dstPort: 27017
 };
 
-//python options
+
+/** Python Options **/
 var options = {
     mode:'text',
     pythonPath: '',
@@ -24,6 +27,10 @@ var options = {
     args: ['코비스']
 };
 
+
+
+// 실시간 데이터는 문자열로 올거야
+// data.map(v => mymap(v)) 이거 필요해
 PythonShell.run('test_realtime.py', options, function (err, results) {
     if (err) throw err;
 
@@ -35,14 +42,10 @@ PythonShell.run('test_realtime.py', options, function (err, results) {
     });
 });
 
-/* 
-@ python file
-1. dd 말고 docD 으로
-2. json.dumps() 없어도 됨?
-*/
 
 
-
+// 몽고디비에서는 object 형식으로 올거야
+// 바로 data.data.date 로 접근 가능해
 var server = tunnel(config, function (error, data) {
     if (error) {
         console.log("SSH connection error: " + error);
@@ -77,6 +80,8 @@ var server = tunnel(config, function (error, data) {
     });
 });
 
+
+/** Set Timeout **/
 // setTimeout(function () {
 //     server.close();
 // }, 2000)
