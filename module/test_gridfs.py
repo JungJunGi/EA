@@ -114,6 +114,30 @@ for dept in companyDict.get(com):
             for y in year.get(year_n):
                 sql = "SELECT MDATETIME, DSITEMVAL  FROM DATA_MEASURE_%s A, INFO_DS125_WebVersion B  WHERE B.FromDSID = A.DSID AND A.DSID = %s AND A.DISTBDID = %s AND DSITEMID = %s"
                 dataNum = cursor.execute(sql, (y, dept[0], dept[1], item))
+                
+                # 데이터가 존재하지 않으면 continue
+                if dataNum == 0:
+                    continue
+
+                metaD["company"] = comNameDict.get(com)
+                metaD["year"] = year_n
+                month = str(y)
+                metaD["month"] = month[4:]
+                metaD["item"] = dsitemDict.get(item)
+                metaD["depart"] = dept[2]
+                docD["meta"] = metaD
+                docD["data"] = []
+
+                dd["meta"] = metaD
+                d = collection.find_one(dd)
+
+                # 해당 meta data가 존재하지 않으면 생성
+                if(not(d)) :
+                    collection.insert_one(docD)
+                    d = collection.find_one(dd)
+
+                print(docD["meta"])
+
                 row = [item for item in cursor.fetchall()]
                 for r in row:
                     r = list(r)
@@ -121,29 +145,16 @@ for dept in companyDict.get(com):
                     r[1] = str(r[1])
                     dsitemD["date"] = r[0]
                     dsitemD["value"] = r[1]
-                    dsitem = json.dumps(dsitemD)
-                    dsitemL.append(dsitem)
+                    # collection.update({"_id":d["_id"]}, {"$push":{"data":dsitemD}})
+                    # fs.put(docD) 
+            
+                # 초기화
+                dsitemD = {}
+                dsitemL = []
+                docD = {}
+                metaD = {}
 
-            metaD["company"] = comNameDict.get(com)
-            metaD["year"] = year_n
-            metaD["item"] = dsitemDict.get(item)
-            metaD["depart"] = dept[2]
-            docD["meta"] = metaD
-            docD["data"] = dsitemL
-            # docD = str(docD)
-            if len(dsitemL) != 0:
-                # filename = 'C:\\Users\\DS\\Documents\\mydata\\' + comNameDict.get(com) + '\\' + str(dept[0]) + '_' + str(dept[1]) + '_' + str(item) + '_' + str(year_n) + '.json'
-                # os.makedirs(os.path.dirname(filename), exist_ok=True)
-                # f = open(filename, 'wt')
-                # f.write(docD)
-                # print(filename)
-                # collection.insert_one(docD)
-                fs.put(docD)
 
-            dsitemD = {}
-            dsitemL = []
-            docD = {}
-            metaD = {}
 
 print("## Successfully Insert Data !! ##")
 print("##", datetime.datetime.today(), "##")
