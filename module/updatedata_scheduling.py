@@ -59,6 +59,7 @@ def job():
     today = year + "-" + month + "-" + mday
 
 
+
     ### Ready for mariadb connect ###
     db = pymysql.connect(
                             host = "www.lems.mbz.kr",
@@ -175,7 +176,7 @@ server = SSHTunnelForwarder(
 ### Start ssh tunnel ###
 server.start()
 
-schedule.every().day.at("23:58").do(job)
+schedule.every().day.at("23:59").do(job)
 
 while True:
     schedule.run_pending()
