@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 ### 실시간 데이터를 마리아디비에서 가져오기 !! ###
 ### 김지연 ###
@@ -134,7 +135,7 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
         docD["meta"] = metaD
         docD["data"] = dsitemL
 
-        print(docD)  # 내보내기
+        print(json.dumps(docD))  # 내보내기
 
         dsitemD = {}
         dsitemL = []
