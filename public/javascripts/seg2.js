@@ -28,7 +28,7 @@ d3.json("/segData/seg2", function (error, myData) {
 
         d.contact_demand = d.current_power / d.contact_power;
 
-        d.timeSlot = checkTimeSlot(d.date);
+        // d.timeSlot = checkTimeSlot(d.date);
     })
 
     setScales(myData.meta, dataSet);
@@ -67,12 +67,13 @@ function drawChart(dataSet) {
         .translateExtent([[0, 0], [width, height]])
         .extent([[0, 0], [width, height]])
         .on("zoom", zoomed);
-
+/*
     var newRamp = d3.scaleLinear().domain([0, 1, 2])
         .range(["limegreen", "green", "darkgreen"]);
+*/
 
     // ON svg
-    var svg = d3.select('.seg2_chart') //d3.select("svg")
+    var svg = d3.select('.seg2_chart')
         .attr("width", width + 200)
         .attr("transform", function(d, i) {
         	return "translate(100, 0)";
@@ -83,6 +84,8 @@ function drawChart(dataSet) {
 
     var chartArea = svg.append("g");
 
+
+/*
     var legend = svg.selectAll(".legend")
         .data(newRamp.domain())
         .enter()
@@ -91,6 +94,8 @@ function drawChart(dataSet) {
         .attr("transform", function(d, i) {
         	return "translate(" + 150 + "," + (440 + (i * 20)) + ")";
         });
+*/
+
 /*
     user.append("text")
         .attr("class", "user")
@@ -111,13 +116,13 @@ function drawChart(dataSet) {
         .attr("height", height)
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .attr("clip-path", "url(#clip)");
-
+/*
     var timeSlot = chartArea.append("g")
         .attr("width", width)
         .attr("height", margin.bottom)
         .attr("transform", "translate(" + margin.left + ", " + height + ")")
         .attr("clip-path", "url(#clip)");
-
+*/
     var axis = chartArea.append("g")
         .attr("width", width)
         .attr("height", height)
@@ -158,11 +163,12 @@ function drawChart(dataSet) {
                 return "translate(" + d3.event.transform.x + ", 0) scale(" + d3.event.transform.k + ", 1)"
             })
         chart.select(".areaChart").attr("d", valueArea);
-
+/*
         timeSlot.selectAll(".timeSlot")
             .attr("transform", function () {
                 return "translate(" + d3.event.transform.x + ", 0) scale(" + d3.event.transform.k + ", 1)"
-            })
+            });
+*/
     }
 
 
@@ -219,7 +225,7 @@ function drawChart(dataSet) {
             })
        })
 
-
+/*
     // make timeSlot
     timeSlot.selectAll("rect")
         .data(dataSet).enter()
@@ -253,7 +259,7 @@ function drawChart(dataSet) {
                   case 1: return "중간부하";
                   case 2: return "최대부하";
               }});
-
+*/
 
 
     // set axis
@@ -280,7 +286,7 @@ function drawChart(dataSet) {
 
 }
 
-
+/*
 function checkTimeSlot(d) {
 
     var getM = d3.timeFormat("%b");
@@ -397,3 +403,4 @@ function checkTimeSlot(d) {
         return -1;
     }
 }
+*/
