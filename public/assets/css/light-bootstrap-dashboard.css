@@ -53,11 +53,16 @@
 /*           Font Smoothing      */
 
 .areaChart{
-    margin-left: 85px;
+    margin-left: 20px;
 }
 
 .seg5_chart{
-    margin-left: 210px;
+    margin-left: 20px;
+}
+
+.m_chart{
+    margin-left: 80px;
+    margin-top: 20px;
 }
 
 .topnav {

@@ -225,7 +225,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .attr("class", 'legend')
         .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
-            return 'translate(1530,' + (((i + 18) * legendHeight) + (-45 * i)) + ')';
+            return 'translate(715,' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
         });
 
     legend.append('rect')

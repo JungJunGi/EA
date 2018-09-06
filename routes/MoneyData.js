@@ -67,6 +67,7 @@ var start = function () {
                             var year = new Date().getFullYear();
                             var month = new Date().getMonth() + 1;
                             var realtime = JSON.parse(element.data.slice(-1)[0]);
+
                             if (month < 10)
                                 realtime.date = year + "-0" + month;
 

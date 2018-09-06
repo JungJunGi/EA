@@ -7,7 +7,7 @@ var margin = { top: 20, right: 0, bottom: 100, left: 30 },
     legendElementWidth = gridSize * 2,
     buckets = 8,
     //bubble
-    diameter = 300,
+    diameter = 380,
 
     colors = ["#e9f79b", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"], // alternatively colorbrewer.YlGnBu[9]
     days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
@@ -17,14 +17,15 @@ var margin = { top: 20, right: 0, bottom: 100, left: 30 },
 //#edf8b1
 
 var m_svg = d3.select(".m_chart")
-    .attr("width", 1300)
-    .attr("height", 480)
+    .attr("width", 1500)
+    .attr("height", 400)
     .attr("transform", "translate(10,10)")
     .append('g');
 
 //label
 var dayLabels = m_svg.append('g').selectAll(".dayLabel")
-    .data(days).enter()
+    .data(days).enter();
+
 dayLabels.append("text")
     .text(function (d) { return d; })
     .attr("x", 6)
@@ -35,6 +36,7 @@ dayLabels.append("text")
 
 var timeLabels = m_svg.append('g').selectAll(".timeLabel")
     .data(times).enter();
+    
 timeLabels.append("text")
     .text(function (d) { return d; })
     .attr("x", function (d, i) { return i * gridSize + 22; })
@@ -58,7 +60,7 @@ var heatmapChart = function (jsonFile) {
         }
 
         const colorScale = d3.scaleQuantile()
-            .domain([0, buckets - 1, d3.max(data.data, (d) => valueSum(d))])
+            .domain([0, d3.max(data.data, (d) => valueSum(d))])
             .range(colors);
 
         //chart
@@ -152,7 +154,7 @@ var heatmapChart = function (jsonFile) {
                 .style("fill", "black")
                 .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.depart; });
-                
+
             node.append("text")
                 .attr("class", "label")
                 .attr("dy", ".4em")
@@ -170,8 +172,12 @@ function Hclasses(root) {
 
     function recurse(node) { classes.push({ depart: node.depart, value: node.value }); }
     for (i = 0; i < len; i++) { recurse(root.value[i]); }
-    
+
     return { children: classes };
 }
 
-heatmapChart('/heatmapData/heatmap');
+var companyName = document.getElementById("userCompany").innerHTML;
+if (companyName.indexOf("(주)") != -1)
+    companyName = companyName.replace("(주)", "")
+
+heatmapChart('/heatmapData/heatmap/company=' + companyName);

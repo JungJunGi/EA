@@ -174,13 +174,13 @@ function Line_chart(meta, sData) {
             d0 = sData[i - 1],
             d1 = sData[i],
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-        console.log(x0, i, d0, d1, d)
+
         var LineX = xScale(d.date) + 60;
         var LineY = yScale(d.value) + 50;
 
         focus.attr("transform", "translate(" + LineX + "," + LineY + ")");
         focus.select(".tooltip-date").text(my_format(d.date));
-        focus.select(".tooltip-value").text(Money_format(Math.round(d.value / 10) * 10) + "원"); //일의 자리 반올림
+        focus.select(".tooltip-value").text(Money_format(Math.round(d.value / 10) * 10) + "원"); //일의 자리 버림
         focus.select(".x").attr("y2", height - yScale(d.value));
         focus.select(".y").attr("x2", width + width);
     }
