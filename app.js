@@ -10,6 +10,8 @@ var heatmapRouter = require('./routes/HeatmapData');
 
 // 전기요금 - line chart
 var moneyLine = require('./routes/MoneyData');
+
+var a = require('./routes/seg2Data');
 /*
 var inha_main = require('./routes/inha_main');
 var moneyLine_sub = require('./routes/moneyLine_sub').router;*/
@@ -48,7 +50,7 @@ app.use('/segData', areaRouter);
 app.use('/moneyData', moneyLine);
 app.use('/heatmapData', heatmapRouter);
 
-
+app.use('/', a);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createErrcor(404));
