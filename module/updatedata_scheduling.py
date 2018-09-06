@@ -55,9 +55,11 @@ def job():
     if mday.__len__()<2:
         mday = "0" + mday
 
-    date = year + month
-    today = year + "-" + month + "-" + mday
-
+    # date = year + month
+    # today = year + "-" + month + "-" + mday
+    date = "201808"
+    today = "2018-08-29"
+    print("today is ", today)
 
 
     ### Ready for mariadb connect ###
@@ -103,6 +105,7 @@ def job():
 
         MONGO_COLLECTION = comNameDict.get(com)
         collection = db[MONGO_COLLECTION]
+        print(MONGO_COLLECTION)
 
         for dept in companyDict.get(com):
             for item in dsitemDict.keys():
@@ -113,6 +116,7 @@ def job():
                 """
                 dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
 
+                # print(dataNum)
                 # 데이터가 존재하지 않으면 continue
                 if dataNum == 0:
                     continue
@@ -127,11 +131,13 @@ def job():
 
                 dd["meta"] = metaD
                 d = collection.find_one(dd)
+                # print(d)
 
                 # 해당 meta data가 존재하지 않으면 생성
                 if(not(d)) :
                     collection.insert_one(docD)
                     d = collection.find_one(dd)
+                    print(d)
 
                 print(docD["meta"])
 
@@ -176,7 +182,7 @@ server = SSHTunnelForwarder(
 ### Start ssh tunnel ###
 server.start()
 
-schedule.every().day.at("23:59").do(job)
+schedule.every().day.at("17:07").do(job)
 
 while True:
     schedule.run_pending()
