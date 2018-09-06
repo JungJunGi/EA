@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var userRouter = require('./routes/user');
 var areaRouter = require('./routes/AreaData');
+var heatmapRouter = require('./routes/HeatmapData');
 
 // 전기요금 - line chart
 var moneyLine = require('./routes/MoneyData');
@@ -45,6 +46,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', userRouter);
 app.use('/segData', areaRouter);
 app.use('/moneyData', moneyLine);
+app.use('/heatmapData', heatmapRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
