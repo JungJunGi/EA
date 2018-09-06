@@ -1,6 +1,9 @@
 
+var companyName = document.getElementById("userCompany").innerHTML;
+if (companyName.indexOf("(주)") != -1)
+    companyName = companyName.replace("(주)", "")
 
-d3.json('/MoneyData/money', function (error, data) {
+d3.json('/moneyData/money/company=' + companyName, function (error, data) {
     if (error) throw error;
 
     //data sort

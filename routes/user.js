@@ -4,12 +4,15 @@ var router = express.Router();
 
 const request = require('request');
 const cheerio = require('cheerio');
-//const crawling = require('../module/datacrawling_main');
+
+//회사명 데이터 보내기.
+const areaRouter = require('./AreaData'),
+    moneyLine = require('./MoneyData');
 
 var MongoClient = require('mongodb').MongoClient,
     tunnel = require('tunnel-ssh');
 
-var database;
+var database, companyDB;
 // 데이터베이스 연결 정보
 var databaseUrl = 'mongodb://localhost:27017';
 
@@ -24,12 +27,13 @@ var config = {
 
 // 데이터베이스 연결
 var server = tunnel(config, function (error, data) {
-    MongoClient.connect(databaseUrl,{ useNewUrlParser: true }, function (err, db) {
+    MongoClient.connect(databaseUrl, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
 
         console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
 
         database = db.db('local');
+        companyDB = db.db('companyData');
     });
 });
 
@@ -88,9 +92,6 @@ router.route('/process/login').post(function (req, res) {
                     if (err) throw err;
 
                 });
-
-                // 회사명으로 data crawling 하기 by jiyeon
-                //crawling.datacrawling(userCompany);
 
                 res.render('ourindex', { title: 'home page' });
 

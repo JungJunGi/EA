@@ -1,7 +1,7 @@
 var format = d3.timeFormat("%m/%Y");
 
 var areaSvg = d3.select(".areaChart"),
-    area_margin = { top: 20, right: 30, bottom: 30, left: 60 },
+    area_margin = { top: 20, right: 300, bottom: 30, left: 60 },
     area_width = +areaSvg.attr("width"),
     area_height = +areaSvg.attr("height");
 
@@ -9,7 +9,11 @@ var bisectDate = d3.bisector(function (d) {
     return d.date;
 }).left;
 
-d3.json('/segData/area', function (error, data) {
+var companyName = document.getElementById("userCompany").innerHTML;
+if (companyName.indexOf("(주)") != -1)
+    companyName = companyName.replace("(주)", "")
+
+d3.json('/segData/area/company=' + companyName, function (error, data) {
     var sData = sortByData(data.data);
 
     sData.forEach(e => {
@@ -25,7 +29,7 @@ d3.json('/segData/area', function (error, data) {
         .keys(data.depart)
         //.order(d3.stackOrderDescending)
         .offset(d3.stackOffsetNone)
-        (data.data);
+        (sData);
 
     var x = d3.scaleTime()
         .range([area_margin.left, area_width - area_margin.right])
@@ -38,7 +42,7 @@ d3.json('/segData/area', function (error, data) {
         .padding(0.1);
     */
     var y = d3.scaleLinear()
-        .domain([d3.min(series, stackMin), d3.max(series, stackMax)])
+        .domain([0, d3.max(series, stackMax)])
         .range([area_height - area_margin.bottom, area_margin.top]).nice();
 
     var z = d3.scaleOrdinal(d3.schemeCategory10);
@@ -46,8 +50,17 @@ d3.json('/segData/area', function (error, data) {
     var area = d3.area()
         //.curve(d3.curveMonotoneX) //선 곡선모양
         .x(function (d) { return x(d.data.date); })
-        .y0(function (d) { return y(d[0]); })
-        .y1(function (d) { return y(d[1]); });
+        .y0(function (d) {
+            if (d[0] >= 0) { }
+            else { d[0] = 0; }
+            return y(d[0]);
+        })
+        .y1(function (d) {
+            if (d[1] >= 0) { }
+            else { d[1] = d[0]; }
+            return y(d[1]);
+        });
+    console.log(series)
 
     areaSvg.append("g")
         .selectAll("g")
@@ -111,7 +124,8 @@ d3.json('/segData/area', function (error, data) {
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
         focus.attr("transform", "translate(" + x(d.date) + "," + y(sum(d, key)) + ")");
-        tooltip.style("top", (y(sum(d, key)) + 1120) + "px").style("left", x(d.date) + "px");
+        //tooltip.style("top", (y(sum(d, key)) + 1100) + "px").style("left", x(d.date) + "px");
+        tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
         tooltip.html("Date: " + format(d.date) + "<hr>" + text(d, key));
 
     }
@@ -119,11 +133,13 @@ d3.json('/segData/area', function (error, data) {
     function sum(d, key) {
         var sumd = 0;
         for (var i = 0; i < data.depart.length; i++) {
-            if (key == data.depart[i]) {
+            if (d[data.depart[i]] > 0) {
+                if (key == data.depart[i]) {
+                    sumd += d[data.depart[i]];
+                    return sumd;
+                }
                 sumd += d[data.depart[i]];
-                return sumd;
             }
-            sumd += d[data.depart[i]];
         }
         return sumd;
     }
@@ -132,14 +148,16 @@ d3.json('/segData/area', function (error, data) {
         var text = "";
         var sum = 0;
         for (var i = 0; i < data.depart.length; i++) {
-            if (key == data.depart[i]) {
-                text += "<font color=" + z(key) + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";
-            }
-            else {
-                text += data.depart[i] + "=" + d[data.depart[i]] + "</br>";
-            }
+            if (d[data.depart[i]] > 0) {
+                if (key == data.depart[i]) {
+                    text += "<font color=" + z(key) + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";
+                }
+                else {
+                    text += data.depart[i] + "=" + d[data.depart[i]] + "</br>";
+                }
 
-            sum += d[data.depart[i]];
+                sum += d[data.depart[i]];
+            }
         }
 
         text += "<hr><b>Total=" + sum + "</b>";
@@ -162,7 +180,7 @@ d3.json('/segData/area', function (error, data) {
 
     function stackMin(serie) {
         return d3.min(serie, function (d) { return d[0]; });
-    }
+    } //만약 값이 없을때??
 
     function stackMax(serie) {
         return d3.max(serie, function (d) { return d[1]; });
@@ -207,7 +225,7 @@ d3.json('/segData/area', function (error, data) {
         .attr("class", 'legend')
         .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
-            return 'translate(860,' + (((i + 5) * legendHeight) + (-45 * i)) + ')';
+            return 'translate(1530,' + (((i + 18) * legendHeight) + (-45 * i)) + ')';
         });
 
     legend.append('rect')
