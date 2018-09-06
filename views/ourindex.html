@@ -75,15 +75,13 @@
                             <div class="card">
                                 <div class="header">
                                     <h4 class="title">전기요금 그래프</h4>
-                                    <p class="category">1년 동안의 사용한 회사전체 전기요금</p>
+                                    <p class="category">최근 1년 동안 사용한 회사전체의 월별 전기요금</p>
                                 </div>
                                 <div class="content">
-                                    <svg class="seg5_chart" width="1200" height="400"></svg>
+                                    <svg class="seg5_chart" width="1500" height="400"></svg>
 
                                     <div class="footer">
-                                        <div class="legend">
-
-                                        </div>
+                                        <div class="legend"></div>
                                         <hr>
                                         <div class="stats">
                                             <!--부가설명-->
@@ -103,94 +101,75 @@
                                 </div>
                                 <div class="content">
                                     <svg class="seg2_chart" width="960" height="400"></svg>
-                                    <div class="footer">
-                                        <div class="legend">
-
+                                    <hr>
+                                    <details>
+                                        <summary>상세보기</summary>
+                                        <div class="card ">
+                                            <div class="header">
+                                                <h4 class="title">부서별 누적전력량</h4>
+                                                <p class="category">최근 1년 동안 부서별로 사용한 월별 전력량</p>
+                                            </div>
+                                            <br>
+                                            <div class="content">
+                                                <svg class="areaChart" width="1800" height="500"></svg>
+                                            </div>
                                         </div>
-                                        <hr>
-                                        <div class="stats">
-                                            <details>
-                                                <summary>펼치기</summary>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <div class="card ">
-                                                            <div class="header">
-                                                                <h4 class="title">누적전력량</h4>
-                                                                <p class="category">차트설명</p>
-                                                            </div>
-                                                            <br>
-                                                            <div class="content">
-                                                                <svg class="areaChart" width="1000" height="500"></svg>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <div class="card ">
-                                                                <div class="header">
-                                                                    <h4 class="title">누적전력량</h4>
-                                                                    <p class="category">차트설명</p>
-                                                                </div>
-                                                                <br>
-                                                                <div class="content">
-                                                                    <svg class = "m_chart" width = "1300" height = "480"></svg>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                </div>
-                                                <!--<div class="area">
-                                                    <svg class="areaChart" width="1000" height="500"></svg>
-                                                </div>
-                                                <div class="heatmap">
-                                                    <svg class="m_chart"></svg>
-                                                </div>-->
-                                            </details>
+                                        <div class="card ">
+                                            <div class="header">
+                                                <h4 class="title">히트맵</h4>
+                                                <p class="category">최근 1년 동안 사용한 전력량을 요일/시간별로 평균낸 수치 데이터</p>
+                                            </div>
+                                            <br>
+                                            <div class="content">
+                                                <svg class="m_chart"></svg>
+                                            </div>
+                                          <div>
+                                           </details>
                                         </div>
-                                    </div>
+                                    </details>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
+                <footer class="footer">
+                    <div class="container-fluid">
+                        <nav class="pull-left">
+                            <ul>
+                                <li>
+                                    <a href="#">
+                                        Home
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Company
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Portfolio
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        Blog
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                        <p class="copyright pull-right">
+                            &copy;
+                            <script>document.write(new Date().getFullYear())</script>
+                            <a href="#">Jung Jun Gi</a>, made with love for a better web
+                        </p>
+                    </div>
+                </footer>
+
             </div>
-
-
-            <footer class="footer">
-                <div class="container-fluid">
-                    <nav class="pull-left">
-                        <ul>
-                            <li>
-                                <a href="#">
-                                    Home
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Company
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Portfolio
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#">
-                                    Blog
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <p class="copyright pull-right">
-                        &copy;
-                        <script>document.write(new Date().getFullYear())</script>
-                        <a href="#">Jung Jun Gi</a>, made with love for a better web
-                    </p>
-                </div>
-            </footer>
-
         </div>
-    </div>
 
 
 </body>
