@@ -1,8 +1,8 @@
 var svg2Size = d3.select('.seg2_chart');
 
 var margin = { top: 50, right: 40, bottom: 60, left: 50 },
-    width = +svg2Size.attr("width") - margin.left - margin.right,
-    height = +svg2Size.attr("height") - margin.top - margin.bottom;
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
 var xScale, xScale2, yScaleB, yScaleA;
 
@@ -70,8 +70,8 @@ function drawChart(dataSet) {
     // ON svg
     var svg = d3.select('.seg2_chart')
         .attr("width", width + 200)
-        .attr("transform", function(d, i) {
-        	return "translate(100, 0)";
+        .attr("transform", function (d, i) {
+            return "translate(100, 0)";
         })
         .call(zoom);
 
@@ -106,14 +106,14 @@ function drawChart(dataSet) {
     // set tool tip
     var tip = d3.tip()
         .attr("class", "d3-tip")
-        .offset([-10,0])
+        .offset([-10, 0])
         .html(function (d) {
             //console.log(d3.event.offsetX, d3.event.offsetY)
             return "Date: <span style=\"color:yellow\">" + getDate(d.date) +
                 "</span><br>Amount of Electricity Used: " +
                 "<span style=\"color:yellow\">" + d.current_power + "</span>" // +
-                // "<br>Contract Demand: <span style=\"color:yellow\">" +
-                // d3.format(".0%")(d.contact_demand)  + "</span>";
+            // "<br>Contract Demand: <span style=\"color:yellow\">" +
+            // d3.format(".0%")(d.contact_demand)  + "</span>";
         });
 
     chartArea.call(tip);
@@ -132,29 +132,29 @@ function drawChart(dataSet) {
                 return "translate(" + d3.event.transform.x + ", 0) scale(" + d3.event.transform.k + ", 1)"
             })
         // chart.select(".areaChart").attr("d", valueArea);
-/*
-        timeSlot.selectAll(".timeSlot")
-            .attr("transform", function () {
-                return "translate(" + d3.event.transform.x + ", 0) scale(" + d3.event.transform.k + ", 1)"
-            });
-*/
+        /*
+                timeSlot.selectAll(".timeSlot")
+                    .attr("transform", function () {
+                        return "translate(" + d3.event.transform.x + ", 0) scale(" + d3.event.transform.k + ", 1)"
+                    });
+        */
     }
 
 
     // make chart
-/*
-    var valueArea = d3.area()
-        .x(function (d) { return xScale(d.date); })
-        .y1(function (d) { return yScaleA(d.contact_demand); })
-        .y0(yScaleA(0))
-        .curve(d3.curveBasis);
-
-    chart.append("path")
-        .attr("class", "areaChart")
-        .datum(dataSet)
-        .attr("d", valueArea)
-        .attr("clip-path", "url(#clip)");
-*/
+    /*
+        var valueArea = d3.area()
+            .x(function (d) { return xScale(d.date); })
+            .y1(function (d) { return yScaleA(d.contact_demand); })
+            .y0(yScaleA(0))
+            .curve(d3.curveBasis);
+    
+        chart.append("path")
+            .attr("class", "areaChart")
+            .datum(dataSet)
+            .attr("d", valueArea)
+            .attr("clip-path", "url(#clip)");
+    */
     chart.selectAll("rect")
         .data(dataSet).enter()
         .append("rect")
@@ -173,27 +173,27 @@ function drawChart(dataSet) {
         .attr("clip-path", "url(#clip)")
         //.on("mouseover", tip.show)
         //.on("mouseout", tip.hide)
-        .on("mouseover", function(d) {
+        .on("mouseover", function (d) {
             tip.show(d);
-		   		d3.select(this)
-		   			.attr("opacity", "0.9");
-		   })
-		   .on("mouseout", function() {
+            d3.select(this)
+                .attr("opacity", "0.9");
+        })
+        .on("mouseout", function () {
             tip.hide();
-			    d3.select(this)
-			   		.transition()
-			   		.duration(500)
-					.attr("opacity", "0.6");
-		   })
-       .on("mousemove", function(d){
-           tip
-            .attr("x", function(){
-                return d3.event.offsetX;
-            })
-            .attr("y", function() {
-                return d3.event.offsetY;
-            })
-       })
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .attr("opacity", "0.6");
+        })
+        .on("mousemove", function (d) {
+            tip
+                .attr("x", function () {
+                    return d3.event.offsetX;
+                })
+                .attr("y", function () {
+                    return d3.event.offsetY;
+                })
+        })
 
 
     // set axis
@@ -205,17 +205,17 @@ function drawChart(dataSet) {
     axis.append("g")
         .call(yAxisB)
         .append("text")
-	    .text("Amount of Electricity Used")
-	    .attr("transform", "translate(10,123) rotate(90)")
-	    .attr('fill','black');
-/*
-    axis.append("g")
-        .attr("transform", "translate(" + width + ", 0)")
-        .call(yAxisA
-            .tickFormat(d3.format(".0%")))
-        .append("text")
-	    .text("Contact Demand")
-	    .attr("transform", "translate(-10,75) rotate(-90)")
-	    .attr('fill','black');
-*/
+        .text("Amount of Electricity Used")
+        .attr("transform", "translate(10,123) rotate(90)")
+        .attr('fill', 'black');
+    /*
+        axis.append("g")
+            .attr("transform", "translate(" + width + ", 0)")
+            .call(yAxisA
+                .tickFormat(d3.format(".0%")))
+            .append("text")
+            .text("Contact Demand")
+            .attr("transform", "translate(-10,75) rotate(-90)")
+            .attr('fill','black');
+    */
 }
