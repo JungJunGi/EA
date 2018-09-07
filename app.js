@@ -34,6 +34,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
  app.use('/', userRouter);
 // app.use('/segData', areaRouter);
 // app.use('/moneyData', moneyLine);

@@ -153,7 +153,7 @@ var heatmapChart = function (jsonFile) {
                 .style("fill", "black")
                 .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.depart; });
-                
+
             node.append("text")
                 .attr("class", "label")
                 .attr("dy", ".4em")
@@ -171,8 +171,13 @@ function Hclasses(root) {
 
     function recurse(node) { classes.push({ depart: node.depart, value: node.value }); }
     for (i = 0; i < len; i++) { recurse(root.value[i]); }
-    
+
     return { children: classes };
 }
 
-heatmapChart('/heatmapData/heatmap');
+
+var companyName = document.getElementById("userCompany").innerHTML;
+if (companyName.indexOf("(주)") != -1)
+    companyName = companyName.replace("(주)", "")
+
+heatmapChart('/heatmapData/heatmap/company=' + companyName);
