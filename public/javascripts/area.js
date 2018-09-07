@@ -147,7 +147,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     function text(d, key) {
         var text = "";
         var sum = 0;
-        for (var i = 0; i < data.depart.length; i++) {
+        for (var i = data.depart.length-1; i >= 0; i--) {
             if (d[data.depart[i]] > 0) {
                 if (key == data.depart[i]) {
                     text += "<font color=" + z(key) + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";

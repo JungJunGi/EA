@@ -42,9 +42,6 @@ var start = function () {
                 companyURL = companyURL.replace("(주)", "")
 
             router.get('/heatmap/company=' + encodeURI(companyURL), (req, res) => {
-                var result = [];
-                var arr = [];
-
 
                 //python options
                 var options = {

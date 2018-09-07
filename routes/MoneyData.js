@@ -1,34 +1,9 @@
-var MongoClient = require('mongodb').MongoClient;
-var databaseUrl = 'mongodb://localhost:27017';
 var express = require('express');
 var router = express.Router();
 
-var tunnel = require('tunnel-ssh');
-
 var PythonShell = require('python-shell'); //python 호출
 
-var companyDB;
-//mongo ssh-tunneling option
-var config = {
-    username: 'elec',
-    password: 'vmlab347!',
-    host: '203.252.208.247',
-    port: 22,
-    dstPort: 20719
-};
-
-// 데이터베이스 연결
-var server = tunnel(config, function (error, data) {
-    MongoClient.connect(databaseUrl, { useNewUrlParser: true }, function (err, db) {
-        if (err) throw err;
-
-        console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
-
-        companyDB = db.db('companyData');
-    });
-});
-
-var start = function (company) {
+var start = function (company, companyDB) {
 
     var query = { "meta.item": "ELECTRIC_CHARGE" };
 
