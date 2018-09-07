@@ -147,7 +147,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     function text(d, key) {
         var text = "";
         var sum = 0;
-        for (var i = 0; i < data.depart.length; i++) {
+        for (var i = data.depart.length-1; i >= 0; i--) {
             if (d[data.depart[i]] > 0) {
                 if (key == data.depart[i]) {
                     text += "<font color=" + z(key) + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";
@@ -225,7 +225,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .attr("class", 'legend')
         .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
-            return 'translate(1530,' + (((i + 18) * legendHeight) + (-45 * i)) + ')';
+            return 'translate(715,' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
         });
 
     legend.append('rect')

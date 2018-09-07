@@ -5,10 +5,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var userRouter = require('./routes/user');
-var areaRouter = require('./routes/AreaData');
-var heatmapRouter = require('./routes/HeatmapData');
+var areaRouter = require('./routes/AreaData').router;
+var heatmapRouter = require('./routes/HeatmapData').router;
 
 // 전기요금 - line chart
+
 var moneyLine = require('./routes/MoneyData');
 
 // for seg2 chart
