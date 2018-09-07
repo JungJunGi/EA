@@ -70,7 +70,7 @@ var start = function (company, companyDB) {
                 //data
                 if (element.meta.year == thisYear) {
                     da.forEach(function (ele) {
-                        if (ele.date.indexOf(':00:00') != -1) { //올해이고 정각이면
+                        //if (ele.date.indexOf(':00:00') != -1) { //올해이고 정각이면
                             var d = new Date(ele.date).getDay();
                             var h = Number(ele.date.substring(11, 13));
                             if (h == 0) { h = 24; }
@@ -83,7 +83,7 @@ var start = function (company, companyDB) {
                                 depart: element.meta.depart,
                                 value: val
                             });
-                        }
+                        //}
                     });
                 }
             });
@@ -97,7 +97,7 @@ var start = function (company, companyDB) {
                     return a.day > b.day ? 1 : -1;
             });
 
-
+            console.log(result)
             return res.json({ "data": result });
         });
     });
