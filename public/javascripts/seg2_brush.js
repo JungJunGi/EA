@@ -24,6 +24,10 @@ d3.json("/a/seg2Data", function (error, myData) {
             da[i].current_power = da[i].value - da[i - 1].value;
         }
 
+        if (d.current_power < 0) {
+            d.current_power = 0;
+        }
+
         d.contact_demand = d.current_power; // 후에 변경해야 함.
         d.timeSlot = checkTimeSlot(d.date);
     });
@@ -68,15 +72,9 @@ d3.json("/a/seg2Data", function (error, myData) {
 
 
 function setScales(dataSet) {
-
-    // console.log(dataSet[0].date)
-    // console.log(dataSet[dataSet.length-1].date)
-
+    
     var start_date = dataSet[0].date;
     var end_date = dataSet[dataSet.length-1].date;
-
-    console.log(start_date)
-    console.log(end_date)
 
     xScale = d3.scaleTime().domain(d3.extent([start_date, end_date])).range([0, width]);
     xScale2 = d3.scaleTime().domain(xScale.domain()).range(xScale.range());
@@ -91,9 +89,11 @@ function setScales(dataSet) {
         .domain([0, 1])
         .range(yScaleB.range());
         
-    y2 = d3.scaleLinear().domain([0, d3.max(dataSet, function (d) {
-        return d.current_power;
-    })]).range([height2, 0]);
+    y2 = d3.scaleLinear()
+        .domain([0, d3.max(dataSet, function (d) {
+            return d.current_power;
+        })])
+        .range([height2, 0]);
 
 }
 
