@@ -10,7 +10,7 @@ var heatmapRouter = require('./routes/HeatmapData').router;
 
 // 전기요금 - line chart
 
-var moneyLine = require('./routes/MoneyData');
+var moneyLine = require('./routes/MoneyData').router;
 
 // for seg2 chart
 var a = require('./routes/seg2Data');
@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', userRouter);
+ app.use('/', userRouter);
 // app.use('/segData', areaRouter);
 // app.use('/moneyData', moneyLine);
 // app.use('/heatmapData', heatmapRouter);
