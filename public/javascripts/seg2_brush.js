@@ -2,18 +2,18 @@
 var svg2Size = d3.select('.seg2_chart');
 
 var margin = { top: 50, right: 40, bottom: 60, left: 50 },
-    margin2 = { top: 500, right: 20, bottom: 30, left: 50 },
+    margin2 = { top: 600, right: 20, bottom: 30, left: 50 },
 
-    width = +svg2Size.attr("width") - margin.left - margin.right,
-    height = +svg2Size.attr("height") - margin.top - margin.bottom,
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
 
-    height2 = 700 - margin2.top - margin2.bottom;
+height2 = 700 - margin2.top - margin2.bottom;
 
 
 var xScale, xScale2, yScaleB, yScaleA;
 var name, id;
 
-d3.json("/segData/seg2", function (error, myData) {
+d3.json("seg2_data.json", function (error, myData) {
 
     var dataSet = myData.data;
 
@@ -58,6 +58,11 @@ function setScales(meta, dataSet) {
     yScaleA = d3.scaleLinear()
         .domain([0, 1])
         .range(yScaleB.range());
+        
+    y2 = d3.scaleLinear().domain([0, d3.max(dataSet, function (d) {
+        return d.current_power;
+    })]).range([height2, 0]);
+
 }
 
 
@@ -71,7 +76,7 @@ function drawChart(dataSet) {
         yAxisA = d3.axisRight(yScaleA);
     //
     var brush = d3.brushX()
-        .extent([[0, 0], [width, 80]])
+        .extent([[0, 0], [width, 70]])
         .on("brush end", brushed);
 
     var zoom = d3.zoom()
@@ -137,10 +142,11 @@ function drawChart(dataSet) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     //
-    var timeSlot2 = chartArea.append("g")
+    var bChart = chartArea.append("g")
+        .attr("class", "BChart")
         .attr("width", width)
-        .attr("height", margin.bottom)
-        .attr("transform", "translate(" + margin.left + ", 480)")
+        .attr("height", height2)
+        .attr("transform", "translate(" + margin.left + ", 530)")
         .attr("clip-path", "url(#clip)")
         .append('g');
 
@@ -238,6 +244,7 @@ function drawChart(dataSet) {
         .datum(dataSet)
         .attr("d", valueArea)
         .attr("clip-path", "url(#clip)");
+
     /*
     axis2.append("path")
         .attr("class", "area")
@@ -285,25 +292,30 @@ function drawChart(dataSet) {
                 })
         });
 
+    //
+    bChart.selectAll("rect")
+        .data(dataSet).enter()
+        .append("rect")
+        .attr("class", "brushChart")
+        .attr("opacity", "0.6")
+        .attr("x", function (d, i, da) { return (xScale(d.date) - (width / da.length) * 0.5); })
+        .attr("y", function (d, i) {
+            return y2(d.current_power);
+        })
+        .attr("width", function (d, i, da) {
+            return (width / da.length);
+        })
+        .attr("height", function (d) {
+            return height2 - y2(d.current_power);
+        })
+        .attr("fill", " rgb(254, 164, 102)")
+        .attr("clip-path", "url(#clip)");
+
     // make timeSlot
     timeSlot.selectAll("rect")
         .data(dataSet).enter()
         .append("rect")
         .attr("class", "timeSlot")
-        .attr("x", function (d, i, da) { return (xScale(d.date) - (width / da.length) * 0.5); })
-        .attr("y", margin.top)
-        .attr("width", function (d, i, da) {
-            return (width / da.length) * 1.1;
-        })
-        .attr("height", margin.bottom)
-        .style("fill", function (d) { return newRamp(d.timeSlot); })
-        .attr("clip-path", "url(#clip)");
-
-    //
-    timeSlot2.selectAll("rect")
-        .data(dataSet).enter()
-        .append("rect")
-        .attr("class", "timeSlot2")
         .attr("x", function (d, i, da) { return (xScale(d.date) - (width / da.length) * 0.5); })
         .attr("y", margin.top)
         .attr("width", function (d, i, da) {
@@ -333,7 +345,6 @@ function drawChart(dataSet) {
             }
         });
 
-
     // set axis
     axis.append("g")
         .attr("class", "axis-x")
@@ -360,6 +371,7 @@ function drawChart(dataSet) {
     //
     axis2.append("g")
         .attr("class", "axis axis-x")
+        .attr("transform", "translate(0 , 70)")
         .call(xAxis2);
 
     axis2.append("g")

@@ -20,7 +20,6 @@ d3.json("seg2_data.json", function (error, myData) {
     name = dataSet[0].name;
     id = dataSet[0].id;
 
-
     dataSet.forEach(function (d, i, da) {
 
         d.date = new Date(d.time_stamp);
