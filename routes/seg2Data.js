@@ -17,7 +17,7 @@ var config = {
     password: 'vmlab347!',
     host: '203.252.208.247',
     port: 22,
-    dstPort: 27018
+    dstPort: 27019
 };
 
 //python options
@@ -28,6 +28,7 @@ var options = {
     args: ['골든팰리스']
 };
 
+/*
 //실시간 데이터 실행.
 PythonShell.run('test_realtime.py', options, function (err, results) {
     if (err) throw err;
@@ -40,15 +41,17 @@ PythonShell.run('test_realtime.py', options, function (err, results) {
     results.forEach(element => {
         
         if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
-            var year = new Date().getFullYear();
-            var month = new Date().getMonth() + 1;
-            var realtime = JSON.parse(element.data.slice(-1)[0]);
-            realtime.date = year + "-" + month;
-            dateD.push(realtime); //실시간 데이터와 연결시키기.
+            console.log(element.data)
+            // var year = new Date().getFullYear();
+            // var month = new Date().getMonth() + 1;
+            // var realtime = JSON.parse(element.data.slice(-1)[0]);
+            // realtime.date = year + "-" + month;
+            // dateD.push(realtime); //실시간 데이터와 연결시키기.
 
         }
     });
 });
+*/
 
 function groupBy(array, col, value) {
     var r = [], o = {};
@@ -77,8 +80,14 @@ var server = tunnel(config, function (error, data) {
 
         db.collection('골든팰리스').find(query).toArray(function (findErr, data) {
             if (findErr) throw findErr;
+
+            var i = 0;
             data.forEach(function (element) {
-                console.log(element)
+                // console.log(i++)
+                // console.log(element)
+
+                dateD.push(element.data)
+                
 
                 // var jsonD = element.data[0];
                 // var d = new Date(jsonD.date);
@@ -102,7 +111,9 @@ var server = tunnel(config, function (error, data) {
                 // }
 
             });
-            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
+            console.log(dateD)
+            //result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
+            //console.log(result)
 
 
         });
