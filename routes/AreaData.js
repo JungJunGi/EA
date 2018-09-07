@@ -15,7 +15,6 @@ var start = function (company, companyDB) {
     router.get('/area/company=' + encodeURI(companyURL), (req, res) => {
         var dateD = [];
         var departD = [];
-        var maindata = new Set();
 
         //python options
         var options = {
@@ -62,7 +61,7 @@ var start = function (company, companyDB) {
                 var year = new Date().getFullYear();
                 var month = new Date().getMonth() + 1;
 
-                maindata.add(element.meta.depart);
+                departD.push(element.meta.depart);
 
                 if (element.meta.year == year && element.meta.month == month) { }
                 else if (jsonD.date.indexOf("-01 00:") != -1) {
@@ -94,9 +93,11 @@ var start = function (company, companyDB) {
 
             });
 
-            maindata.forEach(function (element) {
-                departD.push(element);
-            });
+            //부서명 중복 제거.
+            var uniq = departD.reduce(function(a,b){
+                if (a.indexOf(b) < 0 ) a.push(b);
+                return a;
+              },[]);
 
             //같은 날짜의 데이터끼리 groupBy
             const mergedArray = Array.from(
@@ -106,7 +107,7 @@ var start = function (company, companyDB) {
                 ).values()
             );
 
-            return res.json({ "depart": departD, "data": mergedArray });
+            return res.json({ "depart": uniq, "data": mergedArray });
         });
     });
 
