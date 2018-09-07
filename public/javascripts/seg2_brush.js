@@ -13,8 +13,48 @@ var margin = { top: 50, right: 40, bottom: 60, left: 50 },
 var xScale, xScale2, yScaleB, yScaleA;
 var name, id;
 
-d3.json("/segData/seg2", function (error, myData) {
+d3.json("/a/seg2Data", function (error, myData) {
 
+    var dataSet = myData.data;
+
+    // console.log(dataSet[0].date)
+    // console.log(dataSet[dataSet.length-1].date)
+
+    dataSet.forEach(function (d, i, da) {
+        d.date = new Date(d.date);
+        d.value = Number(d.value);
+
+        if (i == 0) {
+            da[i].current_power = da[i].value;
+        } else {
+            da[i].current_power = da[i].value - da[i - 1].value;
+        }
+
+        d.timeSlot = checkTimeSlot(d.date);
+    });
+
+    console.log(dataSet)
+/*
+    dataSet.forEach(function (d, i, da) {
+
+        d.date = new Date(d.time_stamp);
+
+        d.current_power = +d.accumulate_power;
+
+        if (i > 0) {
+            da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
+        }
+
+        d.contact_demand = d.current_power / d.contact_power;
+
+        d.timeSlot = checkTimeSlot(d.date);
+    })
+
+    setScales(myData.meta, dataSet);
+    drawChart(dataSet);
+*/
+
+/*
     var dataSet = myData.data;
 
     name = dataSet[0].name;
@@ -38,7 +78,8 @@ d3.json("/segData/seg2", function (error, myData) {
 
     setScales(myData.meta, dataSet);
     drawChart(dataSet);
-})
+*/
+});
 
 
 function setScales(meta, dataSet) {

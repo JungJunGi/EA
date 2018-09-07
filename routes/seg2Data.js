@@ -58,10 +58,7 @@ function groupBy(array, col, value) {
     var r = [], o = {};
 
     array.forEach(function (d) {
-        if (!d[col]){
-            console.log(d[col])
-        }
-        else {
+        if (d[col]){
             if (!o[d[col]]) {
                 o[d[col]] = {};
                 o[d[col]][col] = d[col];
@@ -106,13 +103,10 @@ var server = tunnel(config, function (error, data) {
                     
                     dateD.push(el);
                     
-
                 });
             });
-            
-            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
 
-            // console.log(result)
+            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
             return result;
 
         });
