@@ -60,7 +60,6 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             else { d[1] = d[0]; }
             return y(d[1]);
         });
-    console.log(series)
 
     areaSvg.append("g")
         .selectAll("g")
@@ -124,6 +123,8 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
         focus.attr("transform", "translate(" + x(d.date) + "," + y(sum(d, key)) + ")");
+        focus.select(".x").attr("y2", area_height - y(sum(d, key)) - 25);
+
         //tooltip.style("top", (y(sum(d, key)) + 1100) + "px").style("left", x(d.date) + "px");
         tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
         tooltip.html("Date: " + format(d.date) + "<hr>" + text(d, key));
@@ -147,7 +148,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     function text(d, key) {
         var text = "";
         var sum = 0;
-        for (var i = data.depart.length-1; i >= 0; i--) {
+        for (var i = data.depart.length - 1; i >= 0; i--) {
             if (d[data.depart[i]] > 0) {
                 if (key == data.depart[i]) {
                     text += "<font color=" + z(key) + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";
@@ -180,7 +181,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
 
     function stackMin(serie) {
         return d3.min(serie, function (d) { return d[0]; });
-    } //만약 값이 없을때??
+    }
 
     function stackMax(serie) {
         return d3.max(serie, function (d) { return d[1]; });
@@ -194,13 +195,13 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     focus.append("circle")
         .attr("r", 5);
 
-    /*focus.append("line")
-    .attr("class", "x")
-    .style("stroke", "black")
-    .style("stroke-dasharray", "3,3")
-    .style("opacity", 1)
-    .attr("y1", 0)
-    .attr("y2", area_height);*/
+    focus.append("line")
+        .attr("class", "x")
+        .style("stroke", "black")
+        .style("stroke-dasharray", "3,3")
+        .style("opacity", 1)
+        .attr("y1", 0)
+        .attr("y2", area_height);
 
     var tooltip = d3.select("body")
         .append("div")

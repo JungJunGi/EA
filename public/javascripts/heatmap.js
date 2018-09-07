@@ -36,7 +36,7 @@ dayLabels.append("text")
 
 var timeLabels = m_svg.append('g').selectAll(".timeLabel")
     .data(times).enter();
-    
+
 timeLabels.append("text")
     .text(function (d) { return d; })
     .attr("x", function (d, i) { return i * gridSize + 22; })
@@ -123,7 +123,7 @@ var heatmapChart = function (jsonFile) {
         //bubble
         var bubble = d3.pack()
             .size([diameter, diameter])
-            .padding(15);
+            .padding(60);
         var trans = d3.transition()
             .duration(750)
             .ease(d3.easeBounce);
@@ -144,7 +144,7 @@ var heatmapChart = function (jsonFile) {
 
             node.append("circle")
                 .transition(trans) //transition적용
-                .attr("r", function (d) { return d.r; })
+                .attr("r", function (d) { if (d.value != 0) return d.r + 15; })
                 .style("fill", (d) => colorScale(d.value));
 
             node.append("text")

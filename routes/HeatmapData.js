@@ -41,7 +41,7 @@ var start = function (company, companyDB) {
                 if (element.meta.year == thisYear) {
                     da.forEach(function (ele) {
                         var jsonD = JSON.parse(ele)
-                        if (jsonD.date.indexOf(':00:00') != -1) { //올해이고 정각이면
+                        //if (jsonD.date.indexOf(':00:00') != -1) { //올해이고 정각이면
                             var d = new Date(jsonD.date).getDay();
                             var h = Number(jsonD.date.substring(11, 13));
                             if (h == 0) { h = 24; }
@@ -54,7 +54,7 @@ var start = function (company, companyDB) {
                                 depart: element.meta.depart,
                                 value: val
                             });
-                        }
+                        //}
                     });
                 }
             });
