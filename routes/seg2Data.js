@@ -1,4 +1,5 @@
-//전기요금 데이터 - mongodb연동
+/* 회사의 모든 부서 - 5분 단위 전력 사용량 */
+/* 김지연 */
 
 var MongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017';
@@ -11,7 +12,7 @@ var PythonShell = require('python-shell'); //python 호출
 
 var result, dateD = [];
 
-//mongo ssh-tunneling option
+// mongo ssh-tunneling option
 var config = {
     username: 'elec',
     password: 'vmlab347!',
@@ -20,7 +21,7 @@ var config = {
     dstPort: 27019
 };
 
-//python options
+// python options
 var options = {
     mode: 'json',
     pythonPath: '',
@@ -28,8 +29,8 @@ var options = {
     args: ['골든팰리스']
 };
 
-/*
-//실시간 데이터 실행.
+
+// 실시간 데이터 실행.
 PythonShell.run('test_realtime.py', options, function (err, results) {
     if (err) throw err;
 
@@ -37,35 +38,50 @@ PythonShell.run('test_realtime.py', options, function (err, results) {
     if (results == null)
         return;
 
-    //console.log('results: %j', results);
     results.forEach(element => {
         
         if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
-            console.log(element.data)
-            // var year = new Date().getFullYear();
-            // var month = new Date().getMonth() + 1;
-            // var realtime = JSON.parse(element.data.slice(-1)[0]);
-            // realtime.date = year + "-" + month;
-            // dateD.push(realtime); //실시간 데이터와 연결시키기.
+            
+            element.data.forEach(function (el){
+
+                dateD.push(el)
+
+            });
 
         }
     });
 });
-*/
+
 
 function groupBy(array, col, value) {
+
     var r = [], o = {};
-    array.forEach(function (a) {
-        if (!o[a[col]]) {
-            o[a[col]] = {};
-            o[a[col]][col] = a[col];
-            o[a[col]][value] = 0;
-            r.push(o[a[col]]);
+
+    array.forEach(function (d) {
+        if (d[col]){
+            if (!o[d[col]]) {
+                o[d[col]] = {};
+                o[d[col]][col] = d[col];
+                o[d[col]][value] = 0;
+                r.push(o[d[col]]);
+            }
+            o[d[col]][value] += +d[value];
         }
-        o[a[col]][value] += +a[value];
     });
+    
     return r;
 };
+
+
+var start = function (company, companyDB) { 
+
+    router.get('/money/company=' + encodeURI(companyURL), (req, res) => {
+
+
+
+    });
+}
+
 
 var server = tunnel(config, function (error, data) {
     if (error) {
@@ -81,40 +97,17 @@ var server = tunnel(config, function (error, data) {
         db.collection('골든팰리스').find(query).toArray(function (findErr, data) {
             if (findErr) throw findErr;
 
-            var i = 0;
             data.forEach(function (element) {
-                // console.log(i++)
-                // console.log(element)
 
-                dateD.push(element.data)
-                
-
-                // var jsonD = element.data[0];
-                // var d = new Date(jsonD.date);
-                // var year = new Date().getFullYear();
-                // var month = new Date().getMonth() + 1;
-
-                // if (element.meta.year == year && element.meta.month == month) { }
-                // else {
-                //     //다음달 1일이 전달 전기요금.
-
-                //     if (d.getMonth() == 0) {//1월이면
-                //         jsonD.date = (d.getFullYear() - 1) + "-12";
-                //     }
-                //     else if (d.getMonth() < 10) {
-                //         jsonD.date = d.getFullYear() + "-0" + d.getMonth();
-                //     }
-                //     else {//1월이 아니면
-                //         jsonD.date = d.getFullYear() + "-" + d.getMonth();
-                //     }
-                //     dateD.push(jsonD);
-                // }
-
+                element.data.forEach(function (el){
+                    
+                    dateD.push(el);
+                    
+                });
             });
-            console.log(dateD)
-            //result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-            //console.log(result)
 
+            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
+            return result;
 
         });
     });
@@ -124,9 +117,12 @@ router.get('/seg2Data', (req, res) => {
     return res.json(result);
 });
 
-/*setTimeout(function () {
+/*
+setTimeout(function () {
     server.close();
 }, 2000)
 */
 
+
+// module.exports.start = start;
 module.exports = router;

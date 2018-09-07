@@ -5,20 +5,44 @@ var margin = { top: 50, right: 40, bottom: 60, left: 50 },
     margin2 = { top: 600, right: 20, bottom: 30, left: 50 },
 
     width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 500 - margin.top - margin.bottom,
+    height2 = 700 - margin2.top - margin2.bottom,
 
-height2 = 700 - margin2.top - margin2.bottom;
+    xScale, xScale2, yScaleB, yScaleA;
 
-
-var xScale, xScale2, yScaleB, yScaleA;
-var name, id;
-
-d3.json("seg2_data.json", function (error, myData) {
+d3.json("/a/seg2Data", function (error, myData) {
 
     var dataSet = myData.data;
 
-    name = dataSet[0].name;
-    id = dataSet[0].id;
+    dataSet.forEach(function (d, i, da) {
+        d.date = new Date(d.date);
+        d.value = Number(d.value);
+
+        if (i == 0) {
+            da[i].current_power = da[i].value;
+        } else {
+            da[i].current_power = da[i].value - da[i - 1].value;
+        }
+
+        d.contact_demand = d.current_power; // 후에 변경해야 함.
+        d.timeSlot = checkTimeSlot(d.date);
+    });
+
+/*
+    dataSet.forEach(function (d, i, da) {
+
+        d.date = new Date(d.time_stamp);
+
+        d.current_power = +d.accumulate_power;
+
+        if (i > 0) {
+            da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
+        }
+
+        d.contact_demand = d.current_power / d.contact_power;
+
+        d.timeSlot = checkTimeSlot(d.date);
+    })
 
 
     dataSet.forEach(function (d, i, da) {
@@ -35,16 +59,24 @@ d3.json("seg2_data.json", function (error, myData) {
 
         d.timeSlot = checkTimeSlot(d.date);
     })
+*/
 
-    setScales(myData.meta, dataSet);
+    setScales(dataSet);
     drawChart(dataSet);
-})
+
+});
 
 
-function setScales(meta, dataSet) {
+function setScales(dataSet) {
 
-    var start_date = new Date(meta.start_ts);
-    var end_date = new Date(meta.end_ts);
+    // console.log(dataSet[0].date)
+    // console.log(dataSet[dataSet.length-1].date)
+
+    var start_date = dataSet[0].date;
+    var end_date = dataSet[dataSet.length-1].date;
+
+    console.log(start_date)
+    console.log(end_date)
 
     xScale = d3.scaleTime().domain(d3.extent([start_date, end_date])).range([0, width]);
     xScale2 = d3.scaleTime().domain(xScale.domain()).range(xScale.range());
@@ -69,12 +101,11 @@ function setScales(meta, dataSet) {
 function drawChart(dataSet) {
 
     var xAxis = d3.axisBottom(xScale),
-        //
         xAxis2 = d3.axisBottom(xScale2),
 
         yAxisB = d3.axisLeft(yScaleB),
         yAxisA = d3.axisRight(yScaleA);
-    //
+    
     var brush = d3.brushX()
         .extent([[0, 0], [width, 70]])
         .on("brush end", brushed);
@@ -89,14 +120,13 @@ function drawChart(dataSet) {
         .range(["limegreen", "green", "darkgreen"]);
 
     // ON svg
-    var svg = d3.select('.seg2_chart') //d3.select("svg")
+    var svg = d3.select('.seg2_chart')
         .attr("width", width + 200)
         .attr("transform", function (d, i) {
             return "translate(100, 0)";
         })
         .call(zoom);
 
-    //var user = svg.append("g");
 
     var chartArea = svg.append("g");
 
@@ -108,12 +138,7 @@ function drawChart(dataSet) {
         .attr("transform", function (d, i) {
             return "translate(" + 150 + "," + (440 + (i * 20)) + ")";
         });
-    /*
-    user.append("text")
-        .attr("class", "user")
-        .text("USER >>  NAME : " + name + ", ID : " + id)
-        .attr("transform", "translate(20, 25)");
-    */
+
 
     chartArea.append("defs").append("clipPath")
         .attr("id", "clip")
@@ -160,12 +185,12 @@ function drawChart(dataSet) {
 
     var getDate = d3.timeFormat("%Y-%m-%d %H:%M");
 
+
     // set tool tip
     var tip = d3.tip()
         .attr("class", "d3-tip")
         .offset([-10, 0])
         .html(function (d) {
-            //console.log(d3.event.offsetX, d3.event.offsetY)
             return "Date: <span style=\"color:yellow\">" + getDate(d.date) +
                 "</span><br>Amount of Electricity Used: " +
                 "<span style=\"color:yellow\">" + d.current_power + "</span>" +
@@ -199,7 +224,7 @@ function drawChart(dataSet) {
         axis2.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
     }
 
-    //brush function
+    // brush function
     function brushed() {
         if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
         var s = d3.event.selection || xScale2.range();
@@ -245,7 +270,7 @@ function drawChart(dataSet) {
         .attr("d", valueArea)
         .attr("clip-path", "url(#clip)");
 
-    /*
+/*
     axis2.append("path")
         .attr("class", "area")
         .datum(dataSet)
@@ -268,8 +293,6 @@ function drawChart(dataSet) {
             return height - yScaleB(d.current_power);
         })
         .attr("clip-path", "url(#clip)")
-        //.on("mouseover", tip.show)
-        //.on("mouseout", tip.hide)
         .on("mouseover", function (d) {
             tip.show(d);
             d3.select(this)
@@ -378,7 +401,6 @@ function drawChart(dataSet) {
         .attr("class", "brush")
         .call(brush)
         .call(brush.move, xScale.range());
-
 }
 
 
