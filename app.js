@@ -35,10 +35,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
- app.use('/', userRouter);
-// app.use('/segData', areaRouter);
-// app.use('/moneyData', moneyLine);
-// app.use('/heatmapData', heatmapRouter);
+app.use('/', userRouter);
+//app.use('/segData', areaRouter);
+//app.use('/moneyData', moneyLine);
+//app.use('/heatmapData', heatmapRouter);
 app.use('/a', a);
 
 // catch 404 and forward to error handler
