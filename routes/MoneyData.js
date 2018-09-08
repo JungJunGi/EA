@@ -5,8 +5,6 @@ var PythonShell = require('python-shell'); //python 호출
 
 var start = function (company, companyDB) {
 
-    var query = { "meta.item": "ELECTRIC_CHARGE" };
-
     var companyURL = company;
     if (companyURL.indexOf("(주)") != -1)
         companyURL = companyURL.replace("(주)", "")
@@ -14,7 +12,7 @@ var start = function (company, companyDB) {
     router.get('/money/company=' + encodeURI(companyURL), (req, res) => {
         var result, dateD = [];
 
-        //python options
+        /** Python Options **/
         var options = {
             mode: 'json',
             pythonPath: '',
@@ -22,18 +20,19 @@ var start = function (company, companyDB) {
             args: [company]
         };
 
-        //실시간 데이터 실행.
+        var query = { "meta.item": "ELECTRIC_CHARGE" };
+
+        /** From Maria DB **/
         PythonShell.run('test_realtime.py', options, function (err, results) {
             if (err) throw err;
 
-            console.log("실시간데이터 가져오기 from python")
+            console.log("실시간데이터 가져오기 by python")
             if (results == null)
                 return;
 
-            //console.log('results: %j', results);
             results.forEach(element => {
 
-                if (element.meta.item == "ELECTRIC_CHARGE") {
+                if (element.meta.item ==  query["meta.item"]) {
                     var year = new Date().getFullYear();
                     var month = new Date().getMonth() + 1;
                     var realtime = JSON.parse(element.data.slice(-1)[0]);
@@ -44,12 +43,13 @@ var start = function (company, companyDB) {
                     else
                         realtime.date = year + "-" + month;
 
-                    dateD.push(realtime); //실시간 데이터와 연결시키기.
+                    dateD.push(realtime);
 
                 }
             });
         });
 
+        /** From Mongo DB **/
         companyDB.collection(company).find(query).toArray(function (findErr, data) {
             if (findErr) throw findErr;
             data.forEach(function (element) {
@@ -60,28 +60,23 @@ var start = function (company, companyDB) {
                 var month = new Date().getMonth() + 1;
 
                 if (element.meta.year == year && element.meta.month == month) { }
-                else {
-                    //다음달 1일이 전달 전기요금.
+                else { //다음달 1일이 전달 전기요금.
 
-                    if (d.getMonth() == 0) {//1월이면
+                    if (d.getMonth() == 0) { //1월이면
                         jsonD.date = (d.getFullYear() - 1) + "-12";
                     }
                     else if (d.getMonth() < 10) {
                         jsonD.date = d.getFullYear() + "-0" + d.getMonth();
                     }
-                    else {//1월이 아니면
+                    else { //1월이 아니면
                         jsonD.date = d.getFullYear() + "-" + d.getMonth();
                     }
                     dateD.push(jsonD);
                 }
 
-
             });
             result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-
             return res.json(result);
-
-
         });
     });
 }

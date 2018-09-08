@@ -10,79 +10,57 @@ var margin = { top: 50, right: 40, bottom: 60, left: 50 },
 
     xScale, xScale2, yScaleB, yScaleA;
 
-function myChart(jsonFile) {}
+
 
 // user company 정보 가져오기
 var companyName = document.getElementById("userCompany").innerHTML;
 
-if (companyName.indexOf("(주)") != -1)
+if (companyName.indexOf("(주)") != -1) {
     companyName = companyName.replace("(주)", "")
-
-myChart('/seg2Data/seg2/company=' + companyName);
-
-
-
-myChart = function (jsonFile) {
-    d3.json(jsonFile, function (error, myData) {
-
-        var dataSet = myData.data;
-
-        dataSet.forEach(function (d, i, da) {
-            d.date = new Date(d.date);
-            d.value = Number(d.value);
-
-            if (i == 0) {
-                da[i].current_power = da[i].value;
-            } else {
-                da[i].current_power = da[i].value - da[i - 1].value;
-            }
-
-            if (d.current_power < 0) {
-                d.current_power = 0;
-            }
-
-            d.contact_demand = d.current_power; // 후에 변경해야 함.
-            d.timeSlot = checkTimeSlot(d.date);
-        });
-
-    /*
-        dataSet.forEach(function (d, i, da) {
-
-            d.date = new Date(d.time_stamp);
-
-            d.current_power = +d.accumulate_power;
-
-            if (i > 0) {
-                da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
-            }
-
-            d.contact_demand = d.current_power / d.contact_power;
-
-            d.timeSlot = checkTimeSlot(d.date);
-        })
-
-
-        dataSet.forEach(function (d, i, da) {
-
-            d.date = new Date(d.time_stamp);
-
-            d.current_power = +d.accumulate_power;
-
-            if (i > 0) {
-                da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
-            }
-
-            d.contact_demand = d.current_power / d.contact_power;
-
-            d.timeSlot = checkTimeSlot(d.date);
-        })
-    */
-
-        setScales(dataSet);
-        drawChart(dataSet);
-
-    });
 }
+
+
+d3.json('/seg2Data/seg2/company=' + companyName, function (error, myData) {
+
+    var dataSet = myData.data;
+
+    dataSet.forEach(function (d, i, da) {
+        d.date = new Date(d.date);
+        d.value = Number(d.value);
+
+        if (i == 0) {
+            da[i].current_power = da[i].value;
+        } else {
+            da[i].current_power = da[i].value - da[i - 1].value;
+        }
+
+        if (d.current_power < 0) {
+            d.current_power = 0;
+        }
+
+        d.contact_demand = d.current_power; // 후에 변경해야 함.
+        d.timeSlot = checkTimeSlot(d.date);
+    });
+
+/*
+    dataSet.forEach(function (d, i, da) {
+
+        d.date = new Date(d.time_stamp);
+        d.current_power = +d.accumulate_power;
+
+        if (i > 0) {
+            da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
+        }
+
+        d.contact_demand = d.current_power / d.contact_power;
+        d.timeSlot = checkTimeSlot(d.date);
+    })
+*/
+
+    setScales(dataSet);
+    drawChart(dataSet);
+});
+
 
 
 function setScales(dataSet) {
@@ -102,7 +80,7 @@ function setScales(dataSet) {
     yScaleA = d3.scaleLinear()
         .domain([0, 1])
         .range(yScaleB.range());
-        
+  
     y2 = d3.scaleLinear()
         .domain([0, d3.max(dataSet, function (d) {
             return d.current_power;
@@ -207,9 +185,9 @@ function drawChart(dataSet) {
         .html(function (d) {
             return "Date: <span style=\"color:yellow\">" + getDate(d.date) +
                 "</span><br>Amount of Electricity Used: " +
-                "<span style=\"color:yellow\">" + d.current_power + "</span>" +
-                "<br>Contract Demand: <span style=\"color:yellow\">" +
-                d3.format(".0%")(d.contact_demand) + "</span>";
+                "<span style=\"color:yellow\">" + d.current_power + "</span>"; //+
+                // "<br>Contract Demand: <span style=\"color:yellow\">" +
+                // d3.format(".0%")(d.contact_demand) + "</span>";
         });
 
     chartArea.call(tip);
@@ -228,7 +206,7 @@ function drawChart(dataSet) {
             .attr("transform", function () {
                 return "translate(" + d3.event.transform.x + ", 0) scale(" + d3.event.transform.k + ", 1)"
             })
-        chart.select(".areaChart").attr("d", valueArea);
+        // chart.select(".areaChart").attr("d", valueArea);
 
         timeSlot.selectAll(".timeSlot")
             .attr("transform", function () {
@@ -252,7 +230,7 @@ function drawChart(dataSet) {
             .attr("transform", function () {
                 return "translate(" + -position + ", 0) scale(" + width / (s[1] - s[0]) + ", 1)"
             });
-        chart.select(".areaChart").attr("d", valueArea);
+        // chart.select(".areaChart").attr("d", valueArea);
 
         timeSlot.selectAll(".timeSlot")
             .attr("transform", function () {
@@ -265,6 +243,7 @@ function drawChart(dataSet) {
     }
 
     // make chart
+/*
     var valueArea = d3.area()
         .curve(d3.curveMonotoneX)
         .x(function (d) { return xScale(d.date); })
@@ -284,7 +263,7 @@ function drawChart(dataSet) {
         .attr("d", valueArea)
         .attr("clip-path", "url(#clip)");
 
-/*
+
     axis2.append("path")
         .attr("class", "area")
         .datum(dataSet)

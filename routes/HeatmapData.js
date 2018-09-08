@@ -16,7 +16,7 @@ var start = function (company, companyDB) {
         var arr = [];
 
 
-        //python options
+        /** Python Options **/
         var options = {
             mode: 'json',
             pythonPath: '',
@@ -24,18 +24,17 @@ var start = function (company, companyDB) {
             args: [company]
         };
 
-        //실시간 데이터 실행.
+        /** From Maria DB **/
         PythonShell.run('test_realtime.py', options, function (err, results) {
             if (err) throw err;
 
-            console.log("실시간데이터 가져오기 from python")
+            console.log("실시간데이터 가져오기 by python")
             if (results == null)
                 return;
 
             results.forEach(function (element) {
                 var da = element.data;
                 var thisYear = new Date().getFullYear();
-                //console.log(element.data)
 
                 //data
                 if (element.meta.year == thisYear) {
@@ -60,6 +59,7 @@ var start = function (company, companyDB) {
             });
         });
 
+        /** From Mongo DB **/
         companyDB.collection(company).find(query).toArray(function (findErr, data) {
             if (findErr) throw findErr;
 

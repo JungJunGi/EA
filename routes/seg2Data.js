@@ -1,13 +1,8 @@
 /* 회사의 모든 부서 - 5분 단위 전력 사용량 */
 /* 김지연 */
 
-var MongoClient = require('mongodb').MongoClient;
-var url = 'mongodb://localhost:27017';
-
 var express = require("express");
 var router = express.Router();
-
-var tunnel = require('tunnel-ssh');
 var PythonShell = require('python-shell'); //python 호출
 
 var result, dateD = [];
@@ -39,7 +34,7 @@ var start = function (company, companyDB) {
 
     router.get('/seg2/company=' + encodeURI(companyURL), (req, res) => {
 
-        // python options
+        /** Python Options **/
         var options = {
             mode: 'json',
             pythonPath: '',
@@ -48,10 +43,8 @@ var start = function (company, companyDB) {
         };
 
         var query = { "meta.item": "ACCUMULATE_POWER_CONSUMPTION" };
-        console.log(query)
-        console.log(query["meta.item"])
 
-        // From Maria DB
+        /** From Maria DB **/
         PythonShell.run('test_realtime.py', options, function (err, results) {
             if (err) throw err;
 
@@ -61,7 +54,7 @@ var start = function (company, companyDB) {
 
             results.forEach(element => {
                 
-                if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
+                if (element.meta.item == query["meta.item"]) {
                     
                     element.data.forEach(function (el){
 
@@ -71,13 +64,13 @@ var start = function (company, companyDB) {
                 }
             });
 
-            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-            console.log(result)
+            // result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
+            // console.log(result)
         });
 
-        // From Mongo DB
-        companyDB.collection(company).find(query).toArray(function (findErr, data) {
-            if (findErr) throw findErr;
+        /** From Mongo DB **/
+        companyDB.collection(company).find(query).toArray(function (err, data) {
+            if (err) throw err;
 
             data.forEach(function (element) {
 
@@ -87,12 +80,11 @@ var start = function (company, companyDB) {
                     
                 });
             });
-            // result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-            // return result;
 
+            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
+            console.log(result)
+            return res.json(result);
         });
-        
-
     });
 }
 

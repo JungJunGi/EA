@@ -5,9 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var userRouter = require('./routes/user');
-//var areaRouter = require('./routes/AreaData').router;
-//var moneyRouter = require('./routes/MoneyData').router;
-// var heatmapRouter = require('./routes/HeatmapData').router;
+var areaRouter = require('./routes/AreaData').router;
+var moneyRouter = require('./routes/MoneyData').router;
+var heatmapRouter = require('./routes/HeatmapData').router;
 var seg2Router = require('./routes/seg2Data').router;
 
 /*
@@ -30,9 +30,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', userRouter);
-// app.use('/segData', areaRouter);
-// app.use('/moneyData', moneyRouter);
-// app.use('/heatmapData', heatmapRouter);
+app.use('/segData', areaRouter);
+app.use('/moneyData', moneyRouter);
+app.use('/heatmapData', heatmapRouter);
 app.use('/seg2', seg2Router);
 
 
