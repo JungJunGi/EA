@@ -10,65 +10,79 @@ var margin = { top: 50, right: 40, bottom: 60, left: 50 },
 
     xScale, xScale2, yScaleB, yScaleA;
 
-d3.json("/a/seg2Data", function (error, myData) {
+function myChart(jsonFile) {}
 
-    var dataSet = myData.data;
+// user company 정보 가져오기
+var companyName = document.getElementById("userCompany").innerHTML;
 
-    dataSet.forEach(function (d, i, da) {
-        d.date = new Date(d.date);
-        d.value = Number(d.value);
+if (companyName.indexOf("(주)") != -1)
+    companyName = companyName.replace("(주)", "")
 
-        if (i == 0) {
-            da[i].current_power = da[i].value;
-        } else {
-            da[i].current_power = da[i].value - da[i - 1].value;
-        }
+myChart('/seg2Data/seg2/company=' + companyName);
 
-        if (d.current_power < 0) {
-            d.current_power = 0;
-        }
 
-        d.contact_demand = d.current_power; // 후에 변경해야 함.
-        d.timeSlot = checkTimeSlot(d.date);
+
+myChart = function (jsonFile) {
+    d3.json(jsonFile, function (error, myData) {
+
+        var dataSet = myData.data;
+
+        dataSet.forEach(function (d, i, da) {
+            d.date = new Date(d.date);
+            d.value = Number(d.value);
+
+            if (i == 0) {
+                da[i].current_power = da[i].value;
+            } else {
+                da[i].current_power = da[i].value - da[i - 1].value;
+            }
+
+            if (d.current_power < 0) {
+                d.current_power = 0;
+            }
+
+            d.contact_demand = d.current_power; // 후에 변경해야 함.
+            d.timeSlot = checkTimeSlot(d.date);
+        });
+
+    /*
+        dataSet.forEach(function (d, i, da) {
+
+            d.date = new Date(d.time_stamp);
+
+            d.current_power = +d.accumulate_power;
+
+            if (i > 0) {
+                da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
+            }
+
+            d.contact_demand = d.current_power / d.contact_power;
+
+            d.timeSlot = checkTimeSlot(d.date);
+        })
+
+
+        dataSet.forEach(function (d, i, da) {
+
+            d.date = new Date(d.time_stamp);
+
+            d.current_power = +d.accumulate_power;
+
+            if (i > 0) {
+                da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
+            }
+
+            d.contact_demand = d.current_power / d.contact_power;
+
+            d.timeSlot = checkTimeSlot(d.date);
+        })
+    */
+
+        setScales(dataSet);
+        drawChart(dataSet);
+
     });
-
-/*
-    dataSet.forEach(function (d, i, da) {
-
-        d.date = new Date(d.time_stamp);
-
-        d.current_power = +d.accumulate_power;
-
-        if (i > 0) {
-            da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
-        }
-
-        d.contact_demand = d.current_power / d.contact_power;
-
-        d.timeSlot = checkTimeSlot(d.date);
-    })
-
-
-    dataSet.forEach(function (d, i, da) {
-
-        d.date = new Date(d.time_stamp);
-
-        d.current_power = +d.accumulate_power;
-
-        if (i > 0) {
-            da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
-        }
-
-        d.contact_demand = d.current_power / d.contact_power;
-
-        d.timeSlot = checkTimeSlot(d.date);
-    })
-*/
-
-    setScales(dataSet);
-    drawChart(dataSet);
-
-});
+}
 
 
 function setScales(dataSet) {

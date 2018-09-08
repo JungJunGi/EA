@@ -12,47 +12,6 @@ var PythonShell = require('python-shell'); //python 호출
 
 var result, dateD = [];
 
-// mongo ssh-tunneling option
-var config = {
-    username: 'elec',
-    password: 'vmlab347!',
-    host: '203.252.208.247',
-    port: 22,
-    dstPort: 27019
-};
-
-// python options
-var options = {
-    mode: 'json',
-    pythonPath: '',
-    scriptPath: './module/',
-    args: ['골든팰리스']
-};
-
-
-// 실시간 데이터 실행.
-PythonShell.run('test_realtime.py', options, function (err, results) {
-    if (err) throw err;
-
-    console.log("실시간데이터 가져오기 from python")
-    if (results == null)
-        return;
-
-    results.forEach(element => {
-        
-        if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
-            
-            element.data.forEach(function (el){
-
-                dateD.push(el)
-
-            });
-
-        }
-    });
-});
-
-
 function groupBy(array, col, value) {
 
     var r = [], o = {};
@@ -68,33 +27,56 @@ function groupBy(array, col, value) {
             o[d[col]][value] += +d[value];
         }
     });
-    
     return r;
 };
 
 
-var start = function (company, companyDB) { 
+var start = function (company, companyDB) {
+    
+    var companyURL = company;
+    if (companyURL.indexOf("(주)") != -1)
+        companyURL = companyURL.replace("(주)", "")
 
-    router.get('/money/company=' + encodeURI(companyURL), (req, res) => {
+    router.get('/seg2/company=' + encodeURI(companyURL), (req, res) => {
 
+        // python options
+        var options = {
+            mode: 'json',
+            pythonPath: '',
+            scriptPath: './module/',
+            args: [company]
+        };
 
-
-    });
-}
-
-
-var server = tunnel(config, function (error, data) {
-    if (error) {
-        console.log("SSH connection error: " + error);
-    }
-
-    MongoClient.connect(url, { useNewUrlParser: true }, function (err, database) {
-        if (err) return;
-
-        var db = database.db('companyData');
         var query = { "meta.item": "ACCUMULATE_POWER_CONSUMPTION" };
+        console.log(query)
+        console.log(query["meta.item"])
 
-        db.collection('골든팰리스').find(query).toArray(function (findErr, data) {
+        // From Maria DB
+        PythonShell.run('test_realtime.py', options, function (err, results) {
+            if (err) throw err;
+
+            console.log("실시간데이터 가져오기 by python")
+            if (results == null)
+                return;
+
+            results.forEach(element => {
+                
+                if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
+                    
+                    element.data.forEach(function (el){
+
+                        dateD.push(el);
+
+                    });
+                }
+            });
+
+            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
+            console.log(result)
+        });
+
+        // From Mongo DB
+        companyDB.collection(company).find(query).toArray(function (findErr, data) {
             if (findErr) throw findErr;
 
             data.forEach(function (element) {
@@ -105,24 +87,15 @@ var server = tunnel(config, function (error, data) {
                     
                 });
             });
-
-            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-            return result;
+            // result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
+            // return result;
 
         });
+        
+
     });
-});
-
-router.get('/seg2Data', (req, res) => {
-    return res.json(result);
-});
-
-/*
-setTimeout(function () {
-    server.close();
-}, 2000)
-*/
+}
 
 
-// module.exports.start = start;
-module.exports = router;
+module.exports.start = start;
+module.exports.router = router;

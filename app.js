@@ -5,15 +5,10 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var userRouter = require('./routes/user');
-var areaRouter = require('./routes/AreaData').router;
-var heatmapRouter = require('./routes/HeatmapData').router;
-
-// 전기요금 - line chart
-
-var moneyLine = require('./routes/MoneyData').router;
-
-// for seg2 chart
-var a = require('./routes/seg2Data');
+//var areaRouter = require('./routes/AreaData').router;
+//var moneyRouter = require('./routes/MoneyData').router;
+// var heatmapRouter = require('./routes/HeatmapData').router;
+var seg2Router = require('./routes/seg2Data').router;
 
 /*
 var inha_main = require('./routes/inha_main');
@@ -34,12 +29,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 app.use('/', userRouter);
-//app.use('/segData', areaRouter);
-//app.use('/moneyData', moneyLine);
-//app.use('/heatmapData', heatmapRouter);
-app.use('/a', a);
+// app.use('/segData', areaRouter);
+// app.use('/moneyData', moneyRouter);
+// app.use('/heatmapData', heatmapRouter);
+app.use('/seg2', seg2Router);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

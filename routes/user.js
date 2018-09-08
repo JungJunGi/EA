@@ -8,7 +8,8 @@ const cheerio = require('cheerio');
 //회사명 데이터 보내기.
 const areaRouter = require('./AreaData').start,
     moneyLine = require('./MoneyData').start,
-    heatmapRouter = require('./HeatmapData').start;
+    heatmapRouter = require('./HeatmapData').start,
+    seg2 = require('./seg2Data').start;
 
 var MongoClient = require('mongodb').MongoClient,
     tunnel = require('tunnel-ssh');
@@ -99,6 +100,7 @@ router.route('/process/login').post(function (req, res) {
                 moneyLine(userCompany, companyDB);
                 areaRouter(userCompany, companyDB);
                 heatmapRouter(userCompany, companyDB);
+                seg2(userCompany, companyDB);
 
                 res.render('ourindex', { title: 'home page' });
 
