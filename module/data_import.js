@@ -3,13 +3,12 @@ var MongoClient = require('mongodb').MongoClient;
 var url = 'mongodb://localhost:27017';
 
 var tunnel = require('tunnel-ssh'); // ssh-tunneling
-var PythonShell  = require('python-shell'); //python 호출
-// var iconv  = require('iconv').Iconv; //인코딩 관련
-var urlencode  = require('urlencode') //인코딩 관련
+var PythonShell  = require('python-shell'); // python 호출
+var urlencode  = require('urlencode') // 인코딩 관련
 
 
 
-/** Mmongo ssh-tunneling Options **/
+/** Mongo ssh-tunneling Options **/
 var config = {
     username: 'elec',
     password: 'vmlab347!',
@@ -44,6 +43,15 @@ PythonShell.run('test_realtime.py', options, function (err, results) {
 
 
 
+function mymap(v) {
+    var data = v.data.map(function (v2) { return JSON.parse(v2);});
+    var meta = v.meta;
+    var result = {meta, data}
+    
+    return result;
+}
+
+
 // 몽고디비에서는 object 형식으로 올거야
 // 바로 data.data.date 로 접근 가능해
 var server = tunnel(config, function (error, data) {
@@ -58,27 +66,21 @@ var server = tunnel(config, function (error, data) {
         var query = {"meta.year":"2018", "meta.month":"08", "meta.item":"ELECTRIC_CHARGE"};
         db.collection('(주)에이엔씨코리아').findOne(query, function (findErr, data) {
             if (findErr) throw findErr;
-            /*console.log(data);
+            // console.log(data);
             
             //data parsing
-            /*var mapdata = data.map(v => mymap(v));
-            
-            function mymap(v) {
-                var data = v.data.map(function (v2) { return JSON.parse(v2);});
-                var meta = v.meta;
-                var result = {meta, data}
-                
-                return result;
-            }
-            
+            /*
+            var mapdata = data.map(v => mymap(v));
             
             data.forEach(function(element){
                 console.log(element);
-            });*/
+            });
+            */
             
         });
     });
 });
+
 
 
 /** Set Timeout **/
