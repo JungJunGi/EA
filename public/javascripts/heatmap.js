@@ -17,7 +17,7 @@ var margin = { top: 20, right: 0, bottom: 100, left: 30 },
 //#edf8b1
 
 var m_svg = d3.select(".m_chart")
-    .attr("width", 1300)
+    .attr("width", 1500)
     .attr("height", 480)
     .attr("transform", "translate(10,10)")
     .append('g');
@@ -59,7 +59,7 @@ var heatmapChart = function (jsonFile) {
         }
 
         const colorScale = d3.scaleQuantile()
-            .domain([0, buckets - 1, d3.max(data.data, (d) => valueSum(d))])
+            .domain([0, d3.max(data.data, (d) => valueSum(d))])
             .range(colors);
 
         //chart

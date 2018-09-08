@@ -6,14 +6,14 @@ const request = require('request');
 const cheerio = require('cheerio');
 
 //회사명 데이터 보내기.
-const areaRouter = require('./AreaData').start,
+/*const areaRouter = require('./AreaData').start,
     moneyLine = require('./MoneyData').start,
     heatmapRouter = require('./HeatmapData').start;
-
+*/
 var MongoClient = require('mongodb').MongoClient,
     tunnel = require('tunnel-ssh');
 
-var database, companyDB;
+var database;
 
 // 데이터베이스 연결 정보
 var databaseUrl = 'mongodb://localhost:27017';
@@ -96,10 +96,10 @@ router.route('/process/login').post(function (req, res) {
                 });
 
                 //로그인된 회사명 넘기기.
-                moneyLine(userCompany, companyDB);
+               /* moneyLine(userCompany, companyDB);
                 areaRouter(userCompany, companyDB);
                 heatmapRouter(userCompany, companyDB);
-
+*/
                 res.render('ourindex', { title: 'home page' });
 
             } else {  // 조회된 레코드가 없는 경우 실패 응답 전송
