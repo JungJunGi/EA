@@ -17,7 +17,7 @@ var margin = { top: 20, right: 0, bottom: 100, left: 30 },
 //#edf8b1
 
 var m_svg = d3.select(".m_chart")
-    .attr("width", 1300)
+    .attr("width", 1400)
     .attr("height", 480)
     .attr("transform", "translate(10,10)")
     .append('g');
@@ -134,7 +134,7 @@ var heatmapChart = function (jsonFile) {
             bubble(root);
 
             node = m_svg.append('g')
-                .attr("transform", "translate(1000, 00)")
+                .attr("transform", "translate(980, 10)")
                 .selectAll(".node")
                 .data(root.children)
                 .enter().append("g")
@@ -150,7 +150,7 @@ var heatmapChart = function (jsonFile) {
                 .attr("class", "label")
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
-                .style("fill", "black")
+                .style("fill", "white")
                 .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.depart; });
 
@@ -158,7 +158,7 @@ var heatmapChart = function (jsonFile) {
                 .attr("class", "label")
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
-                .style("fill", "black")
+                .style("fill", "white")
                 .attr("transform", function (d) { return "translate(0,10)"; })
                 .text(function (d) { if (d.value != 0) return d.value; });
         }
