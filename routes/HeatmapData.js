@@ -37,10 +37,12 @@ var start = function (company, companyDB) {
                 var thisYear = new Date().getFullYear();
 
                 //data
-                if (element.meta.year == thisYear) {
-                    da.forEach(function (ele) {
-                        var jsonD = JSON.parse(ele)
-                        //if (jsonD.date.indexOf(':00:00') != -1) { //올해이고 정각이면
+                if (element.meta.item == query["meta.item"]) {
+
+                    if (element.meta.year == thisYear) {
+                        da.forEach(function (ele) {
+                            var jsonD = JSON.parse(ele)
+                            //if (jsonD.date.indexOf(':00:00') != -1) { //올해이고 정각이면
                             var d = new Date(jsonD.date).getDay();
                             var h = Number(jsonD.date.substring(11, 13));
                             if (h == 0) { h = 24; }
@@ -53,8 +55,9 @@ var start = function (company, companyDB) {
                                 depart: element.meta.depart,
                                 value: val
                             });
-                        //}
-                    });
+                            //}
+                        });
+                    }
                 }
             });
         });
@@ -71,18 +74,18 @@ var start = function (company, companyDB) {
                 if (element.meta.year == thisYear) {
                     da.forEach(function (ele) {
                         //if (ele.date.indexOf(':00:00') != -1) { //올해이고 정각이면
-                            var d = new Date(ele.date).getDay();
-                            var h = Number(ele.date.substring(11, 13));
-                            if (h == 0) { h = 24; }
-                            var val = parseFloat(ele.value)
+                        var d = new Date(ele.date).getDay();
+                        var h = Number(ele.date.substring(11, 13));
+                        if (h == 0) { h = 24; }
+                        var val = parseFloat(ele.value)
 
-                            //요일, 시간, 부서, 값
-                            arr.push({
-                                day: d + 1,
-                                hour: h,
-                                depart: element.meta.depart,
-                                value: val
-                            });
+                        //요일, 시간, 부서, 값
+                        arr.push({
+                            day: d + 1,
+                            hour: h,
+                            depart: element.meta.depart,
+                            value: val
+                        });
                         //}
                     });
                 }
