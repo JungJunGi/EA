@@ -5,21 +5,23 @@ var router = express.Router();
 const request = require('request');
 const cheerio = require('cheerio');
 
-//회사명 데이터 보내기.
+var MongoClient = require('mongodb').MongoClient;
+var tunnel = require('tunnel-ssh');
+
+
+// 회사명 데이터 보내기.
 const areaRouter = require('./AreaData').start,
     moneyLine = require('./MoneyData').start,
     heatmapRouter = require('./HeatmapData').start,
     seg2 = require('./seg2Data').start;
 
-var MongoClient = require('mongodb').MongoClient,
-    tunnel = require('tunnel-ssh');
 
+var databaseUrl = 'mongodb://localhost:27017';
 var database, companyDB;
 
-// 데이터베이스 연결 정보
-var databaseUrl = 'mongodb://localhost:27017';
 
-//mongo ssh-tunneling option
+
+/** Mongo ssh-tunneling Options **/
 var config = {
     username: 'elec',
     password: 'vmlab347!',
@@ -28,7 +30,7 @@ var config = {
     dstPort: 27017
 };
 
-// 데이터베이스 연결
+/** 데이터베이스 연결 **/
 var server = tunnel(config, function (error, data) {
     MongoClient.connect(databaseUrl, { useNewUrlParser: true }, function (err, db) {
         if (err) throw err;
@@ -40,8 +42,10 @@ var server = tunnel(config, function (error, data) {
     });
 });
 
-//===== 회사명 가져오기 =====//
-var maindata = new Set(); //회사명 중복 제거.
+
+
+/** 회사명 가져오기 **/
+var maindata = new Set(); // 회사명 중복 제거.
 
 request("http://165.246.39.81:54231/", (error, response, body) => {
     if (error) throw error;
@@ -63,12 +67,41 @@ request("http://165.246.39.81:54231/", (error, response, body) => {
         console.error(error);
     }
 });
-/* GET login page. */
+
+/** GET login page **/
 router.get('/login', function (req, res, next) {
     res.render('login', { title: 'login page' });
 });
 
-// 로그인 라우팅 함수 - 데이터베이스의 정보와 비교
+
+
+/** 사용자 인증 함수 **/
+var authUser = function (database, id, password, callback) {
+    console.log('authUser 호출됨 : ' + id + ', ' + password);
+
+    // users 컬렉션 참조
+    var users = database.collection('users');
+
+    // 아이디와 비밀번호를 이용해 검색
+    users.find({ "id": id, "password": password }).toArray(function (err, docs) {
+        if (err) { // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
+            callback(err, null);
+            return;
+        }
+
+        if (docs.length > 0) {  // 조회한 레코드가 있는 경우 콜백 함수를 호출하면서 조회 결과 전달
+            console.log('아이디 [%s], 패스워드 [%s] 가 일치하는 사용자 찾음.', id, password);
+            callback(null, docs);
+        } else {  // 조회한 레코드가 없는 경우 콜백 함수를 호출하면서 null, null 전달
+            console.log("일치하는 사용자를 찾지 못함.");
+            callback(null, null);
+        }
+    });
+
+}
+
+
+/** 로그인 라우팅 함수 - 데이터베이스의 정보와 비교 **/
 router.route('/process/login').post(function (req, res) {
 
     // 요청 파라미터 확인
@@ -82,21 +115,21 @@ router.route('/process/login').post(function (req, res) {
         authUser(database, paramId, paramPassword, function (err, docs) {
             if (err) { throw err; }
 
-            // 조회된 레코드가 있으면 성공 응답 전송//
+            // 조회된 레코드가 있으면 성공 응답 전송
             if (docs) {
                 console.dir(docs);
 
                 // 조회 결과에서 회사명
                 var userCompany = docs[0].company;
 
-                //회사명 넘겨주기. 새 js파일 생성 작성.
+                // 회사명 넘겨주기. 새 js파일 생성 작성.
                 var data = 'document.getElementById("userCompany").innerHTML =' + "'" + userCompany + "'" + ';';
                 fs.writeFile('./public/javascripts/userCompany.js', data, 'utf8', function (err) {
                     if (err) throw err;
 
                 });
 
-                //로그인된 회사명 넘기기.
+                // 로그인된 회사명 넘기기.
                 moneyLine(userCompany, companyDB);
                 areaRouter(userCompany, companyDB);
                 heatmapRouter(userCompany, companyDB);
@@ -119,7 +152,49 @@ router.route('/process/login').post(function (req, res) {
 
 });
 
-// 사용자 추가 라우팅 함수 - 클라이언트에서 보내오는 데이터를 이용해 데이터베이스에 추가
+
+
+
+/** 사용자 추가 함수 **/
+var addUser = function (database, id, password, company, callback) {
+    console.log('addUser 호출됨 : ' + id + ', ' + password + ', ' + company);
+
+    // users 컬렉션 참조
+    var users = database.collection('users');
+
+    // id 중복확인 후 사용자 추가
+    users.find({ "id": id }).toArray(function (err, docs) {
+        if (err) {  // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
+            callback(err, null);
+            return;
+        }
+
+        if (docs.length > 0 || !maindata.has(company)) {
+            callback(null, null);
+
+        } else {  // 중복된 id가 없거나 가입된 회사일 경우 사용자 추가
+            users.insertMany([{ "id": id, "password": password, "company": company }], function (err, result) {
+                if (err) {  // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
+                    callback(err, null);
+                    return;
+                }
+
+                // 에러 아닌 경우, 콜백 함수를 호출하면서 결과 객체 전달
+                if (result.insertedCount > 0) {
+                    console.log("사용자 레코드 추가됨 : " + result.insertedCount);
+                } else {
+                    console.log("추가된 레코드가 없음.");
+                }
+                callback(null, result);
+            });
+
+        }
+    });
+
+}
+
+
+/** 사용자 추가 라우팅 함수 - 클라이언트에서 보내오는 데이터를 이용해 데이터베이스에 추가 **/
 router.route('/process/adduser').post(function (req, res) {
     console.log('/process/adduser 호출됨.');
 
@@ -155,67 +230,5 @@ router.route('/process/adduser').post(function (req, res) {
 
 });
 
-// 사용자를 인증 함수
-var authUser = function (database, id, password, callback) {
-    console.log('authUser 호출됨 : ' + id + ', ' + password);
-
-    // users 컬렉션 참조
-    var users = database.collection('users');
-
-    // 아이디와 비밀번호를 이용해 검색
-    users.find({ "id": id, "password": password }).toArray(function (err, docs) {
-        if (err) { // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
-            callback(err, null);
-            return;
-        }
-
-        if (docs.length > 0) {  // 조회한 레코드가 있는 경우 콜백 함수를 호출하면서 조회 결과 전달
-            console.log('아이디 [%s], 패스워드 [%s] 가 일치하는 사용자 찾음.', id, password);
-            callback(null, docs);
-        } else {  // 조회한 레코드가 없는 경우 콜백 함수를 호출하면서 null, null 전달
-            console.log("일치하는 사용자를 찾지 못함.");
-            callback(null, null);
-        }
-    });
-}
-
-//사용자를 추가 함수
-var addUser = function (database, id, password, company, callback) {
-    console.log('addUser 호출됨 : ' + id + ', ' + password + ', ' + company);
-
-    // users 컬렉션 참조
-    var users = database.collection('users');
-
-    //id 중복확인 후 사용자 추가
-    users.find({ "id": id }).toArray(function (err, docs) {
-        if (err) { // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
-            callback(err, null);
-            return;
-        }
-
-        if (docs.length > 0 || !maindata.has(company)) {
-            callback(null, null);
-
-        } else { //중복된 id가 없거나 가입된 회사일 경우 사용자 추가
-            users.insertMany([{ "id": id, "password": password, "company": company }], function (err, result) {
-                if (err) {  // 에러 발생 시 콜백 함수를 호출하면서 에러 객체 전달
-                    callback(err, null);
-                    return;
-                }
-
-                // 에러 아닌 경우, 콜백 함수를 호출하면서 결과 객체 전달
-                if (result.insertedCount > 0) {
-                    console.log("사용자 레코드 추가됨 : " + result.insertedCount);
-                } else {
-                    console.log("추가된 레코드가 없음.");
-                }
-                callback(null, result);
-
-            });
-        }
-
-    });
-
-}
 
 module.exports = router;
