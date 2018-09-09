@@ -10,7 +10,7 @@ var margin = { top: 20, right: 0, bottom: 100, left: 30 },
     diameter = 380,
 
     colors = ["#e9f79b", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#253494", "#081d58"], // alternatively colorbrewer.YlGnBu[9]
-    days = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+    days = [ "Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
     times = ["1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12a", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p", "12p"];
 //datasets = ["data.tsv", "data2.tsv"];
 //ffffaa f9f986 ffffd9
@@ -59,7 +59,7 @@ var heatmapChart = function (jsonFile) {
         }
 
         const colorScale = d3.scaleQuantile()
-            .domain([0, buckets - 1, d3.max(data.data, (d) => valueSum(d))])
+            .domain([0, d3.max(data.data, (d) => valueSum(d))])
             .range(colors);
 
         //chart
@@ -150,7 +150,7 @@ var heatmapChart = function (jsonFile) {
                 .attr("class", "label")
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
-                .style("fill", "white")
+                .style("fill", "black")
                 .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.depart; });
 
@@ -158,7 +158,7 @@ var heatmapChart = function (jsonFile) {
                 .attr("class", "label")
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
-                .style("fill", "white")
+                .style("fill", "black")
                 .attr("transform", function (d) { return "translate(0,10)"; })
                 .text(function (d) { if (d.value != 0) return d.value; });
         }
