@@ -88,6 +88,7 @@ var start = function (company, companyDB) {
 
                 });
             });
+            
             var re = groupBy(arr, 'day', 'hour', 'depart');
             result = groupBy(re, 'day', 'hour');
 
