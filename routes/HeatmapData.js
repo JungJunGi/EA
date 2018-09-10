@@ -4,9 +4,8 @@ var router = express.Router();
 var PythonShell = require('python-shell'); //python 호출
 
 var start = function (company, companyDB) {
-    var thisYear = String(new Date().getFullYear());
 
-    var query = { "meta.item": 'SUM_ACTIVE_POWER', "meta.year": thisYear };
+    var query = { "meta.item": 'SUM_ACTIVE_POWER' };
 
     var companyURL = company;
     if (companyURL.indexOf("(주)") != -1)
@@ -40,24 +39,25 @@ var start = function (company, companyDB) {
                 //data
                 if (element.meta.item == query["meta.item"]) {
 
+                    if (element.meta.year == thisYear) {
+                        da.forEach(function (ele) {
+                            var jsonD = JSON.parse(ele)
+                            //if (jsonD.date.indexOf(':00:00') != -1) { //올해이고 정각이면
+                            var d = new Date(jsonD.date).getDay();
+                            var h = Number(jsonD.date.substring(11, 13));
+                            if (h == 0) { h = 24; }
+                            var val = Number(jsonD.value);
 
-                    da.forEach(function (ele) {
-                        var jsonD = JSON.parse(ele)
-
-                        var d = new Date(jsonD.date).getDay();
-                        var h = Number(jsonD.date.substring(11, 13));
-
-                        if (h == 0) { h = 24; }
-                        if (d == 0) { d = 7; }
-
-                        //요일, 시간, 부서, 값
-                        arr.push({
-                            day: d,
-                            hour: h,
-                            depart: element.meta.depart,
-                            value: jsonD.value
+                            //요일, 시간, 부서, 값
+                            arr.push({
+                                day: d + 1,
+                                hour: h,
+                                depart: element.meta.depart,
+                                value: val
+                            });
+                            //}
                         });
-                    });
+                    }
                 }
             });
         });
@@ -71,22 +71,24 @@ var start = function (company, companyDB) {
                 var thisYear = new Date().getFullYear();
 
                 //data
-                da.forEach(function (ele) {
-                    var d = new Date(ele.date).getDay();
-                    var h = Number(ele.date.substring(11, 13));
+                if (element.meta.year == thisYear) {
+                    da.forEach(function (ele) {
+                        //if (ele.date.indexOf(':00:00') != -1) { //올해이고 정각이면
+                        var d = new Date(ele.date).getDay();
+                        var h = Number(ele.date.substring(11, 13));
+                        if (h == 0) { h = 24; }
+                        var val = parseFloat(ele.value)
 
-                    if (h == 0) { h = 24; }
-                    if (d == 0) { d = 7; }
-
-                    //요일, 시간, 부서, 값
-                    arr.push({
-                        day: d,
-                        hour: h,
-                        depart: element.meta.depart,
-                        value: ele.value
+                        //요일, 시간, 부서, 값
+                        arr.push({
+                            day: d + 1,
+                            hour: h,
+                            depart: element.meta.depart,
+                            value: val
+                        });
+                        //}
                     });
-
-                });
+                }
             });
             
             var re = groupBy(arr, 'day', 'hour', 'depart');
@@ -155,16 +157,16 @@ var groupBy = (arr, day, hour, depart = '') => {
 
             hourArr.map((item1) => {
                 departArr.map((item2) => {
-                    var sum = 0; count = 0; var val =
+                    var sum = 0; var val =
                         arr.map((ele) => {
                             if (ele.hour === item1 && ele.day === item && ele.depart === item2) {
-                                if (ele.value != 'None') {
-                                    sum += Number(ele.value)
-                                    count++;
-                                }
+                                sum += parseFloat(ele.value)
+                                count++;
                             }
                         })
-                    val = sum / count;
+                    if (sum == 0.0) { val = 0.0; }
+                    else { val = sum / count; }
+                    count = 0;
 
                     resultArr.push({
                         day: item,
