@@ -59,7 +59,7 @@ var heatmapChart = function (jsonFile) {
         }
 
         const colorScale = d3.scaleQuantile()
-            .domain([0, buckets - 1, d3.max(data.data, (d) => valueSum(d))])
+            .domain([0, d3.max(data.data, (d) => valueSum(d))])
             .range(colors);
 
         //chart
@@ -150,7 +150,7 @@ var heatmapChart = function (jsonFile) {
                 .attr("class", "label")
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
-                .style("fill", "white")
+                .style("fill", "black")
                 .attr("transform", function (d) { return "translate(0,-10)"; })
                 .text(function (d) { if (d.value != 0) return d.data.depart; });
 
@@ -158,7 +158,7 @@ var heatmapChart = function (jsonFile) {
                 .attr("class", "label")
                 .attr("dy", ".4em")
                 .style("text-anchor", "middle")
-                .style("fill", "white")
+                .style("fill", "black")
                 .attr("transform", function (d) { return "translate(0,10)"; })
                 .text(function (d) { if (d.value != 0) return d.value; });
         }

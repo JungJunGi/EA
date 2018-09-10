@@ -42,20 +42,21 @@ var start = function (company, companyDB) {
                     if (element.meta.year == thisYear) {
                         da.forEach(function (ele) {
                             var jsonD = JSON.parse(ele)
-                            //if (jsonD.date.indexOf(':00:00') != -1) { //올해이고 정각이면
+
                             var d = new Date(jsonD.date).getDay();
                             var h = Number(jsonD.date.substring(11, 13));
                             if (h == 0) { h = 24; }
-                            var val = Number(jsonD.value);
+                            if (d == 0) { d = 7; }
 
                             //요일, 시간, 부서, 값
-                            arr.push({
-                                day: d + 1,
-                                hour: h,
-                                depart: element.meta.depart,
-                                value: val
-                            });
-                            //}
+                            if(jsonD.value != 'None'){
+                                arr.push({
+                                    day: d,
+                                    hour: h,
+                                    depart: element.meta.depart,
+                                    value: jsonD.value
+                                });
+                            }
                         });
                     }
                 }
@@ -71,26 +72,27 @@ var start = function (company, companyDB) {
                 var thisYear = new Date().getFullYear();
 
                 //data
-                if (element.meta.year == thisYear) {
+                //if (element.meta.year == thisYear) {
                     da.forEach(function (ele) {
-                        //if (ele.date.indexOf(':00:00') != -1) { //올해이고 정각이면
                         var d = new Date(ele.date).getDay();
                         var h = Number(ele.date.substring(11, 13));
+
                         if (h == 0) { h = 24; }
-                        var val = parseFloat(ele.value)
+                        if (d == 0) { d = 7; }
 
                         //요일, 시간, 부서, 값
-                        arr.push({
-                            day: d + 1,
-                            hour: h,
-                            depart: element.meta.depart,
-                            value: val
-                        });
-                        //}
+                        if(ele.value != 'None'){
+                            arr.push({
+                                day: d,
+                                hour: h,
+                                depart: element.meta.depart,
+                                value: ele.value
+                            });
+                        }
                     });
-                }
+               // }
             });
-            
+
             var re = groupBy(arr, 'day', 'hour', 'depart');
             result = groupBy(re, 'day', 'hour');
 
@@ -157,16 +159,16 @@ var groupBy = (arr, day, hour, depart = '') => {
 
             hourArr.map((item1) => {
                 departArr.map((item2) => {
-                    var sum = 0; var val =
+                    var sum = 0; var count = 0; var val =
                         arr.map((ele) => {
                             if (ele.hour === item1 && ele.day === item && ele.depart === item2) {
-                                sum += parseFloat(ele.value)
-                                count++;
+                                //if (ele.value != 'None') {
+                                    sum += Number(ele.value)
+                                    count++;
+                                //}
                             }
                         })
-                    if (sum == 0.0) { val = 0.0; }
-                    else { val = sum / count; }
-                    count = 0;
+                    val = sum / count;
 
                     resultArr.push({
                         day: item,
