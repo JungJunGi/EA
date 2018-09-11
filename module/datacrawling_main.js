@@ -11,7 +11,7 @@ var maindata = new Array();
 
 module.exports.datacrawling = function (company){
 
-request("http://165.246.39.81:54231/", (error, response, body) => {
+    request("http://165.246.39.81:54231/", (error, response, body) => {
         if (error) throw error;
 
         let $ = cheerio.load(body);
@@ -43,5 +43,5 @@ request("http://165.246.39.81:54231/", (error, response, body) => {
         }
 
         return maindata;
-    });
+    }); 
 }
