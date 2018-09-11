@@ -116,7 +116,6 @@ def job():
                 """
                 dataNum = cursor.execute(sql, (int(date), dept[0], dept[1], item, "%Y-%m-%d", today))
 
-                # print(dataNum)
                 # 데이터가 존재하지 않으면 continue
                 if dataNum == 0:
                     continue
@@ -131,7 +130,6 @@ def job():
 
                 dd["meta"] = metaD
                 d = collection.find_one(dd)
-                # print(d)
 
                 # 해당 meta data가 존재하지 않으면 생성
                 if(not(d)) :

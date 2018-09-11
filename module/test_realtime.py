@@ -135,7 +135,7 @@ for dept in companyDict.get(com):  # 원하는 company의 depart
         docD["meta"] = metaD
         docD["data"] = dsitemL
 
-        print(json.dumps(docD))  # 내보내기
+        print(docD)  # 내보내기
 
         dsitemD = {}
         dsitemL = []

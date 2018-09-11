@@ -83,7 +83,7 @@ MONGO_HOST = "203.252.208.247"
 MONGO_PORT = 22
 MONGO_USER = "elec"
 MONGO_PASS = "vmlab347!"
-MONGO_DB = "companyData"
+MONGO_DB = "test"
 MONGO_COLLECTION = ""
 
 ### Define ssh tunnel ###
@@ -107,6 +107,9 @@ db = client[MONGO_DB]
 
 for com in companyDict.keys():
 
+    if com < 400:
+        continue
+
     MONGO_COLLECTION = comNameDict.get(com)
     collection = db[MONGO_COLLECTION]
     print(MONGO_COLLECTION, datetime.datetime.today())
@@ -125,6 +128,15 @@ for com in companyDict.keys():
                     # 데이터가 존재하지 않으면 continue
                     if dataNum == 0:
                         continue
+                    
+                    row = [item for item in cursor.fetchall()]
+                    for r in row:
+                        r = list(r)
+                        r[0] = str(r[0])
+                        r[1] = str(r[1])
+                        dsitemD["date"] = r[0]
+                        dsitemD["value"] = r[1]
+                        dsitemL.append(dsitemD)
 
                     metaD["company"] = comNameDict.get(com)
                     metaD["year"] = year_n
@@ -133,34 +145,15 @@ for com in companyDict.keys():
                     metaD["item"] = dsitemDict.get(item)
                     metaD["depart"] = dept[2]
                     docD["meta"] = metaD
-                    docD["data"] = []
+                    docD["data"]=dsitemL
 
-                    dd["meta"] = metaD
-                    d = collection.find_one(dd)
-
-                    # 해당 meta data가 존재하지 않으면 생성
-                    if(not(d)) :
-                        collection.insert_one(docD)
-                        d = collection.find_one(dd)
-
-                    print(docD["meta"])
-
-                    row = [item for item in cursor.fetchall()]
-                    for r in row:
-                        r = list(r)
-                        r[0] = str(r[0])
-                        r[1] = str(r[1])
-                        dsitemD["date"] = r[0]
-                        dsitemD["value"] = r[1]
-                        collection.update({"_id":d["_id"]}, {"$push":{"data":dsitemD}})
-                
+                    collection.insert_one(json.dumps(docD))
 
                     # 초기화
                     dsitemD = {}
                     dsitemL = []
                     docD = {}
                     metaD = {}
-
 
 
 
