@@ -82,7 +82,7 @@ var start = function (company, companyDB) {
             });
 
             result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-            console.log(result)
+            //console.log(result)
             return res.json(result);
         });
     });
