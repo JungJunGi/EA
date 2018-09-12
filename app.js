@@ -4,17 +4,20 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var userRouter = require('./routes/user');
-var areaRouter = require('./routes/AreaData').router;
-var moneyRouter = require('./routes/MoneyData').router;
-var heatmapRouter = require('./routes/HeatmapData').router;
-var seg2Router = require('./routes/seg2Data').router;
+var userRouter = require('./routes/user'); //signin / signup
 
+var areaRouter = require('./routes/AreaData').router; //stacked area chart
+var moneyLine = require('./routes/MoneyData').router; // 전기요금 - line chart
+var heatmapRouter = require('./routes/HeatmapData').router; //heatmap
+
+var seg2Data = require('./routes/seg2Data').router;// for seg2 chart
+
+var DonutData = require('./routes/DonutCh').router;// 도넛차트
 /*
+//인하 url 전기요금
 var inha_main = require('./routes/inha_main');
 var moneyLine_sub = require('./routes/moneyLine_sub').router;
 */
-
 
 var app = express();
 
@@ -29,20 +32,21 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
 app.use('/', userRouter);
 app.use('/segData', areaRouter);
-app.use('/moneyData', moneyRouter);
+app.use('/moneyData', moneyLine);
 app.use('/heatmapData', heatmapRouter);
-app.use('/seg2Data', seg2Router);
-
+app.use('/seg2Data', seg2Data);
+app.use('/segData', DonutData);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createErrcor(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

@@ -36,14 +36,14 @@ var start = function (company, companyDB) {
                 return;
 
             results.forEach(function (element) {
-                var da = element.data;
-                var thisYear = new Date().getFullYear();
+                //var da = element.data;
+                //var thisYear = new Date().getFullYear();
 
                 //data
                 if (element.meta.item == query["meta.item"]) {
 
-                    if (element.meta.year == thisYear) {
-                        da.forEach(function (ele) {
+                    //if (element.meta.year == thisYear) {
+                        element.data.forEach(function (ele) {
                             var jsonD = JSON.parse(ele)
 
                             var d = new Date(jsonD.date).getDay();
@@ -61,7 +61,7 @@ var start = function (company, companyDB) {
                                 });
                             }
                         });
-                    }
+                    //}
                 }
             });
         });
