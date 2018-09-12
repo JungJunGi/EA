@@ -12,7 +12,7 @@ function groupBy(array, col, value) {
     var r = [], o = {};
 
     array.forEach(function (d) {
-        if (d[col]){
+        if (d[col]) {
             if (!o[d[col]]) {
                 o[d[col]] = {};
                 o[d[col]][col] = d[col];
@@ -27,12 +27,15 @@ function groupBy(array, col, value) {
 
 
 var start = function (company, companyDB) {
-    
+
     var companyURL = company;
     if (companyURL.indexOf("(주)") != -1)
         companyURL = companyURL.replace("(주)", "")
 
     router.get('/seg2/company=' + encodeURI(companyURL), (req, res) => {
+
+        var pre_date = new Date();
+        pre_date.setDate(pre_date.getDate() - 365)//현재로 부터 일년 전
 
         /** Python Options **/
         var options = {
@@ -48,16 +51,15 @@ var start = function (company, companyDB) {
         PythonShell.run('test_realtime.py', options, function (err, results) {
             if (err) throw err;
 
-            console.log("실시간데이터 가져오기 by python")
+            console.log("seg2데이터")
             if (results == null)
                 return;
 
             results.forEach(element => {
-                
-                if (element.meta.item == query["meta.item"]) {
-                    
-                    element.data.forEach(function (el){
 
+                if (element.meta.item == query["meta.item"]) {
+
+                    element.data.forEach(function (el) {
                         dateD.push(el);
 
                     });
@@ -74,10 +76,11 @@ var start = function (company, companyDB) {
 
             data.forEach(function (element) {
 
-                element.data.forEach(function (el){
-                    
-                    dateD.push(el);
-                    
+                element.data.forEach(function (el) {
+                    if (new Date(el.date) > pre_date) {
+                        dateD.push(el);
+                    }
+
                 });
             });
 

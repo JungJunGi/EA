@@ -15,6 +15,9 @@ var start = function (company, companyDB) {
         var result = [];
         var arr = [];
 
+        var pre_date = new Date();
+        pre_date.setDate(pre_date.getDate() - 365)//현재로 부터 일년 전
+
 
         /** Python Options **/
         var options = {
@@ -28,7 +31,7 @@ var start = function (company, companyDB) {
         PythonShell.run('test_realtime.py', options, function (err, results) {
             if (err) throw err;
 
-            console.log("실시간데이터 가져오기 by python")
+            console.log("히트맵 데이터")
             if (results == null)
                 return;
 
@@ -49,7 +52,7 @@ var start = function (company, companyDB) {
                             if (d == 0) { d = 7; }
 
                             //요일, 시간, 부서, 값
-                            if(jsonD.value != 'None'){
+                            if (jsonD.value != 'None') {
                                 arr.push({
                                     day: d,
                                     hour: h,
@@ -68,12 +71,13 @@ var start = function (company, companyDB) {
             if (findErr) throw findErr;
 
             data.forEach(function (element) {
-                var da = element.data;
-                var thisYear = new Date().getFullYear();
+                //var da = element.data;
+                //var thisYear = new Date().getFullYear();
 
                 //data
                 //if (element.meta.year == thisYear) {
-                    da.forEach(function (ele) {
+                element.data.forEach(function (ele) {
+                    if (new Date(ele.date) > pre_date) {
                         var d = new Date(ele.date).getDay();
                         var h = Number(ele.date.substring(11, 13));
 
@@ -81,7 +85,7 @@ var start = function (company, companyDB) {
                         if (d == 0) { d = 7; }
 
                         //요일, 시간, 부서, 값
-                        if(ele.value != 'None'){
+                        if (ele.value != 'None') {
                             arr.push({
                                 day: d,
                                 hour: h,
@@ -89,8 +93,9 @@ var start = function (company, companyDB) {
                                 value: ele.value
                             });
                         }
-                    });
-               // }
+                    }
+                });
+                // }
             });
 
             var re = groupBy(arr, 'day', 'hour', 'depart');
@@ -163,8 +168,8 @@ var groupBy = (arr, day, hour, depart = '') => {
                         arr.map((ele) => {
                             if (ele.hour === item1 && ele.day === item && ele.depart === item2) {
                                 //if (ele.value != 'None') {
-                                    sum += Number(ele.value)
-                                    count++;
+                                sum += Number(ele.value)
+                                count++;
                                 //}
                             }
                         })
