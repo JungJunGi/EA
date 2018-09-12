@@ -28,7 +28,7 @@ var start = function (company, companyDB) {
         PythonShell.run('test_realtime.py', options, function (err, results) {
             if (err) throw err;
 
-            console.log("실시간데이터 가져오기 from python")
+            console.log("부서별 누적 데이터")
             if (results == null)
                 return;
 

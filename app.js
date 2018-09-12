@@ -33,7 +33,7 @@ app.use('/', userRouter);
 app.use('/segData', areaRouter);
 app.use('/moneyData', moneyRouter);
 app.use('/heatmapData', heatmapRouter);
-app.use('/seg2', seg2Router);
+app.use('/seg2Data', seg2Router);
 
 
 // catch 404 and forward to error handler
