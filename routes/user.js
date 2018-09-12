@@ -13,7 +13,8 @@ var tunnel = require('tunnel-ssh');
 const areaRouter = require('./AreaData').start,
     moneyLine = require('./MoneyData').start,
     heatmapRouter = require('./HeatmapData').start,
-    seg2 = require('./seg2Data').start;
+    seg2 = require('./seg2Data').start,
+    DonutData = require('./DonutCh').start;
 
 
 var databaseUrl = 'mongodb://localhost:27017';
@@ -134,6 +135,7 @@ router.route('/process/login').post(function (req, res) {
                 areaRouter(userCompany, companyDB);
                 heatmapRouter(userCompany, companyDB);
                 seg2(userCompany, companyDB);
+                DonutData(userCompany, companyDB);
 
                 res.render('ourindex', { title: 'home page' });
 
