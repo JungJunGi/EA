@@ -65,12 +65,13 @@ d3.json('/seg2Data/seg2/company=' + companyName, function (error, data) {
     if (error) throw error;
 
     //data
-    var Jdata = data.data;
+    var Jdata = sortByData2(data.data);
+    
     Jdata.forEach(e => {
         e.date = new Date(e.date);
         e.value = Number(e.value);
     });
-    Jdata = Jdata.slice(1000, 2000);
+    //Jdata = Jdata.slice(1000, 2000);
 
     //chart
     x.domain(d3.extent(Jdata, function (d) { return d.date; }));
@@ -136,4 +137,13 @@ function zoomed() {
     seg2_focus.select(".axis--x").call(x_Axis);
     seg2_focus.select(".barea").attr("d", area_);
     seg2_ontext.select(".brush").call(brush.move, x.range().map(t.invertX, t));
+}
+
+function sortByData2(data) {
+
+    var sData = data.sort(function (x, y) {
+        return d3.ascending(x.date, y.date);
+    })
+
+    return sData;
 }

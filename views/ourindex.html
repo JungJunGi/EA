@@ -35,7 +35,7 @@
     <script type="text/javascript" src="/javascripts/d3-tip.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/stylesheets/seg2.css" />
-    <script type="text/javascript" src="/javascripts/seg2_.js" defer></script>
+    <script type="text/javascript" src="/javascripts/seg2_brush.js" defer></script>
     <link rel="stylesheet" type="text/css" href="/stylesheets/seg5.css" />
     <script type="text/javascript" src="/javascripts/seg5.js" defer></script>
 
@@ -44,6 +44,10 @@
 
     <link rel="stylesheet" type="text/css" href="/stylesheets/heatmap.css" />
     <script type="text/javascript" src="/javascripts/heatmap.js" defer></script>
+
+    
+    <link rel="stylesheet" type="text/css" href="/stylesheets/seg4.css" />
+    <script type="text/javascript" src="/javascripts/seg4.js" defer></script>
 
 
 </head>
@@ -74,12 +78,12 @@
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="header">
-                                    <h4 class="title">부서별 누적전력량</h4>
-                                    <p class="category">최근 1년 동안 부서별로 사용한 월별 전력량</p>
+                                    <h4 class="title">금일 데이터</h4>
+                                    <p class="category">금일 사용량 표시</p>
                                 </div>
                                 <div class="content">
-                                    <svg class="areaChart" width="1000" height="400"></svg>
-
+                                    <svg class="seg4_chart_1" width="400" height="300"></svg>
+                                    <svg class="seg4_chart_2" width="400" height="300"></svg>
                                     <div class="footer">
                                         <div class="legend"></div>
                                         <hr>
@@ -97,7 +101,7 @@
                                     <p class="category">최근 1년 동안 사용한 회사전체의 월별 전기요금</p>
                                 </div>
                                 <div class="content">
-                                    <svg class="seg5_chart" width="960" height="400"></svg>
+                                    <svg class="seg5_chart" width="960" height="300"></svg>
 
                                     <div class="footer">
                                         <div class="legend"></div>
@@ -115,25 +119,37 @@
                         <div class="col-md-12">
                             <div class="card ">
                                 <div class="header">
-                                    <h4 class="title">전력사용량</h4>
+                                    <h4 class="title">시간당 전력사용량</h4>
                                     <p class="category">최근 1년 동안 해당 시간에 회사 전체의 전력사용량</p>
                                 </div>
                                 <div class="content">
-                                    <svg class="seg2_chart" width="960" height="500"></svg>
+                                    <svg class="seg2_chart" width="1500" height="680"></svg>
                                     <hr>
                                     <div class="stats">
-                                        <!--부가설명-->
+                                        <details>
+                                            <summary>부서별 상세보기</summary>
+                                            <div class="card ">
+                                                <div class="header">
+                                                    <h4 class="title">부서별 누적전력량</h4>
+                                                    <p class="category">최근 1년 동안 부서별로 사용한 월별 전력량</p>
+                                                </div>
+                                                <div class="content">
+                                                    <svg class="areaChart" width="1700" height="400"></svg>
+                                                </div>
+                                            </div>
+                                        </details>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
                         <div class="col-md-12">
                             <div class="card ">
                                 <div class="header">
                                     <h4 class="title">전력 사용 패턴 분석</h4>
-                                    <p class="category">올해 사용한 전력량을 요일/시간별로 평균낸 수치 데이터</p>
+                                    <p class="category">최근 1년 동안 사용한 전력량을 요일/시간별로 평균낸 수치 데이터</p>
                                 </div>
                                 <div class="content">
                                     <svg class="m_chart"></svg>

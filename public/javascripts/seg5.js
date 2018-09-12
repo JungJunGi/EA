@@ -1,3 +1,13 @@
+var svg5 = d3.select('.seg5_chart');//.attr("transform", "translate(400, 10)");
+var svg5_margin = { top: 10, right: 200, bottom: 20, left: 60 };
+
+var svg5_width = +svg5.attr("width") - svg5_margin.left - svg5_margin.right,
+    svg5_height = +svg5.attr("height") - svg5_margin.top - svg5_margin.bottom;
+
+var my_format = d3.timeFormat("%m/%Y"),
+    Money_format = d3.format(",");
+
+var bisectDate2 = d3.bisector(function (d) { return d.date; }).left;
 
 var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
@@ -7,24 +17,14 @@ d3.json('/moneyData/money/company=' + companyName, function (error, data) {
     if (error) throw error;
 
     //data sort
-    var sData = sortByData(data.data);
+    var sData = sortByData2(data.data);
     Line_chart(data.meta, sData);
 
 });//json
 
 function Line_chart(meta, sData) {
 
-    var svg5 = d3.select('.seg5_chart');//.attr("transform", "translate(400, 10)");
-    var margin = { top: 50, right: 200, bottom: 50, left: 60 };
-
-    var width = +svg5.attr("width") - margin.left - margin.right,
-        height = +svg5.attr("height") - margin.top - margin.bottom;
-
-    var my_format = d3.timeFormat("%m/%Y");
-    Money_format = d3.format(",");
-
-    var bisectDate = d3.bisector(function (d) { return d.date; }).left;
-
+    
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
 
@@ -32,15 +32,13 @@ function Line_chart(meta, sData) {
 
     var xScale = d3.scaleTime()
         .domain([newD, x_max])
-        .range([0, width]);
+        .range([0, svg5_width]);
 
     var y_max = d3.max(sData, function (d) { return d.value; });
-    y_max = y_max + 20000;
 
-    console.log(y_max);
     var yScale = d3.scaleLinear()
         .domain([0, y_max])
-        .range([height, 0]);
+        .range([svg5_height, 0]).nice();
 
     var xAxis = d3.axisBottom(xScale)
         .tickFormat(my_format) //표시할 형태를 포메팅한다.
@@ -49,16 +47,17 @@ function Line_chart(meta, sData) {
     var yAxis = d3.axisLeft(yScale);
 
     var g = svg5.append("g")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("width", svg5_width)
+        .attr("height", svg5_height)
+        .attr("transform", "translate(" + svg5_margin.left + "," + svg5_margin.top + ")");
 
     //X_Axis
-    var wd = width - 10;
+    var wd = svg5_width - 10;
+
     g.append("g")
         .attr("class", "X_Axis")
         .style("font", "12px open-sans")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0," + svg5_height + ")")
         .call(xAxis)
         .append("text")
         .attr("transform", "translate(" + wd + ",-5)")
@@ -126,7 +125,7 @@ function Line_chart(meta, sData) {
         .style("stroke-dasharray", "3,3")
         .style("opacity", 0.5)
         .attr("y1", 0)
-        .attr("y2", height);
+        .attr("y2", svg5_height);
 
     focus.append("rect")
         .attr("class", "tooltip2")
@@ -160,8 +159,8 @@ function Line_chart(meta, sData) {
 
     svg5.append("rect")
         .attr("class", "overlay")
-        .attr("width", width + 500)
-        .attr("height", height + 500)
+        .attr("width", svg5_width + 500)
+        .attr("height", svg5_height + 500)
         .style("fill", "none")
         .style("pointer-events", "all")
         .on("mouseover", function () { focus.style("display", null); })
@@ -170,7 +169,7 @@ function Line_chart(meta, sData) {
 
     function mousemove(d) {
         var x0 = xScale.invert(d3.mouse(this)[0]),
-            i = bisectDate(sData, x0, 1),
+            i = bisectDate2(sData, x0, 1), //date를 찾지 못함
             d0 = sData[i - 1],
             d1 = sData[i],
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
@@ -181,12 +180,12 @@ function Line_chart(meta, sData) {
         focus.attr("transform", "translate(" + LineX + "," + LineY + ")");
         focus.select(".tooltip-date").text(my_format(d.date));
         focus.select(".tooltip-value").text(Money_format(Math.round(d.value / 10) * 10) + "원"); //일의 자리 버림
-        focus.select(".x").attr("y2", height - yScale(d.value));
-        focus.select(".y").attr("x2", width + width);
+        focus.select(".x").attr("y2", svg5_height - yScale(d.value));
+        focus.select(".y").attr("x2", svg5_width + svg5_width);
     }
 }
 
-function sortByData(data) {
+function sortByData2(data) {
 
     var sData = data.sort(function (x, y) {
         return d3.descending(x.date, y.date);

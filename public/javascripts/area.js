@@ -16,8 +16,8 @@ if (companyName.indexOf("(주)") != -1)
 d3.json('/segData/area/company=' + companyName, function (error, data) {
     var sData = sortByData(data.data);
 
-    sData.forEach(e => {
-        e.date = new Date(e.date);
+    sData.forEach(function (d, i, da) {
+        d.date = new Date(d.date);
     });
 
     var x_min = d3.min(sData, function (d) { return d.date; });
@@ -226,7 +226,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .attr("class", 'legend')
         .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
-            return 'translate(715,' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
+            return 'translate('+ (area_width-250) +',' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
         });
 
     legend.append('rect')
@@ -235,6 +235,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .style("fill", function (d) { return z(d.key); });
 
     legend.append('text')
+        .attr("class","areaTx")
         .attr("x", 30).attr("y", 15)
         .text(function (d) { return d.key; })
         .style("fill", 'black').style("font_size", '14px');
