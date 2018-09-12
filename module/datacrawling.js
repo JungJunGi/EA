@@ -1,3 +1,4 @@
+
 /* 인하대학교 데이터 페이지 크롤링해오기 */
 /* 김지연 */
 
@@ -5,8 +6,8 @@ const request = require('request');
 const cheerio = require('cheerio');
 
 const express = require("express");
-var urlencode = require('urlencode');
-var router = express.Router();
+// var urlencode = require('urlencode');
+// var router = express.Router();
 
 const crawling = require('./datacrawling_main').datacrawling;
 
@@ -40,15 +41,57 @@ data category
 
 */
 
+console.log("start")
+main(3, "(주)엘케이")
 
-module.exports = function (categoryNumber, companyName){
+
+function main () {
+    request("http://165.246.39.81:54231/", (error, response, body) => {
+        if (error) throw error;
+
+        let $ = cheerio.load(body);
+
+        try {
+            
+            $('a').each(function(i, e){
+                let s = e.attribs.href;
+                s = s.split("?");
+                s = s[1].split("&");
+
+                maindata.push(s);
+
+                let company = s[0].split("=");
+                s[0] = company[1]; 
+
+                let depart = s[1].split("=");
+                s[1] = depart[1];
+
+                let dsid = s[2].split("=");
+                s[2] = dsid[1];
+
+                let distbdid = s[3].split("=");
+                s[3] = distbdid[1];
+            })
+
+        } catch (error){
+            console.error(error);
+        }
+
+        console.log("hello")
+
+        return maindata;
+    }); 
+}
+
+
+function sub (categoryNumber, companyName){
 
     company = companyName;
     category = categoryNumber;
 
     // from datacrawling_main.js
     maindata = crawling(company);
-
+/*
     maindata.forEach(function(d, i){
         if (company == d[0]) {
             dsid = d[2];
@@ -56,7 +99,7 @@ module.exports = function (categoryNumber, companyName){
         }
 
     });
-
+*/
     console.log(company, depart);
 
     
@@ -78,17 +121,7 @@ module.exports = function (categoryNumber, companyName){
     }
 */
 
-/*
-    // 최근 6개월 간의 전기요금 차트 
-    if (category == 10)
-        forlinechart(today, m)
-
-    // 회사당 부서별 유효 전력량 차트
-    else if (category == 16)
-        forstackedareachart(today, y, m-1, d, leapyear)
-*/
-
 }
 
 
-module.exports.router = router;
+// module.exports.router = router;

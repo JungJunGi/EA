@@ -2,7 +2,7 @@
 /* 인하대학교 데이터 페이지 크롤링해오기 */
 /* 김지연 */
 
-const findData = require('./datacrawling_sub').findData;
+// const findData = require('./datacrawling_sub').findData;
 
 const request = require('request');
 const cheerio = require('cheerio');
@@ -41,6 +41,8 @@ module.exports.datacrawling = function (company){
         } catch (error){
             console.error(error);
         }
+
+        console.log("hello")
 
         return maindata;
     }); 
