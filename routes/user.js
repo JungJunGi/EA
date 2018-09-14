@@ -215,9 +215,19 @@ router.route('/process/adduser').post(function (req, res) {
             if (result && result.insertedCount > 0) {
                 console.dir(result);
 
+                var userCompany = result.ops[0].company;
+
                 res.writeHead('200', { 'Content-Type': 'text/html;charset=utf8' });
                 res.write('<head><script type="text/javascript">alert("가입을 축하드립니다. 로그인하세요."); window.location="/login/#signin"</script></head>');
                 res.end();
+
+                /*
+                moneyLine(userCompany, companyDB);
+                areaRouter(userCompany, companyDB);
+                heatmapRouter(userCompany, companyDB);
+                seg2(userCompany, companyDB);
+                DonutData(userCompany, companyDB);*/
+
             } else {  // 결과 객체가 없으면 실패 응답 전송
                 res.writeHead('200', { 'Content-Type': 'text/html;charset=utf8' });
                 res.write('<head><script type="text/javascript">alert("회원가입에 실패하였습니다. 다시 시도하세요."); window.location="/login/#signup"</script></head>');

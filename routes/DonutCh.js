@@ -31,7 +31,7 @@ var start = function (company, companyDB) {
 
             results.forEach(element => {
 
-                if (element.meta.item == "SUM_ACTIVE_POWER") {
+                if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
                     var realtime = JSON.parse(element.data.slice(-1)[0]);
                     dataD.push({ "name": element.meta.depart, "value": realtime.value });
                 }

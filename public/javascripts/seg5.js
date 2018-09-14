@@ -175,7 +175,7 @@ function Line_chart(meta, sData) {
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
         var LineX = xScale(d.date) + 60;
-        var LineY = yScale(d.value) + 50;
+        var LineY = yScale(d.value) + 20;
 
         focus.attr("transform", "translate(" + LineX + "," + LineY + ")");
         focus.select(".tooltip-date").text(my_format(d.date));

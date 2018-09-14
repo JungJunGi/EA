@@ -5,7 +5,7 @@ var PythonShell = require('python-shell'); //python 호출
 
 var start = function (company, companyDB) {
 
-    var query = { "meta.item": "ACCUMULATE_POWER_CONSUMPTION" };//누적사용량
+    var query = { "meta.item": "SUM_ACTIVE_POWER" };//누적사용량
 
     //api만들때 (), 괄호가 들어가면 오류...그래서 ()떼고 만들기. 
     var companyURL = company;
@@ -13,6 +13,9 @@ var start = function (company, companyDB) {
         companyURL = companyURL.replace("(주)", "")
 
     router.get('/area/company=' + encodeURI(companyURL), (req, res) => {
+        var pre_date = new Date();
+        pre_date.setDate(pre_date.getDate() - 365)//현재로 부터 일년 전
+        
         var dateD = [];
         var departD = [];
 
@@ -34,19 +37,22 @@ var start = function (company, companyDB) {
 
             results.forEach(element => {
 
-                if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
-                    var year = new Date().getFullYear();
-                    var month = new Date().getMonth() + 1;
+                if (element.meta.item == "SUM_ACTIVE_POWER") {
+                    element.data.forEach(function (el, index) {
+                        el = JSON.parse(el);
 
-                    var realtime = JSON.parse(element.data.slice(-1)[0]);
+                        if ((index == element.data.length - 1) && el.value != 'None')//하루 단위로..
+                            dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + Number(el.value) + "}"));
+                        else {
+                            if (index == 0) {
+                                el.value = el.value;
+                            }
+                            else
+                                el.value += element.data[index - 1].value;
+                        }
 
-                    if (month < 10)
-                        realtime.date = year + "-0" + month;
 
-                    else
-                        realtime.date = year + "-" + month;
-
-                    dateD.push(JSON.parse("{\"date\":\"" + realtime.date + "\",\"" + element.meta.depart + "\":" + Number(realtime.value) + "}")); //실시간 데이터와 연결시키기.
+                    });
                 }
             });
         });
@@ -56,48 +62,35 @@ var start = function (company, companyDB) {
 
             data.forEach(function (element) {
 
-                var jsonD = element.data.slice(-1)[0];
-                var d = new Date(jsonD.date);
                 var year = new Date().getFullYear();
                 var month = new Date().getMonth() + 1;
 
                 departD.push(element.meta.depart);
 
-                if (element.meta.year == year && element.meta.month == month) { }
-                else if (jsonD.date.indexOf("-01 00:") != -1) {
 
-                    //다음달 1일이 전달 누적사용량.
-
-                    if (d.getMonth() == 0) {//1월이면
-                        jsonD.date = (d.getFullYear() - 1) + "-12";
-                    }
-                    //1월이 아니면
-                    else if (d.getMonth() < 10) {
-                        jsonD.date = d.getFullYear() + "-0" + d.getMonth();
-                    }
-                    else {
-                        jsonD.date = d.getFullYear() + "-" + d.getMonth();
+                element.data.forEach(function (el, index) {
+                    if (new Date(el.date) > pre_date) {
+                        if (el.date.indexOf("00:00:00") != -1 && el.value != 'None')//하루 단위로..
+                            dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + Number(el.value) + "}"));
+                        else {
+                            if (index == 0) {
+                                el.value = el.value;
+                            }
+                            else
+                                el.value += element.data[index - 1].value;
+                        }
                     }
 
-                    dateD.push(JSON.parse("{\"date\":\"" + jsonD.date + "\",\"" + element.meta.depart + "\":" + Number(jsonD.value) + "}"));
-                }
-                else {
-                    if (d.getMonth() < 9) {
-                        jsonD.date = d.getFullYear() + "-0" + (d.getMonth() + 1);
-                    }
-                    else {
-                        jsonD.date = d.getFullYear() + "-" + (d.getMonth() + 1);
-                    }
-                    dateD.push(JSON.parse("{\"date\":\"" + jsonD.date + "\",\"" + element.meta.depart + "\":" + Number(jsonD.value) + "}"));
-                }
+                });
+
 
             });
 
             //부서명 중복 제거.
-            var uniq = departD.reduce(function(a,b){
-                if (a.indexOf(b) < 0 ) a.push(b);
+            var uniq = departD.reduce(function (a, b) {
+                if (a.indexOf(b) < 0) a.push(b);
                 return a;
-              },[]);
+            }, []);
 
             //같은 날짜의 데이터끼리 groupBy
             const mergedArray = Array.from(

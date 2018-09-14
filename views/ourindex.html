@@ -45,7 +45,7 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/heatmap.css" />
     <script type="text/javascript" src="/javascripts/heatmap.js" defer></script>
 
-    
+
     <link rel="stylesheet" type="text/css" href="/stylesheets/seg4.css" />
     <script type="text/javascript" src="/javascripts/seg4.js" defer></script>
 
@@ -88,7 +88,8 @@
                                         <div class="legend"></div>
                                         <hr>
                                         <div class="stats">
-                                            <!--부가설명-->
+                                            누적전력: 한달동안 사용한 전력 /
+                                            피상전력: 전원에서 공급되는 전력
                                         </div>
                                     </div>
                                 </div>
@@ -107,7 +108,7 @@
                                         <div class="legend"></div>
                                         <hr>
                                         <div class="stats">
-                                            <!--부가설명-->
+                                            그래프 위에 마우스를 올려보세요.
                                         </div>
                                     </div>
                                 </div>
@@ -119,22 +120,27 @@
                         <div class="col-md-12">
                             <div class="card ">
                                 <div class="header">
-                                    <h4 class="title">시간당 전력사용량</h4>
+                                    <h4 class="title">회사전체 전력사용량</h4>
                                     <p class="category">최근 1년 동안 해당 시간에 회사 전체의 전력사용량</p>
                                 </div>
                                 <div class="content">
-                                    <svg class="seg2_chart" width="1500" height="680"></svg>
+                                    <svg class="seg2_chart" width="1500" height="630"></svg>
                                     <hr>
                                     <div class="stats">
                                         <details>
                                             <summary>부서별 상세보기</summary>
+                                            <br>
                                             <div class="card ">
                                                 <div class="header">
-                                                    <h4 class="title">부서별 누적전력량</h4>
-                                                    <p class="category">최근 1년 동안 부서별로 사용한 월별 전력량</p>
+                                                    <h4 class="title">부서별 전력사용량</h4>
+                                                    <p class="category">최근 1년 동안 해당 시간에 부서별 전력사용량</p>
                                                 </div>
                                                 <div class="content">
                                                     <svg class="areaChart" width="1700" height="400"></svg>
+                                                    <hr>
+                                                    <div class="stats">
+                                                        위에 브러쉬를 움직여 날짜를 선택해 보세요.
+                                                    </div>
                                                 </div>
                                             </div>
                                         </details>
@@ -155,7 +161,7 @@
                                     <svg class="m_chart"></svg>
                                     <hr>
                                     <div class="stats">
-                                        <!--부가설명-->
+                                        그래프 위에 마우스를 올리면 부서별 정보를 볼 수 있습니다.
                                     </div>
                                 </div>
                             </div>

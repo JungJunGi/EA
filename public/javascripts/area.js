@@ -1,4 +1,4 @@
-var format = d3.timeFormat("%m/%Y");
+var format = d3.timeFormat("%Y-%m-%d");
 
 var areaSvg = d3.select(".areaChart"),
     area_margin = { top: 20, right: 300, bottom: 30, left: 60 },
@@ -33,7 +33,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
 
     var x = d3.scaleTime()
         .range([area_margin.left, area_width - area_margin.right])
-        .domain([newD, x_max]);
+        .domain([x_min, x_max]);
 
     /*
      var x = d3.scaleBand()
@@ -165,13 +165,14 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         return text;
     }
 
-    var xAxis = d3.axisBottom(x)
-        .tickFormat(format)
-        .ticks(d3.timeMonth);
+    var xAxis = d3.axisBottom(x);
+        /*.tickFormat(format)
+        .ticks(d3.timeMonth);*/
 
     var yAxis = d3.axisLeft(y);
 
     areaSvg.append("g")
+        .attr("class","axis-x")
         .attr("transform", "translate(0," + y(0) + ")")
         .call(xAxis);
 
@@ -246,18 +247,8 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
 function sortByData(data) {
 
     var sData = data.sort(function (x, y) {
-        return d3.descending(x.date, y.date);
-    })
-    sData = sData.slice(0, 12);
-
-    sData = sData.sort(function (x, y) {
         return d3.ascending(x.date, y.date);
     })
-
-    sData.forEach(e => {
-        e.date = new Date(e.date);
-        e.value = Number(e.value);
-    });
 
     return sData;
 }
