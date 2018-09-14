@@ -45,7 +45,7 @@ var start = function (company, companyDB) {
             args: [company]
         };
 
-        var query = { "meta.item": "ACCUMULATE_POWER_CONSUMPTION" };
+        var query = { "meta.item": "SUM_ACTIVE_POWER" };
 
         /** From Maria DB **/
         PythonShell.run('test_realtime.py', options, function (err, results) {
@@ -57,10 +57,19 @@ var start = function (company, companyDB) {
 
             results.forEach(element => {
 
-                if (element.meta.item == query["meta.item"]) {
+                if (element.meta.item == "SUM_ACTIVE_POWER") {
+                    element.data.forEach(function (el, index) {
+                        el = JSON.parse(el);
 
-                    element.data.forEach(function (el) {
-                        dateD.push(el);
+                        if ((index == element.data.length - 1) && el.value != 'None')//하루 단위로..
+                            dateD.push(el);
+                        else {
+                            if (index == 0) {
+                                el.value = el.value;
+                            }
+                            else
+                                el.value += element.data[index - 1].value;
+                        }
 
                     });
                 }
@@ -76,9 +85,20 @@ var start = function (company, companyDB) {
 
             data.forEach(function (element) {
 
-                element.data.forEach(function (el) {
+                element.data.forEach(function (el, index) {
                     if (new Date(el.date) > pre_date) {
-                        dateD.push(el);
+
+
+                        if (el.date.indexOf("00:00:00") != -1 && el.value != 'None')//하루 단위로..
+                            dateD.push(el);
+                        else {
+                            if (index == 0) {
+                                el.value = el.value;
+                            }
+                            else
+                                el.value += element.data[index - 1].value;
+                        }
+
                     }
 
                 });

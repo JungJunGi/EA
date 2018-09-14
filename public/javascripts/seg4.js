@@ -23,7 +23,7 @@ var svg_2 = d3.select('.seg4_chart_2') //d3.select("body").select("svg")
     .append('g');
 
 //pie chart
-pie("/segData/seg4_data1/company=" + companyName, "금일 유효전력", svg_1);
+pie("/segData/seg4_data1/company=" + companyName, "금일 누적전력", svg_1);
 pie("/segData/seg4_data2/company=" + companyName, "금일 피상전력", svg_2);
 
 //json
@@ -36,7 +36,7 @@ function classes_4(root, label) {
         else value_recurse(node, label);
     }
     function value_recurse(node, label) {
-        if (label == '금일 유효전력')
+        if (label == '금일 누적전력')
             classes.push({ siteName: node.name, value: node.value });
         else if (label == '금일 피상전력')
             classes.push({ siteName: node.name, value: node.value });
