@@ -23,7 +23,7 @@ d3.json("/seg2Data/seg2/company=" + companyName, function (error, myData) {
         d.value = Number(d.value);
 
         da[i].current_power = da[i].value;
-        
+
 
         if (d.current_power < 0) {
             d.current_power = 0;
@@ -179,7 +179,7 @@ function drawChart(dataSet) {
 
         axis2.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
     }
-    
+
     // brush function
     function brushed() {
         if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
@@ -200,14 +200,18 @@ function drawChart(dataSet) {
             .translate(-s[0], 0));
 
         //area brush 연동.
-        var svgarea = d3.select('.areaChart');
+        var svgarea = d3.select('.areaChart')
+        .attr("clip-path", "url(#clip)");
 
         svgarea.select(".axis-x").call(xAxis); //x축 넘어감
-        
+       //svgarea.select(".area").attr("d", area);
         svgarea.selectAll(".area").attr("transform", function () {
             return "translate(" + -position + ", 0) scale(" + svg2_width / (s[1] - s[0]) + ", 1)"
         }); //area넘어감
         
+        /*svgarea.select(".zoom").call(zoom.transform, d3.zoomIdentity
+        .scale(svg2_width / (s[1] - s[0]))
+        .translate(-s[0], 0));*/
         //area data 재등록.(data불일치)
 
     }

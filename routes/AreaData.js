@@ -5,7 +5,7 @@ var PythonShell = require('python-shell'); //python 호출
 
 var start = function (company, companyDB) {
 
-    var query = { "meta.item": "SUM_ACTIVE_POWER" };//누적사용량
+    var query = { "meta.item": "ACCUMULATE_POWER_CONSUMPTION" };//누적사용량
 
     //api만들때 (), 괄호가 들어가면 오류...그래서 ()떼고 만들기. 
     var companyURL = company;
@@ -15,7 +15,7 @@ var start = function (company, companyDB) {
     router.get('/area/company=' + encodeURI(companyURL), (req, res) => {
         var pre_date = new Date();
         pre_date.setDate(pre_date.getDate() - 365)//현재로 부터 일년 전
-        
+
         var dateD = [];
         var departD = [];
 
@@ -36,21 +36,19 @@ var start = function (company, companyDB) {
                 return;
 
             results.forEach(element => {
-
-                if (element.meta.item == "SUM_ACTIVE_POWER") {
+                var pre_value = 0;
+                if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
                     element.data.forEach(function (el, index) {
                         el = JSON.parse(el);
 
-                        if ((index == element.data.length - 1) && el.value != 'None')//하루 단위로..
-                            dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + Number(el.value) + "}"));
-                        else {
-                            if (index == 0) {
-                                el.value = el.value;
-                            }
-                            else
-                                el.value += element.data[index - 1].value;
+                        if (index == 0) {
+                            pre_value = Number(el.value);
                         }
+                        else {
+                            if (index == element.data.length - 1)
+                                dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + (Number(el.value) - pre_value) + "}"));
 
+                        }
 
                     });
                 }
@@ -67,18 +65,23 @@ var start = function (company, companyDB) {
 
                 departD.push(element.meta.depart);
 
-
+                var pre_value = 0;
                 element.data.forEach(function (el, index) {
                     if (new Date(el.date) > pre_date) {
-                        if (el.date.indexOf("00:00:00") != -1 && el.value != 'None')//하루 단위로..
-                            dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + Number(el.value) + "}"));
-                        else {
-                            if (index == 0) {
-                                el.value = el.value;
-                            }
-                            else
-                                el.value += element.data[index - 1].value;
+
+                        if (index == 0) {
+                            pre_value = Number(el.value);
                         }
+                        else {
+                            if (el.date.indexOf("00:00:00") != -1)//하루 단위로..
+                            {
+                                var a = Number(el.value);
+
+                                dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + (Number(el.value) - pre_value) + "}"));
+                                pre_value = a;
+                            }
+                        }
+
                     }
 
                 });
