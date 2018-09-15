@@ -5,8 +5,6 @@ var express = require("express");
 var router = express.Router();
 var PythonShell = require('python-shell'); //python 호출
 
-var result, dateD = [];
-
 function groupBy(array, col, value) {
 
     var r = [], o = {};
@@ -34,6 +32,8 @@ var start = function (company, companyDB) {
 
     router.get('/seg2/company=' + encodeURI(companyURL), (req, res) => {
 
+        var result, dateD = [];
+
         var pre_date = new Date();
         pre_date.setDate(pre_date.getDate() - 365)//현재로 부터 일년 전
 
@@ -45,7 +45,7 @@ var start = function (company, companyDB) {
             args: [company]
         };
 
-        var query = { "meta.item": "SUM_ACTIVE_POWER" };
+        var query = { "meta.item": "ACCUMULATE_POWER_CONSUMPTION" };
 
         /** From Maria DB **/
         PythonShell.run('test_realtime.py', options, function (err, results) {
@@ -56,19 +56,18 @@ var start = function (company, companyDB) {
                 return;
 
             results.forEach(element => {
-
-                if (element.meta.item == "SUM_ACTIVE_POWER") {
+                var pre_value = 0;
+                if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
                     element.data.forEach(function (el, index) {
                         el = JSON.parse(el);
 
-                        if ((index == element.data.length - 1) && el.value != 'None')//하루 단위로..
+                        if (index == 0) {
+                            pre_value = Number(el.value);
+                        }
+                        if (index == element.data.length - 1) {
+                            el.value -= pre_value;
+
                             dateD.push(el);
-                        else {
-                            if (index == 0) {
-                                el.value = el.value;
-                            }
-                            else
-                                el.value += element.data[index - 1].value;
                         }
 
                     });
@@ -82,21 +81,22 @@ var start = function (company, companyDB) {
         /** From Mongo DB **/
         companyDB.collection(company).find(query).toArray(function (err, data) {
             if (err) throw err;
+            var pre_value = 0;
 
             data.forEach(function (element) {
-
                 element.data.forEach(function (el, index) {
                     if (new Date(el.date) > pre_date) {
 
+                        if (index == 0) {
+                            pre_value = Number(el.value);
+                        }
+                        if (el.date.indexOf("00:00:00") != -1)//하루 단위로..
+                        {
+                            var a = Number(el.value);
+                            el.value -= pre_value;
 
-                        if (el.date.indexOf("00:00:00") != -1 && el.value != 'None')//하루 단위로..
                             dateD.push(el);
-                        else {
-                            if (index == 0) {
-                                el.value = el.value;
-                            }
-                            else
-                                el.value += element.data[index - 1].value;
+                            pre_value = a;
                         }
 
                     }
