@@ -6,6 +6,7 @@ const request = require('request');
 const cheerio = require('cheerio');
 
 const express = require("express");
+const async = require("async");
 // var urlencode = require('urlencode');
 // var router = express.Router();
 
@@ -41,22 +42,25 @@ data category
 
 */
 
-console.log("start")
-main(3, "(주)엘케이")
+main(16, "신화개발")
 
+async function main (categoryNumber, companyName){
 
-function main () {
-    request("http://165.246.39.81:54231/", (error, response, body) => {
+    var maindata = [];
+    var dataSet = {};
+    
+    request("http://165.246.39.81:54231/", async (error, response, body) => {
         if (error) throw error;
 
-        let $ = cheerio.load(body);
+        let $ = await cheerio.load(body);
 
         try {
-            
             $('a').each(function(i, e){
                 let s = e.attribs.href;
                 s = s.split("?");
                 s = s[1].split("&");
+
+                var departDic = {};
 
                 maindata.push(s);
 
@@ -71,57 +75,117 @@ function main () {
 
                 let distbdid = s[3].split("=");
                 s[3] = distbdid[1];
-            })
 
-        } catch (error){
+                departDic[s[1]] = [s[2], s[3]];
+
+                if (dataSet[s[0]] == null) {
+                    dataSet[s[0]] = [];
+                    dataSet[s[0]].push(departDic);
+                } else {
+                    dataSet[s[0]].push(departDic);
+                }
+
+            });
+
+        } catch (error) {
             console.error(error);
+
+        } finally {
+
+            let data = dataSet[companyName];
+
+            let today = new Date().toISOString().slice(0,10).replace("-","").replace("-","");
+
+            getData(categoryNumber, companyName, today, data);
         }
 
-        console.log("hello")
-
-        return maindata;
     }); 
 }
 
 
-function sub (categoryNumber, companyName){
+/** 해당 회사, 해당 부서, 해당 아이템 데이터 가져오기 **/
+function getData(categoryNumber, companyName, today, data) {
 
-    company = companyName;
-    category = categoryNumber;
+    for(var i in data){
 
-    // from datacrawling_main.js
-    maindata = crawling(company);
-/*
-    maindata.forEach(function(d, i){
-        if (company == d[0]) {
-            dsid = d[2];
-            depart.push(d[1]);
-        }
+        var depart = Object.keys(data[i])[0];
+        var id = Object.values(data[i])[0];
 
-    });
-*/
-    console.log(company, depart);
-
+        var dsid = id[0];
+        var distbdid = id[1];
+        
+        console.log(depart)
+        console.log(dsid, distbdid)
     
-/*
-    // date info
-    var today = new Date()      // today
-    y = today.getFullYear();    // this year
-    m = today.getMonth()+1;     // this month
-    d = today.getDate();        // this date
-    leapyear = false;           // is this year leap year?
+        url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
+        
+        var myBody, myData=[];
+        var jsonText;
+        var myJson;
 
-    // data format : date -> string
-    // today = today.toISOString().slice(0,10).replace("-","").replace("-","");
+        request(url, (error, response, body) => {
+            if (error) throw error;
 
-    if ((y%400==0) || (y%4==0 && y%100!=0)){    // 윤년 2월일때 29일까지
-        leapyear = true;
-    } else {                                    // 평년 2월일때 28일까지
-        leapyear = false;
+            let $ = cheerio.load(body);
+
+            try {
+
+                jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
+                    + "\"date\" : \"" + today + "\",\"category\" : \"" + categoryNumber + "\"}, "
+                    + "\"data\" : [ ";
+
+                if (myBody == "No result") { // 해당 데이터 없음 !!!
+
+                    jsonText = jsonText + "] }";
+
+                } else { // 데이터 있음 !!!
+
+                    myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
+                    myBody = myBody.split("\n");
+                    
+                    myBody.forEach(function(d, i, da) {
+                        var a = d.split(",");
+                        myData.push(a);
+
+                        jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"d\" : \"" + a[1] + "\" },";
+                    });
+                }
+                
+            } catch (error) {
+                
+                console.error(error);
+            } finally {
+
+                var str;
+
+                jsonText = jsonText.slice(0, -1) + "] }";
+
+                myJson = JSON.parse(jsonText);
+
+                console.log(myJson)
+    /*
+                if (today) {
+                    str = "RealTime"
+                    // console.log(str, myJson.data[myJson.data.length - 1]); // 지금시각 데이터    
+                    
+                }
+                else {
+                    var ym = parseInt( Number(date)/100 ) - 1
+                    var y = parseInt(ym/100)
+                    var m = parseInt(ym%100)
+                    str = 'money' + y + '-' + m
+                    // console.log(str, myJson.data[0]); // 0시0분 데이터
+                    
+                }   
+
+                // router.get('/'+str, (req, res) => {  return res.json(myJson); });
+
+                makeJson(company, depart, str);
+    */
+            }
+        });
     }
-*/
 
 }
-
 
 // module.exports.router = router;
