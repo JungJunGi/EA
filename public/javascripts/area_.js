@@ -1,9 +1,8 @@
 var format = d3.timeFormat("%Y-%m-%d");
 
 var areaSvg = d3.select(".areaChart"),
-    area_margin = { top: 20, right: 300, bottom: 30, left: 58 },
-    area_margin2 = { top: 50, right: 40, bottom: 60, left: 70 },
-    area_width = +areaSvg.attr("width") - area_margin2.left - area_margin2.right-100,
+    area_margin = { top: 20, right: 300, bottom: 30, left: 60 },
+    area_width = +areaSvg.attr("width"),
     area_height = +areaSvg.attr("height");
 
 var bisectDate = d3.bisector(function (d) {
@@ -20,25 +19,6 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     sData.forEach(function (d, i, da) {
         d.date = new Date(d.date);
     });
-    
-    areaSvg.append("defs").append("clipPath")
-    .attr("id", "clip2")
-    .append("rect")
-    .attr("width", area_width)
-    .attr("height", area_height);
-    //.attr("transform", "translate(-100,0)");
-
-    var area_chart = areaSvg.append("g")
-        .attr("class", "areachart")
-        .attr("width", area_width)
-        .attr("height", area_height)
-        .attr("transform", "translate(" + area_margin.left + ",0)");
-
-    var area_axis = areaSvg.append("g")
-        .attr("width", area_width)
-        .attr("height", area_height)
-        .attr("transform", "translate(" + area_margin.left + ",0)");
-
 
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
@@ -52,7 +32,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         (sData);
 
     var x = d3.scaleTime()
-        .range([0, area_width])
+        .range([area_margin.left, area_width - area_margin.right])
         .domain([x_min, x_max]);
 
     /*
@@ -62,8 +42,8 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .padding(0.1);
     */
     var y = d3.scaleLinear()
-        .domain([100, d3.max(series, stackMax)])
-        .range([area_height - area_margin.bottom, 10]).nice();
+        .domain([0, d3.max(series, stackMax)])
+        .range([area_height - area_margin.bottom, area_margin.top]).nice();
 
     var z = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -81,7 +61,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             return y(d[1]);
         });
 
-    area_chart.append("g")
+    areaSvg.append("g")
         .selectAll("g")
         .data(series)
         .enter().append("g")
@@ -186,23 +166,18 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     }
 
     var xAxis = d3.axisBottom(x);
-    /*.tickFormat(format)
-    .ticks(d3.timeMonth);*/
+        /*.tickFormat(format)
+        .ticks(d3.timeMonth);*/
 
     var yAxis = d3.axisLeft(y);
 
-    area_axis.append("g")
-        .attr("class", "axis--x")
+    areaSvg.append("g")
+        .attr("class","axis-x")
         .attr("transform", "translate(0," + y(0) + ")")
         .call(xAxis);
-    /*
-        areaSvg.append("g")
-            .attr("class","axis--x")
-            .attr("transform", "translate(0," + y(0) + ")")
-            .call(xAxis);
-    */
-   area_axis.append("g")
-        //.attr("transform", "translate(58,0)")
+
+    areaSvg.append("g")
+        .attr("transform", "translate(" + area_margin.left + ",0)")
         .call(yAxis);
 
     function stackMin(serie) {
@@ -252,7 +227,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .attr("class", 'legend')
         .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
-            return 'translate(' + (area_width + 60) + ',' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
+            return 'translate('+ (area_width-250) +',' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
         });
 
     legend.append('rect')
@@ -261,7 +236,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .style("fill", function (d) { return z(d.key); });
 
     legend.append('text')
-        .attr("class", "areaTx")
+        .attr("class","areaTx")
         .attr("x", 30).attr("y", 15)
         .text(function (d) { return d.key; })
         .style("fill", 'black').style("font_size", '14px');
