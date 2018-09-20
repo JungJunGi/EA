@@ -200,15 +200,16 @@ function drawChart(dataSet) {
             .translate(-s[0], 0));
 
         //area brush 연동.
-        var svgarea = d3.select('.areaChart')
-        .attr("clip-path", "url(#clip)");
-
-        svgarea.select(".axis-x").call(xAxis); //x축 넘어감
-       //svgarea.select(".area").attr("d", area);
+        var svgarea = d3.select('.areaChart');        
+        
+        svgarea.select(".axis--x").call(xAxis); //x축 넘어감
         svgarea.selectAll(".area").attr("transform", function () {
             return "translate(" + -position + ", 0) scale(" + svg2_width / (s[1] - s[0]) + ", 1)"
         }); //area넘어감
-        
+        svgarea.selectAll(".focus").attr("transform", function () {
+            return "translate(" + -position + ", 0) scale(" + svg2_width / (s[1] - s[0]) + ", 1)"
+        }); //tooltip 넘어감
+
         /*svgarea.select(".zoom").call(zoom.transform, d3.zoomIdentity
         .scale(svg2_width / (s[1] - s[0]))
         .translate(-s[0], 0));*/

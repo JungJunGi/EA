@@ -131,11 +131,11 @@ router.route('/process/login').post(function (req, res) {
                 });
 
                 // 로그인된 회사명 넘기기.
-                moneyLine(userCompany, companyDB);
+                //moneyLine(userCompany, companyDB);
                 areaRouter(userCompany, companyDB);
-                heatmapRouter(userCompany, companyDB);
+                //heatmapRouter(userCompany, companyDB);
                 seg2(userCompany, companyDB);
-                DonutData(userCompany, companyDB);
+                //DonutData(userCompany, companyDB);
 
                 res.render('ourindex', { title: 'home page' });
 

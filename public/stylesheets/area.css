@@ -6,3 +6,6 @@
     fill: black;
     stroke: white;
 }
+.areachart{
+    clip-path: url(#clip2);
+}
