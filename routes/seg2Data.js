@@ -86,7 +86,6 @@ var start = function (company, companyDB) {
             data.forEach(function (element) {
                 element.data.forEach(function (el, index) {
                     if (new Date(el.date) > pre_date) {
-
                         if (index == 0) {
                             pre_value = Number(el.value);
                         }

@@ -60,9 +60,6 @@ var start = function (company, companyDB) {
 
             data.forEach(function (element) {
 
-                var year = new Date().getFullYear();
-                var month = new Date().getMonth() + 1;
-
                 departD.push(element.meta.depart);
 
                 var pre_value = 0;

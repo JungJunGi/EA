@@ -36,8 +36,6 @@ var start = function (company, companyDB) {
                 return;
 
             results.forEach(function (element) {
-                //var da = element.data;
-                //var thisYear = new Date().getFullYear();
 
                 //data
                 if (element.meta.item == query["meta.item"]) {
@@ -71,11 +69,8 @@ var start = function (company, companyDB) {
             if (findErr) throw findErr;
 
             data.forEach(function (element) {
-                //var da = element.data;
-                //var thisYear = new Date().getFullYear();
 
-                //data
-                //if (element.meta.year == thisYear) {
+                //data insert
                 element.data.forEach(function (ele) {
                     if (new Date(ele.date) > pre_date) {
                         var d = new Date(ele.date).getDay();

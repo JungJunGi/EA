@@ -122,7 +122,8 @@ router.route('/process/login').post(function (req, res) {
 
                 // 조회 결과에서 회사명
                 var userCompany = docs[0].company;
-
+                //var front = userCompany.replace(userCompany.substring(userCompany.length-2,userCompany.length),"**")
+                
                 // 회사명 넘겨주기. 새 js파일 생성 작성.
                 var data = 'document.getElementById("userCompany").innerHTML =' + "'" + userCompany + "'" + ';';
                 fs.writeFile('./public/javascripts/userCompany.js', data, 'utf8', function (err) {
@@ -131,11 +132,11 @@ router.route('/process/login').post(function (req, res) {
                 });
 
                 // 로그인된 회사명 넘기기.
-                moneyLine(userCompany, companyDB);
+                //moneyLine(userCompany, companyDB);
                 areaRouter(userCompany, companyDB);
-                heatmapRouter(userCompany, companyDB);
+                //heatmapRouter(userCompany, companyDB);
                 seg2(userCompany, companyDB);
-                DonutData(userCompany, companyDB);
+                //DonutData(userCompany, companyDB);
 
                 res.render('ourindex', { title: 'home page' });
 
