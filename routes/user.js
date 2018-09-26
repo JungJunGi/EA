@@ -14,7 +14,8 @@ const areaRouter = require('./AreaData').start,
     moneyLine = require('./MoneyData').start,
     heatmapRouter = require('./HeatmapData').start,
     seg2 = require('./seg2Data').start,
-    DonutData = require('./DonutCh').start;
+    DonutData = require('./DonutCh').start,
+    power_factor = require('./power_factor').start;
 
 
 var databaseUrl = 'mongodb://localhost:27017';
@@ -122,21 +123,23 @@ router.route('/process/login').post(function (req, res) {
 
                 // 조회 결과에서 회사명
                 var userCompany = docs[0].company;
-                //var front = userCompany.replace(userCompany.substring(userCompany.length-2,userCompany.length),"**")
+                var showCompany = userCompany.replace(userCompany.substring(userCompany.length-2,userCompany.length),"**");
                 
-                // 회사명 넘겨주기. 새 js파일 생성 작성.
+                //회사명 넘겨주기. 새 js파일 생성 작성.
                 var data = 'document.getElementById("userCompany").innerHTML =' + "'" + userCompany + "'" + ';';
+                data += 'document.getElementById("showCompany").innerHTML =' + "'" + showCompany + "'" + ';';
                 fs.writeFile('./public/javascripts/userCompany.js', data, 'utf8', function (err) {
                     if (err) throw err;
 
                 });
 
                 // 로그인된 회사명 넘기기.
-                //moneyLine(userCompany, companyDB);
+                moneyLine(userCompany, companyDB);
                 areaRouter(userCompany, companyDB);
-                //heatmapRouter(userCompany, companyDB);
+                heatmapRouter(userCompany, companyDB);
                 seg2(userCompany, companyDB);
-                //DonutData(userCompany, companyDB);
+                DonutData(userCompany, companyDB);
+                power_factor(userCompany, companyDB);
 
                 res.render('ourindex', { title: 'home page' });
 

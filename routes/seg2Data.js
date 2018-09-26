@@ -45,7 +45,7 @@ var start = function (company, companyDB) {
             args: [company]
         };
 
-        var query = { "meta.item": "ACCUMULATE_POWER_CONSUMPTION" };
+        var query = { "meta.item": "SUM_ACTIVE_POWER" };
 
         /** From Maria DB **/
         PythonShell.run('test_realtime.py', options, function (err, results) {
@@ -56,19 +56,13 @@ var start = function (company, companyDB) {
                 return;
 
             results.forEach(element => {
-                var pre_value = 0;
-                if (element.meta.item == "ACCUMULATE_POWER_CONSUMPTION") {
+                if (element.meta.item == "SUM_ACTIVE_POWER") {
                     element.data.forEach(function (el, index) {
-                        el = JSON.parse(el);
-
-                        if (index == 0) {
-                            pre_value = Number(el.value);
+                        var jsonD = JSON.parse(el);
+                        if(jsonD.value=='None'){
+                            jsonD.value = (Number(element.data[index-1].value)+Number(element.data[index+1].value))/2;
                         }
-                        if (index == element.data.length - 1) {
-                            el.value -= pre_value;
-
-                            dateD.push(el);
-                        }
+                        dateD.push(jsonD);
 
                     });
                 }
@@ -86,17 +80,10 @@ var start = function (company, companyDB) {
             data.forEach(function (element) {
                 element.data.forEach(function (el, index) {
                     if (new Date(el.date) > pre_date) {
-                        if (index == 0) {
-                            pre_value = Number(el.value);
+                        if(el.value=='None'){
+                            el.value = (Number(element.data[index-1].value)+Number(element.data[index+1].value))/2;
                         }
-                        if (el.date.indexOf("00:00:00") != -1)//하루 단위로..
-                        {
-                            var a = Number(el.value);
-                            el.value -= pre_value;
-
-                            dateD.push(el);
-                            pre_value = a;
-                        }
+                        dateD.push(el);
 
                     }
 
