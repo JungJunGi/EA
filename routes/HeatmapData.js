@@ -41,24 +41,26 @@ var start = function (company, companyDB) {
                 if (element.meta.item == query["meta.item"]) {
 
                     //if (element.meta.year == thisYear) {
-                        element.data.forEach(function (ele) {
-                            var jsonD = JSON.parse(ele)
+                    element.data.forEach(function (ele, index) {
+                        var jsonD = JSON.parse(ele)
 
-                            var d = new Date(jsonD.date).getDay();
-                            var h = Number(jsonD.date.substring(11, 13));
-                            if (h == 0) { h = 24; }
-                            if (d == 0) { d = 7; }
+                        var d = new Date(jsonD.date).getDay();
+                        var h = Number(jsonD.date.substring(11, 13));
+                        if (h == 0) { h = 24; }
+                        if (d == 0) { d = 7; }
 
-                            //요일, 시간, 부서, 값
-                            if (jsonD.value != 'None') {
-                                arr.push({
-                                    day: d,
-                                    hour: h,
-                                    depart: element.meta.depart,
-                                    value: jsonD.value
-                                });
-                            }
+                        //요일, 시간, 부서, 값
+                        if (jsonD.value == 'None') {
+                            jsonD.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
+                        }
+                        arr.push({
+                            day: d,
+                            hour: h,
+                            depart: element.meta.depart,
+                            value: jsonD.value
                         });
+
+                    });
                     //}
                 }
             });
@@ -71,7 +73,7 @@ var start = function (company, companyDB) {
             data.forEach(function (element) {
 
                 //data insert
-                element.data.forEach(function (ele) {
+                element.data.forEach(function (ele, index) {
                     if (new Date(ele.date) > pre_date) {
                         var d = new Date(ele.date).getDay();
                         var h = Number(ele.date.substring(11, 13));
@@ -80,14 +82,16 @@ var start = function (company, companyDB) {
                         if (d == 0) { d = 7; }
 
                         //요일, 시간, 부서, 값
-                        if (ele.value != 'None') {
-                            arr.push({
-                                day: d,
-                                hour: h,
-                                depart: element.meta.depart,
-                                value: ele.value
-                            });
+                        if (ele.value == 'None') {
+                            ele.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
                         }
+
+                        arr.push({
+                            day: d,
+                            hour: h,
+                            depart: element.meta.depart,
+                            value: ele.value
+                        });
                     }
                 });
                 // }

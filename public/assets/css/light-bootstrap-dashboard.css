@@ -52,11 +52,14 @@
 
 /*           Font Smoothing      */
 
-.areaChart{
-    margin-left: 50px;
-    margin-top: 10px;
+#userCompany{
+    color:#333;
 }
 
+.areaChart{
+    margin-left: 100px;
+    margin-top: 10px;
+}
 
 .seg5_chart{
     margin-left: 20px;

@@ -49,7 +49,8 @@
     <link rel="stylesheet" type="text/css" href="/stylesheets/seg4.css" />
     <script type="text/javascript" src="/javascripts/seg4.js" defer></script>
 
-
+    <link rel="stylesheet" href="/stylesheets/power_style.css">
+    <script type="text/javascript" src="/javascripts/power_factor.js" defer></script>
 </head>
 
 <body>
@@ -59,6 +60,7 @@
             <!--navbar-->
             <div class="topnav">
                 <a class="active">정전기</a>
+                <a class="company" id="showCompany"></a>
                 <a class="company" id="userCompany"></a>
                 <script type="text/javascript" src="/javascripts/userCompany.js"></script>
 
@@ -75,6 +77,25 @@
             <div class="content">
                 <div class="container-fluid">
                     <div class="row">
+                        <div class="col-md-12">
+                            <div class="card ">
+                                <div class="header">
+                                    <h4 class="title">전기사용 효율성</h4>
+                                    <p class="category">고객이 유지하여야 할 역률은 90%이상</p>
+                                </div>
+                                <div class="content">
+                                    <div id="departDropdown"></div>
+                                    <div id="graph"></div>
+                                    <hr>
+                                    <div class="stats">
+                                        역률: 피상전력에 대한 유효전력의 비율
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="header">
@@ -88,8 +109,7 @@
                                         <div class="legend"></div>
                                         <hr>
                                         <div class="stats">
-                                            누적전력: 한달동안 사용한 전력 /
-                                            피상전력: 전원에서 공급되는 전력
+                                            누적전력: 한달동안 사용한 전력 / 피상전력: 전원에서 공급되는 전력
                                         </div>
                                     </div>
                                 </div>
@@ -124,7 +144,7 @@
                                     <p class="category">최근 1년 동안 해당 시간에 회사 전체의 전력사용량</p>
                                 </div>
                                 <div class="content">
-                                    <svg class="seg2_chart" width="1500" height="630"></svg>
+                                    <svg class="seg2_chart" width="1800" height="630"></svg>
                                     <hr>
                                     <div class="stats">
                                         <details>
