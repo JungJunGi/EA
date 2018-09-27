@@ -1,9 +1,8 @@
-var format = d3.timeFormat("%Y-%m-%d %H:%M");
+var format = d3.timeFormat("%Y-%m-%d");
 
 var areaSvg = d3.select(".areaChart"),
-    area_margin = { top: 20, right: 300, bottom: 30, left: 58 },
-    area_margin2 = { top: 50, right: 40, bottom: 60, left: 70 },
-    area_width = +areaSvg.attr("width") - area_margin2.left - area_margin2.right - 100,
+    area_margin = { top: 20, right: 300, bottom: 30, left: 60 },
+    area_width = +areaSvg.attr("width"),
     area_height = +areaSvg.attr("height");
 
 var bisectDate = d3.bisector(function (d) {
@@ -14,87 +13,12 @@ var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
 
-function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
-
-    yProperty = yProperty || 0;
-    xProperty = xProperty || 1;
-
-    var m = Math.floor,
-        y = Math.abs,
-        f = data.length;
-
-    if (threshold >= f || 0 === threshold) {
-        return data;
-    }
-
-    var n = [],
-        t = 0,
-        p = (f - 2) / (threshold - 2),
-        c = 0,
-        v,
-        u,
-        w;
-
-    n[t++] = data[c];
-
-    for (var e = 0; e < threshold - 2; e++) {
-        for (var g = 0,
-            h = 0,
-            a = m((e + 1) * p) + 1,
-            d = m((e + 2) * p) + 1,
-            d = d < f ? d : f,
-            k = d - a; a < d; a++) {
-            g += +data[a][xProperty], h += +data[a][yProperty];
-        }
-
-        for (var g = g / k,
-            h = h / k,
-            a = m((e + 0) * p) + 1,
-            d = m((e + 1) * p) + 1,
-            k = +data[c][xProperty],
-            x = +data[c][yProperty],
-            c = -1; a < d; a++) {
-            "undefined" != typeof data[a] &&
-                (u = .5 * y((k - g) * (data[a][yProperty] - x) - (k - data[a][xProperty]) * (h - x)),
-                    u > c && (c = u, v = data[a], w = a));
-        }
-
-        n[t++] = v;
-        c = w;
-    }
-
-    n[t++] = data[f - 1];
-
-    return n;
-};
-
 d3.json('/segData/area/company=' + companyName, function (error, data) {
     var sData = sortByData(data.data);
 
     sData.forEach(function (d, i, da) {
         d.date = new Date(d.date);
     });
-
-    sData = largestTriangleThreeBucket(sData, area_width / 2, "date", data.depart[0]);
-    
-    areaSvg.append("defs").append("clipPath")
-        .attr("id", "clip2")
-        .append("rect")
-        .attr("width", area_width)
-        .attr("height", area_height);
-    //.attr("transform", "translate(-100,0)");
-
-    var area_chart = areaSvg.append("g")
-        .attr("class", "areachart")
-        .attr("width", area_width)
-        .attr("height", area_height)
-        .attr("transform", "translate(" + area_margin.left + ",0)");
-
-    var area_axis = areaSvg.append("g")
-        .attr("width", area_width)
-        .attr("height", area_height)
-        .attr("transform", "translate(" + area_margin.left + ",0)");
-
 
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
@@ -108,7 +32,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         (sData);
 
     var x = d3.scaleTime()
-        .range([0, area_width])
+        .range([area_margin.left, area_width - area_margin.right])
         .domain([x_min, x_max]);
 
     /*
@@ -118,8 +42,8 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .padding(0.1);
     */
     var y = d3.scaleLinear()
-        .domain([100, d3.max(series, stackMax)])
-        .range([area_height - area_margin.bottom, 10]).nice();
+        .domain([0, d3.max(series, stackMax)])
+        .range([area_height - area_margin.bottom, area_margin.top]).nice();
 
     var z = d3.scaleOrdinal(d3.schemeCategory10);
 
@@ -137,7 +61,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             return y(d[1]);
         });
 
-    area_chart.append("g")
+    areaSvg.append("g")
         .selectAll("g")
         .data(series)
         .enter().append("g")
@@ -242,23 +166,18 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     }
 
     var xAxis = d3.axisBottom(x);
-    /*.tickFormat(format)
-    .ticks(d3.timeMonth);*/
+        /*.tickFormat(format)
+        .ticks(d3.timeMonth);*/
 
     var yAxis = d3.axisLeft(y);
 
-    area_axis.append("g")
-        .attr("class", "axis--x")
+    areaSvg.append("g")
+        .attr("class","axis-x")
         .attr("transform", "translate(0," + y(0) + ")")
         .call(xAxis);
-    /*
-        areaSvg.append("g")
-            .attr("class","axis--x")
-            .attr("transform", "translate(0," + y(0) + ")")
-            .call(xAxis);
-    */
-    area_axis.append("g")
-        //.attr("transform", "translate(58,0)")
+
+    areaSvg.append("g")
+        .attr("transform", "translate(" + area_margin.left + ",0)")
         .call(yAxis);
 
     function stackMin(serie) {
@@ -308,7 +227,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .attr("class", 'legend')
         .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
-            return 'translate(' + (area_width + 80) + ',' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
+            return 'translate('+ (area_width-250) +',' + (((i + 15) * legendHeight) + (-45 * i)) + ')';
         });
 
     legend.append('rect')
@@ -317,7 +236,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .style("fill", function (d) { return z(d.key); });
 
     legend.append('text')
-        .attr("class", "areaTx")
+        .attr("class","areaTx")
         .attr("x", 30).attr("y", 15)
         .text(function (d) { return d.key; })
         .style("fill", 'black').style("font_size", '14px');

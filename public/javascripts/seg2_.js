@@ -1,92 +1,128 @@
 
 var svg2Size = d3.select('.seg2_chart');
 
-var svg2_margin = { top: 50, right: 40, bottom: 60, left: 70 },
-    svg2_margin2 = { top: 600, right: 20, bottom: 30, left: 50 },
+var svg2_margin = { top: 50, right: 180, bottom: 60, left: 50 },
+    svg2_margin2 = { top: 600, right: 100, bottom: 30, left: 30 },
 
     svg2_width = +svg2Size.attr("width") - svg2_margin.left - svg2_margin.right,
     svg2_height = 500 - svg2_margin.top - svg2_margin.bottom,
     svg2_height2 = 700 - svg2_margin2.top - svg2_margin2.bottom,
 
-    xScale, xScale2, yScaleB, yScaleA;
+    xScale, xScale2, yScale;
 
 var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
 
-d3.json("/seg2Data/seg2/company=" + companyName, function (error, myData) {
+d3.json("/seg2Data/seg2/company=" + companyName, function (error, data) {
 
-    var dataSet = myData.data;
+    function orderData3(data) {
 
-    dataSet.forEach(function (d, i, da) {
-        d.date = new Date(d.date);
-        d.value = Number(d.value);
-
-        da[i].current_power = da[i].value;
-
-
-        if (d.current_power < 0) {
-            d.current_power = 0;
-        }
-
-        //d.contact_demand = d.current_power; // 후에 변경해야 함.
-    });
-
-    /*
-        dataSet.forEach(function (d, i, da) {
-    
-            d.date = new Date(d.time_stamp);
-            d.current_power = +d.accumulate_power;
-    
-            if (i > 0) {
-                da[i].current_power = da[i].current_power - da[i - 1].accumulate_power;
-            }
-    
-            d.contact_demand = d.current_power / d.contact_power;
-            d.timeSlot = checkTimeSlot(d.date);
+        var sData = data.sort(function (x, y) {
+            return d3.ascending(x.date, y.date);
         })
-    */
-    var orderData = orderData3(dataSet);
+
+        sData.forEach(d => {
+            d.date = Number(new Date(d.date).getTime());
+            if (d.value < 0) {
+                d.value = -d.value;
+            }
+        });
+        return sData;
+    }
+
+    var orderData = orderData3(data.data);
 
     setScales(orderData);
     drawChart(orderData);
 
 });
 
+function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
 
-function setScales(dataSet) {
+    yProperty = yProperty || 0;
+    xProperty = xProperty || 1;
+
+    var m = Math.floor,
+        y = Math.abs,
+        f = data.length;
+
+    if (threshold >= f || 0 === threshold) {
+        return data;
+    }
+
+    var n = [],
+        t = 0,
+        p = (f - 2) / (threshold - 2),
+        c = 0,
+        v,
+        u,
+        w;
+
+    n[t++] = data[c];
+
+    for (var e = 0; e < threshold - 2; e++) {
+        for (var g = 0,
+            h = 0,
+            a = m((e + 1) * p) + 1,
+            d = m((e + 2) * p) + 1,
+            d = d < f ? d : f,
+            k = d - a; a < d; a++) {
+            g += +data[a][xProperty], h += +data[a][yProperty];
+        }
+
+        for (var g = g / k,
+            h = h / k,
+            a = m((e + 0) * p) + 1,
+            d = m((e + 1) * p) + 1,
+            k = +data[c][xProperty],
+            x = +data[c][yProperty],
+            c = -1; a < d; a++) {
+            "undefined" != typeof data[a] &&
+                (u = .5 * y((k - g) * (data[a][yProperty] - x) - (k - data[a][xProperty]) * (h - x)),
+                    u > c && (c = u, v = data[a], w = a));
+        }
+
+        n[t++] = v;
+        c = w;
+    }
+
+    n[t++] = data[f - 1];
+
+    return n;
+};
+
+function setScales(data) {
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
+
     var start_date = dataSet[0].date;
     var end_date = dataSet[dataSet.length - 1].date;
 
     xScale = d3.scaleTime().domain(d3.extent([start_date, end_date])).range([0, svg2_width]);
     xScale2 = d3.scaleTime().domain(xScale.domain()).range(xScale.range());
 
-    yScaleB = d3.scaleLinear()
+    yScale = d3.scaleLinear()
         .domain([0, d3.max(dataSet, function (d) {
-            return d.current_power;
+            return d.value;
         })])
         .range([svg2_height, 0]).nice();
 
-    yScaleA = d3.scaleLinear()
-        .domain([0, 1])
-        .range(yScaleB.range());
-
     y2 = d3.scaleLinear()
         .domain([0, d3.max(dataSet, function (d) {
-            return d.current_power;
+            return d.value;
         })])
         .range([svg2_height2, 0]);
 
 }
 
 
-function drawChart(dataSet) {
+function drawChart(data) {
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
 
     var xAxis = d3.axisBottom(xScale),
         xAxis2 = d3.axisBottom(xScale2),
 
-        yAxisB = d3.axisLeft(yScaleB),
-        yAxisA = d3.axisRight(yScaleA);
+        yAxis = d3.axisLeft(yScale);
 
     var brush = d3.brushX()
         .extent([[0, 0], [svg2_width, 70]])
@@ -106,6 +142,12 @@ function drawChart(dataSet) {
             return "translate(100, 0)";
         })
         .call(zoom);
+
+    svg.append("text")
+        .attr("class", "log")
+        .attr("dx", 12)
+        .attr("dy", 12)
+        .text("data:" + data.length + " downsampled:" + 0);
 
     var chartArea = svg.append("g");
 
@@ -145,7 +187,7 @@ function drawChart(dataSet) {
         .attr("clip-path", "url(#clip)")
         .append("g");
 
-    var getDate = d3.timeFormat("%Y-%m-%d");
+    var getDate = d3.timeFormat("%Y-%m-%d %H:%M");
 
 
     // set tool tip
@@ -155,7 +197,7 @@ function drawChart(dataSet) {
         .html(function (d) {
             return "Date: <span style=\"color:yellow\">" + getDate(d.date) +
                 "</span><br>Amount of Electricity Used: " +
-                "<span style=\"color:yellow\">" + d.current_power + "</span>"; //+
+                "<span style=\"color:yellow\">" + d.value + "</span>"; //+
             // "<br>Contract Demand: <span style=\"color:yellow\">" +
             // d3.format(".0%")(d.contact_demand) + "</span>";
         });
@@ -200,15 +242,16 @@ function drawChart(dataSet) {
             .translate(-s[0], 0));
 
         //area brush 연동.
-        var svgarea = d3.select('.areaChart')
-        .attr("clip-path", "url(#clip)");
+        var svgarea = d3.select('.areaChart');
 
-        svgarea.select(".axis-x").call(xAxis); //x축 넘어감
-       //svgarea.select(".area").attr("d", area);
+        svgarea.select(".axis--x").call(xAxis); //x축 넘어감
         svgarea.selectAll(".area").attr("transform", function () {
             return "translate(" + -position + ", 0) scale(" + svg2_width / (s[1] - s[0]) + ", 1)"
         }); //area넘어감
-        
+        svgarea.selectAll(".focus").attr("transform", function () {
+            return "translate(" + -position + ", 0) scale(" + svg2_width / (s[1] - s[0]) + ", 1)"
+        }); //tooltip 넘어감
+
         /*svgarea.select(".zoom").call(zoom.transform, d3.zoomIdentity
         .scale(svg2_width / (s[1] - s[0]))
         .translate(-s[0], 0));*/
@@ -221,15 +264,15 @@ function drawChart(dataSet) {
         .append("rect")
         .attr("class", "barChart")
         .attr("opacity", "0.6")
-        .attr("x", function (d, i, da) { return (xScale(d.date) - ((svg2_width / da.length) - 1.5) * 0.5); })
+        .attr("x", function (d, i, da) { return (xScale(d.date) - (svg2_width / da.length) * 0.5); })
         .attr("y", function (d, i) {
-            return yScaleB(d.current_power);
+            return yScale(d.value);
         })
         .attr("width", function (d, i, da) {
-            return (svg2_width / da.length) - 1.5;
+            return (svg2_width / da.length);
         })
         .attr("height", function (d) {
-            return svg2_height - yScaleB(d.current_power);
+            return svg2_height - yScale(d.value);
         })
         .attr("clip-path", "url(#clip)")
         .on("mouseover", function (d) {
@@ -259,15 +302,15 @@ function drawChart(dataSet) {
         .append("rect")
         .attr("class", "brushChart")
         .attr("opacity", "0.6")
-        .attr("x", function (d, i, da) { return (xScale(d.date) - ((svg2_width / da.length) - 1.5) * 0.5); })
+        .attr("x", function (d, i, da) { return (xScale(d.date) - (svg2_width / da.length) * 0.5); })
         .attr("y", function (d, i) {
-            return y2(d.current_power);
+            return y2(d.value);
         })
         .attr("width", function (d, i, da) {
-            return (svg2_width / (da.length)) - 1.5;
+            return (svg2_width / da.length);
         })
         .attr("height", function (d) {
-            return svg2_height2 - y2(d.current_power);
+            return svg2_height2 - y2(d.value);
         })
         .attr("fill", " rgb(254, 164, 102)")
         .attr("clip-path", "url(#clip)");
@@ -280,21 +323,11 @@ function drawChart(dataSet) {
 
     axis.append("g")
         .attr("class", "axis-y")
-        .call(yAxisB)
+        .call(yAxis)
         .append("text")
         .text("Amount of Electricity Used")
         .attr("transform", "translate(10,123) rotate(90)")
         .attr('fill', 'black');
-
-    axis.append("g")
-        .attr("transform", "translate(" + svg2_width + ", 0)")
-        .call(yAxisA
-            .tickFormat(d3.format(".0%")))
-        .append("text")
-        .text("Contact Demand")
-        .attr("transform", "translate(-10,75) rotate(-90)")
-        .attr('fill', 'black');
-
 
     axis2.append("g")
         .attr("class", "axis axis-x")
@@ -305,14 +338,7 @@ function drawChart(dataSet) {
         .attr("class", "brush")
         .call(brush)
         .call(brush.move, xScale.range());
-}
 
-
-function orderData3(data) {
-
-    var sData = data.sort(function (x, y) {
-        return d3.ascending(x.date, y.date);
-    })
-
-    return sData;
+        d3.select(".log").text("data:" + data.length + " downsampled:" + dataSet.length);
+        
 }

@@ -1,1 +1,1 @@
-document.getElementById("userCompany").innerHTML ='신화개발';
+document.getElementById("userCompany").innerHTML ='신화개발';document.getElementById("showCompany").innerHTML ='신화**';

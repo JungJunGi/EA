@@ -13,6 +13,8 @@ var heatmapRouter = require('./routes/HeatmapData').router; //heatmap
 var seg2Data = require('./routes/seg2Data').router;// for seg2 chart
 
 var DonutData = require('./routes/DonutCh').router;// 도넛차트
+var power_factor = require('./routes/power_factor').router;// 역률차트
+
 /*
 //인하 url 전기요금
 var inha_main = require('./routes/inha_main');
@@ -39,6 +41,7 @@ app.use('/moneyData', moneyLine);
 app.use('/heatmapData', heatmapRouter);
 app.use('/seg2Data', seg2Data);
 app.use('/segData', DonutData);
+app.use('/segData', power_factor);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
