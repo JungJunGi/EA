@@ -124,7 +124,7 @@ async function main (categoryNumber, companyName){
 
         } finally {
 
-            getData(categoryNumber, companyName, today, dataSet[companyName]);
+            makeJson(categoryNumber, companyName, today, dataSet[companyName]);
         }
 
     }); 
@@ -132,7 +132,9 @@ async function main (categoryNumber, companyName){
 
 
 /** 해당 회사, 해당 부서, 해당 아이템 데이터 가져오기 **/
-function getData(categoryNumber, companyName, today, data) {
+async function makeJson(categoryNumber, companyName, today, data) {
+
+    var category = checkCategory(categoryNumber);   // data category
 
     for(var i in data){
 
@@ -142,61 +144,62 @@ function getData(categoryNumber, companyName, today, data) {
         var dsid = id[0];
         var distbdid = id[1];
         
-        //console.log(depart)
-        //console.log(dsid, distbdid)
-        //console.log(today)
+        // console.log(depart)
+        // console.log(dsid, distbdid)
     
         url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
         
-        var myBody, myData=[];
-        var jsonText;
-        var myJson;
-
-        request(url, (error, response, body) => {
-            if (error) throw error;
-
-            let $ = cheerio.load(body);
-
-            try {
-                
-                var category = checkCategory(categoryNumber);   // data category
-
-                jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
+        var jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
                     + "\"year\" : \"" + today.slice(0,4) + "\",\"month\" : \"" + today.slice(4,6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
-                if (myBody == "No result") { // 해당 데이터 없음 !!!
-
-                    jsonText = jsonText + "] }";
-
-                } else { // 데이터 있음 !!!
-
-                    myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
-                    myBody = myBody.split("\n");
-                    
-                    myBody.forEach(function(d, i, da) {
-                        var a = d.split(",");
-                        myData.push(a);
-
-                        jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
-                        // .toISOString().replace('T',' ').replace('.000Z','')
-                    });
-                }
-                
-            } catch (error) {
-                
-                console.error(error);
-            } finally {
-
-
-                jsonText = jsonText.slice(0, -1) + "] }";
-
-                myJson = JSON.parse(jsonText);
-
-                console.log(myJson)
-            }
-        });
+        await getData(url, jsonText);
     }
+
+}
+
+
+
+async function getData (url, jsonText){
+    
+    request(url, async (error, response, body) => {
+        if (error) throw error;
+
+        let $ = cheerio.load(body);
+        var myBody;
+        var myData = [];
+
+        try {
+            
+            if (body == "No result") { // 해당 데이터 없음 !!!
+
+                jsonText = jsonText + "] }";
+
+            } else { // 데이터 있음 !!!
+
+                myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
+                myBody = myBody.split("\n");
+                
+                myBody.forEach(await function(d, i, da) {
+                    var a = d.split(",");
+                    myData.push(a);
+
+                    jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
+                    // .toISOString().replace('T',' ').replace('.000Z','')
+                });
+            }
+            
+        } catch (error) {
+            
+            console.error(error);
+        } finally {
+
+            jsonText = jsonText.slice(0, -1) + "] }";
+            result = JSON.parse(jsonText);
+
+            console.log(result)
+        }
+    });
 
 }
 
