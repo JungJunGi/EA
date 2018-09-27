@@ -1,7 +1,7 @@
 ﻿var express = require('express');
 var router = express.Router();
 
-var PythonShell = require('python-shell'); //python 호출
+const realData = require('../module/datacrawling').main;
 
 var start = function (company, companyDB) {
 
@@ -19,46 +19,19 @@ var start = function (company, companyDB) {
         var dateD = [];
         var departD = [];
 
-        //python options
-        var options = {
-            mode: 'json',
-            pythonPath: '',
-            scriptPath: './module/',
-            args: [company]
-        };
-
-        //실시간 데이터 실행.
-        PythonShell.run('test_realtime.py', options, function (err, results) {
-            if (err) throw err;
-
-            console.log("부서별 누적 데이터")
-            if (results == null)
-                return;
-
+        realData(16, company, function (results) {
             results.forEach(element => {
-                var pre_value = 0;
-                if (element.meta.item == "SUM_ACTIVE_POWER") {
-                    element.data.forEach(function (el, index) {
-                        var jsonD = JSON.parse(el);
-                                if(jsonD.value=='None'){
-                                    jsonD.value = (Number(element.data[index-1].value)+Number(element.data[index+1].value))/2;
-                                }
-                                dateD.push(JSON.parse("{\"date\":\"" + jsonD.date + "\",\"" + element.meta.depart + "\":" + Number(jsonD.value) + "}"));
-                        /*el = JSON.parse(el);
 
-                        if (index == 0) {
-                            pre_value = Number(el.value);
-                        }
-                        else {
-                            if (index == element.data.length - 1)
-                                dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + (Number(el.value) - pre_value) + "}"));
+                element.data.forEach(function (el, index) {
+                    if (el.value == 'None') {
+                        el.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
+                    }
+                    dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + Number(el.value) + "}"));
 
-                        }*/
+                });
 
-                    });
-                }
             });
-        });
+        })
 
         companyDB.collection(company).find(query).toArray(function (findErr, data) {
             if (findErr) throw findErr;
@@ -70,8 +43,8 @@ var start = function (company, companyDB) {
                 var pre_value = 0;
                 element.data.forEach(function (el, index) {
                     if (new Date(el.date) > pre_date) {
-                        if(el.value=='None'){
-                            el.value = (Number(element.data[index-1].value)+Number(element.data[index+1].value))/2;
+                        if (el.value == 'None') {
+                            el.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
                         }
                         dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + Number(el.value) + "}"));
                         /*if (index == 0) {

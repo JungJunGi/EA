@@ -3,7 +3,8 @@
 
 var express = require("express");
 var router = express.Router();
-var PythonShell = require('python-shell'); //python 호출
+
+const realData = require('../module/datacrawling').main;
 
 function groupBy(array, col, value) {
 
@@ -37,39 +38,22 @@ var start = function (company, companyDB) {
         var pre_date = new Date();
         pre_date.setDate(pre_date.getDate() - 365)//현재로 부터 일년 전
 
-        /** Python Options **/
-        var options = {
-            mode: 'json',
-            pythonPath: '',
-            scriptPath: './module/',
-            args: [company]
-        };
-
         var query = { "meta.item": "SUM_ACTIVE_POWER" };
 
-        /** From Maria DB **/
-        PythonShell.run('test_realtime.py', options, function (err, results) {
-            if (err) throw err;
-
-            console.log("seg2데이터")
-            if (results == null)
-                return;
-
+        realData(16, company, function (results) {
             results.forEach(element => {
-                if (element.meta.item == "SUM_ACTIVE_POWER") {
-                    element.data.forEach(function (el, index) {
-                        var jsonD = JSON.parse(el);
-                        if(jsonD.value=='None'){
-                            jsonD.value = (Number(element.data[index-1].value)+Number(element.data[index+1].value))/2;
-                        }
-                        dateD.push(jsonD);
 
-                    });
-                }
-            });
+                element.data.forEach(function (el, index) {
 
-            // result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-            // console.log(result)
+                    if (el.value == 'None') {
+                        el.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
+                    }
+                    dateD.push(el);
+
+                });
+
+            })
+
         });
 
         /** From Mongo DB **/
@@ -80,8 +64,8 @@ var start = function (company, companyDB) {
             data.forEach(function (element) {
                 element.data.forEach(function (el, index) {
                     if (new Date(el.date) > pre_date) {
-                        if(el.value=='None'){
-                            el.value = (Number(element.data[index-1].value)+Number(element.data[index+1].value))/2;
+                        if (el.value == 'None') {
+                            el.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
                         }
                         dateD.push(el);
 
