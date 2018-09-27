@@ -10,8 +10,6 @@ const async = require("async");
 // var urlencode = require('urlencode');
 // var router = express.Router();
 
-const crawling = require('./datacrawling_main').datacrawling;
-
 var res = new Array;
 
 var company;    // company name
@@ -19,6 +17,36 @@ var dsid;       // company id
 var category;   // data category
 var depart = new Array;     // departs name
 var myDate = new Array;     // date string
+
+let today = new Date().toISOString().slice(0,10).replace("-","").replace("-","");
+
+
+function checkCategory (categoryNumber) {
+
+    var category;   // data category
+
+    switch (categoryNumber) {
+        case 3: category = 'ACCUMULATE_POWER_CONSUMPTION'; break;
+        case 5: category = 'AVERAGE_FREQUENCY'; break;
+        case 6: category = 'AVERAGE_LINE_VOLTAGE'; break;
+        case 7: category = 'AVERAGE_PHASE_CURRENT'; break;
+        case 8: category = 'AVERAGE_PHASE_VOLTAGE'; break;
+        case 9: category = 'AVERAGE_TEMPERATURE'; break;
+        case 10: category = 'ELECTRIC_CHARGE'; break;
+        case 11: category = 'INVERTER_CONVERSION_EFFICIENCY'; break;
+        case 12: category = 'LINE_VOLTAGE_R_S'; break;
+        case 13: category = 'LINE_VOLTAGE_S_T'; break;
+        case 14: category = 'LINE_VOLTAGE_T_R'; break;
+        case 15: category = 'POWER_FACTOR'; break;
+        case 16: category = 'SUM_ACTIVE_POWER'; break;
+        case 17: category = 'SUM_APPARENT_POWER'; break;
+        case 21: category = 'SUM_REACTIVE_POWER'; break;
+        case 22: category = 'AVERAGE_THD_PHASE_VOLTAGE'; break;
+        case 23: category = 'AVERAGE_THD_PHASE_CURRENT'; break;
+    }
+
+    return category
+}
 
 /* 
 
@@ -39,10 +67,14 @@ data category
 16: 유효전력
 17: 피상전력
 21: 무효전력 
+22: 전압 총고조파왜곡율
+23: 전류 총고조파왜곡율
 
 */
 
+
 main(16, "신화개발")
+
 
 async function main (categoryNumber, companyName){
 
@@ -92,11 +124,7 @@ async function main (categoryNumber, companyName){
 
         } finally {
 
-            let data = dataSet[companyName];
-
-            let today = new Date().toISOString().slice(0,10).replace("-","").replace("-","");
-
-            getData(categoryNumber, companyName, today, data);
+            getData(categoryNumber, companyName, today, dataSet[companyName]);
         }
 
     }); 
@@ -114,8 +142,9 @@ function getData(categoryNumber, companyName, today, data) {
         var dsid = id[0];
         var distbdid = id[1];
         
-        console.log(depart)
-        console.log(dsid, distbdid)
+        //console.log(depart)
+        //console.log(dsid, distbdid)
+        //console.log(today)
     
         url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
         
@@ -129,9 +158,11 @@ function getData(categoryNumber, companyName, today, data) {
             let $ = cheerio.load(body);
 
             try {
+                
+                var category = checkCategory(categoryNumber);   // data category
 
                 jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
-                    + "\"date\" : \"" + today + "\",\"category\" : \"" + categoryNumber + "\"}, "
+                    + "\"year\" : \"" + today.slice(0,4) + "\",\"month\" : \"" + today.slice(4,6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
                 if (myBody == "No result") { // 해당 데이터 없음 !!!
@@ -147,7 +178,8 @@ function getData(categoryNumber, companyName, today, data) {
                         var a = d.split(",");
                         myData.push(a);
 
-                        jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"d\" : \"" + a[1] + "\" },";
+                        jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
+                        // .toISOString().replace('T',' ').replace('.000Z','')
                     });
                 }
                 
@@ -156,32 +188,12 @@ function getData(categoryNumber, companyName, today, data) {
                 console.error(error);
             } finally {
 
-                var str;
 
                 jsonText = jsonText.slice(0, -1) + "] }";
 
                 myJson = JSON.parse(jsonText);
 
                 console.log(myJson)
-    /*
-                if (today) {
-                    str = "RealTime"
-                    // console.log(str, myJson.data[myJson.data.length - 1]); // 지금시각 데이터    
-                    
-                }
-                else {
-                    var ym = parseInt( Number(date)/100 ) - 1
-                    var y = parseInt(ym/100)
-                    var m = parseInt(ym%100)
-                    str = 'money' + y + '-' + m
-                    // console.log(str, myJson.data[0]); // 0시0분 데이터
-                    
-                }   
-
-                // router.get('/'+str, (req, res) => {  return res.json(myJson); });
-
-                makeJson(company, depart, str);
-    */
             }
         });
     }

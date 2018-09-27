@@ -9,7 +9,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Current File",
-            "program": "${workspaceFolder}\\module\\datacrawling_sub_"
+            "program": "${workspaceFolder}\\module\\datacrawling"
         },
         {
             "type": "node",
