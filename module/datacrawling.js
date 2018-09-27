@@ -73,10 +73,12 @@ data category
 */
 
 
-main(16, "신화개발")
+/*main(16, "신화개발",function(result){
+    console.log(result);
+})*/
 
 
-async function main (categoryNumber, companyName){
+async function main (categoryNumber, companyName, callback){
 
     var maindata = [];
     var dataSet = {};
@@ -124,7 +126,10 @@ async function main (categoryNumber, companyName){
 
         } finally {
 
-            makeJson(categoryNumber, companyName, today, dataSet[companyName]);
+            getData(categoryNumber, companyName, today, dataSet[companyName],function(result){
+                callback(result)
+           });
+          
         }
 
     }); 
@@ -132,75 +137,76 @@ async function main (categoryNumber, companyName){
 
 
 /** 해당 회사, 해당 부서, 해당 아이템 데이터 가져오기 **/
-async function makeJson(categoryNumber, companyName, today, data) {
+async function getData(categoryNumber, companyName, today, data, callback) {
 
-    var category = checkCategory(categoryNumber);   // data category
+    var result = [];
 
-    for(var i in data){
+    data.forEach(function(e, index){
 
-        var depart = Object.keys(data[i])[0];
-        var id = Object.values(data[i])[0];
+        var depart = Object.keys(e)[0];
+        var id = Object.values(e)[0];
 
         var dsid = id[0];
         var distbdid = id[1];
         
-        // console.log(depart)
-        // console.log(dsid, distbdid)
-    
+        //console.log(depart)
+        //console.log(dsid, distbdid)
+        //console.log(today)
+  
         url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
         
-        var jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
+        var myBody, myData=[];
+        var jsonText;
+        var myJson;
+
+        request(url, (error, response, body) => {
+            if (error) throw error
+            let $ = cheerio.load(body);
+
+            try {
+                
+                var category = checkCategory(categoryNumber);   // data category
+
+                jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
                     + "\"year\" : \"" + today.slice(0,4) + "\",\"month\" : \"" + today.slice(4,6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
-        await getData(url, jsonText);
-    }
+                if (myBody == "No result") { // 해당 데이터 없음 !!!
 
-}
+                    jsonText = jsonText + "] }";
 
+                } else { // 데이터 있음 !!!
 
+                    myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
+                    myBody = myBody.split("\n");
+                    
+                    myBody.forEach(function(d, i, da) {
+                        var a = d.split(",");
+                        myData.push(a);
 
-async function getData (url, jsonText){
-    
-    request(url, async (error, response, body) => {
-        if (error) throw error;
-
-        let $ = cheerio.load(body);
-        var myBody;
-        var myData = [];
-
-        try {
-            
-            if (body == "No result") { // 해당 데이터 없음 !!!
-
-                jsonText = jsonText + "] }";
-
-            } else { // 데이터 있음 !!!
-
-                myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
-                myBody = myBody.split("\n");
+                        jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
+                        // .toISOString().replace('T',' ').replace('.000Z','')
+                    });
+                }
                 
-                myBody.forEach(await function(d, i, da) {
-                    var a = d.split(",");
-                    myData.push(a);
+            } catch (error) {
+                
+                console.error(error);
+            } finally {
 
-                    jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
-                    // .toISOString().replace('T',' ').replace('.000Z','')
-                });
+
+                jsonText = jsonText.slice(0, -1) + "] }";
+                myJson = JSON.parse(jsonText);
+
+                result.push(myJson);
+                
+                if(data.length==result.length){
+                    callback(result);
+                }
             }
             
-        } catch (error) {
-            
-            console.error(error);
-        } finally {
-
-            jsonText = jsonText.slice(0, -1) + "] }";
-            result = JSON.parse(jsonText);
-
-            console.log(result)
-        }
+        });
     });
-
 }
 
-// module.exports.router = router;
+module.exports.main = main;

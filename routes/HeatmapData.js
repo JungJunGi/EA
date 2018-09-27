@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var PythonShell = require('python-shell'); //python 호출
+const realData = require('../module/datacrawling').main;
 
 var start = function (company, companyDB) {
 
@@ -18,53 +18,31 @@ var start = function (company, companyDB) {
         var pre_date = new Date();
         pre_date.setDate(pre_date.getDate() - 365)//현재로 부터 일년 전
 
+        realData(16, company, function (results) {
+            results.forEach(element => {
 
-        /** Python Options **/
-        var options = {
-            mode: 'json',
-            pythonPath: '',
-            scriptPath: './module/',
-            args: [company]
-        };
+                element.data.forEach(function (ele, index) {
 
-        /** From Maria DB **/
-        PythonShell.run('test_realtime.py', options, function (err, results) {
-            if (err) throw err;
+                    var d = new Date(ele.date).getDay();
+                    var h = Number(ele.date.substring(11, 13));
+                    if (h == 0) { h = 24; }
+                    if (d == 0) { d = 7; }
 
-            console.log("히트맵 데이터")
-            if (results == null)
-                return;
-
-            results.forEach(function (element) {
-
-                //data
-                if (element.meta.item == query["meta.item"]) {
-
-                    //if (element.meta.year == thisYear) {
-                    element.data.forEach(function (ele, index) {
-                        var jsonD = JSON.parse(ele)
-
-                        var d = new Date(jsonD.date).getDay();
-                        var h = Number(jsonD.date.substring(11, 13));
-                        if (h == 0) { h = 24; }
-                        if (d == 0) { d = 7; }
-
-                        //요일, 시간, 부서, 값
-                        if (jsonD.value == 'None') {
-                            jsonD.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
-                        }
-                        arr.push({
-                            day: d,
-                            hour: h,
-                            depart: element.meta.depart,
-                            value: jsonD.value
-                        });
-
+                    //요일, 시간, 부서, 값
+                    if (ele.value == 'None') {
+                        ele.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
+                    }
+                    arr.push({
+                        day: d,
+                        hour: h,
+                        depart: element.meta.depart,
+                        value: ele.value
                     });
-                    //}
-                }
+
+                });
+
             });
-        });
+        })
 
         /** From Mongo DB **/
         companyDB.collection(company).find(query).toArray(function (findErr, data) {
