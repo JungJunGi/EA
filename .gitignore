@@ -74,3 +74,8 @@ typings/
 
 # config
 config/
+./config
+
+# test file
+./test
+test/

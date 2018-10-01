@@ -11,7 +11,6 @@ import pymysql
 import json
 import datetime
 
-
  
 ### Ready for data ###
 group_companyId = [] 
@@ -43,15 +42,18 @@ year["2018"] = data_2018
 
 
 ### Ready for mariadb connect ###
+maria_info_file = open('./config/maria.json').read()
+maria_info = json.loads(maria_info_file)
+
 db = pymysql.connect(
-                        host = "www.lems.mbz.kr",
-                        user = "lems_user",
-                        passwd = "Pass_%$#@",
-                        db = "POWERMON",
-                        port = 10336,
-                        charset = "euckr"
+                        host = maria_info['host'],
+                        user = maria_info['user'],
+                        passwd = maria_info['passwd'],
+                        db = maria_info['db'],
+                        port = maria_info['port'],
+                        charset = maria_info['charset']
                     )
-    
+
 cursor = db.cursor()
 
 ### Read COMPANY id & name ###
@@ -78,19 +80,20 @@ dsitemDict = dict(zip(group_dsitemId, group_dsitemName))
 
 
 
+
 ### Ready for mongodb access ###
-MONGO_HOST = "203.252.208.247"
-MONGO_PORT = 22
-MONGO_USER = "elec"
-MONGO_PASS = "vmlab347!"
-MONGO_DB = "test"
-MONGO_COLLECTION = ""
+mongo_info_file = open('./config/mongo.json').read()
+mongo_info = json.loads(mongo_info_file)
+
+MONGO_DB = mongo_info['MONGO_DB']
+MONGO_COLLECTION = mongo_info['MONGO_COLLECTION']
+
 
 ### Define ssh tunnel ###
 server = SSHTunnelForwarder(
-    MONGO_HOST,
-    ssh_username = MONGO_USER,
-    ssh_password = MONGO_PASS,
+    mongo_info['MONGO_HOST'],
+    ssh_username = mongo_info['MONGO_USER'],
+    ssh_password = mongo_info['MONGO_PASS'],
     remote_bind_address = ('127.0.0.1', 27017)
 )
 
@@ -106,10 +109,6 @@ client = pymongo.MongoClient('127.0.0.1', server.local_bind_port)
 db = client[MONGO_DB]
 
 for com in companyDict.keys():
-
-    if com < 400:
-        continue
-
     MONGO_COLLECTION = comNameDict.get(com)
     collection = db[MONGO_COLLECTION]
     print(MONGO_COLLECTION, datetime.datetime.today())
@@ -146,14 +145,17 @@ for com in companyDict.keys():
                     metaD["depart"] = dept[2]
                     docD["meta"] = metaD
                     docD["data"]=dsitemL
-
-                    collection.insert_one(json.dumps(docD))
+                   
+                    print(json.dumps(docD)) # collection.insert_one(json.dumps(docD))
 
                     # 초기화
                     dsitemD = {}
                     dsitemL = []
                     docD = {}
                     metaD = {}
+                    break
+                break
+            break
 
 
 
