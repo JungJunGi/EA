@@ -57,21 +57,24 @@ def job():
 
     date = year + month
     today = year + "-" + month + "-" + mday
-    date = "201809"
-    today = "2018-09-30"
+    # date = "201809"
+    # today = "2018-09-30"
     print("today is ", today)
 
 
     ### Ready for mariadb connect ###
+    maria_info_file = open('./config/maria.json').read()
+    maria_info = json.loads(maria_info_file)
+
     db = pymysql.connect(
-                            host = "www.lems.mbz.kr",
-                            user = "lems_user",
-                            passwd = "Pass_%$#@",
-                            db = "POWERMON",
-                            port = 10336,
-                            charset = "euckr"
+                            host = maria_info['host'],
+                            user = maria_info['user'],
+                            passwd = maria_info['passwd'],
+                            db = maria_info['db'],
+                            port = maria_info['port'],
+                            charset = maria_info['charset']
                         )
-        
+
     cursor = db.cursor()
 
     ### Read COMPANY id & name ###
@@ -161,18 +164,18 @@ def job():
 
 
 ### Ready for mongodb access ###
-MONGO_HOST = "203.252.208.247"
-MONGO_PORT = 22
-MONGO_USER = "elec"
-MONGO_PASS = "vmlab347!"
-MONGO_DB = "companyData"
-MONGO_COLLECTION = ""
+mongo_info_file = open('./config/mongo.json').read()
+mongo_info = json.loads(mongo_info_file)
+
+MONGO_DB = mongo_info['MONGO_DB']
+MONGO_COLLECTION = mongo_info['MONGO_COLLECTION']
+
 
 ### Define ssh tunnel ###
 server = SSHTunnelForwarder(
-    MONGO_HOST,
-    ssh_username = MONGO_USER,
-    ssh_password = MONGO_PASS,
+    mongo_info['MONGO_HOST'],
+    ssh_username = mongo_info['MONGO_USER'],
+    ssh_password = mongo_info['MONGO_PASS'],
     remote_bind_address = ('127.0.0.1', 27017)
 )
 
@@ -180,7 +183,7 @@ server = SSHTunnelForwarder(
 ### Start ssh tunnel ###
 server.start()
 
-schedule.every().day.at("16:33").do(job)
+schedule.every().day.at("23:59").do(job)
 
 while True:
     schedule.run_pending()

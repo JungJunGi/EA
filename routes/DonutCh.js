@@ -15,7 +15,6 @@ var start = function (company, companyDB) {
         realData(3, company, function (results) {
             results.forEach(element => {
                 var realtime = element.data.slice(-1)[0];
-                console.log(realtime)
                 dataD.push({ "name": element.meta.depart, "value": realtime.value });
 
             });

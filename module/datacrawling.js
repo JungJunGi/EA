@@ -72,12 +72,6 @@ data category
 
 */
 
-
-/*main(16, "신화개발",function(result){
-    console.log(result);
-})*/
-
-
 async function main (categoryNumber, companyName, callback){
 
     var maindata = [];
