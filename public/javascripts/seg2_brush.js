@@ -1,4 +1,3 @@
-
 // user company 정보 가져오기
 var companyName = document.getElementById("userCompany").innerHTML;
 
@@ -6,144 +5,216 @@ if (companyName.indexOf("(주)") != -1) {
     companyName = companyName.replace("(주)", "")
 }
 
-var chart2 = d3.select('.seg2_chart'),
-    seg2_margin = { top: 20, right: 20, bottom: 150, left: 40 },
-    seg2_margin2 = { top: 430, right: 20, bottom: 20, left: 40 },
+var svg2Size = d3.select('.seg2_chart');
 
-    width = +chart2.attr("width") - seg2_margin.left - seg2_margin.right,
-    height = +chart2.attr("height") - seg2_margin.top - seg2_margin.bottom,
-    height2 = +chart2.attr("height") - seg2_margin2.top - seg2_margin2.bottom;
+var svg2_margin = { top: 50, right: 250, bottom: 50, left: 40 },
+    svg2_width = +svg2Size.attr("width") - svg2_margin.left - svg2_margin.right,
+    svg2_height = 450 - svg2_margin.top - svg2_margin.bottom;
 
-var x = d3.scaleTime().range([0, width]),
-    x2 = d3.scaleTime().range([0, width]),
-    y = d3.scaleLinear().range([height, 0]),
-    y2 = d3.scaleLinear().range([height2, 0]);
-
-var x_Axis = d3.axisBottom(x),
-    x_Axis2 = d3.axisBottom(x2),
-    y_Axis = d3.axisLeft(y);
-
-var brush = d3.brushX()
-    .extent([[0, 0], [width, height2]])
-    .on("brush end", brushed);
-
-var zoom = d3.zoom()
-    .scaleExtent([1, 10])
-    .translateExtent([[0, 0], [width, height]])
-    .extent([[0, 0], [width, height]])
-    .on("zoom", zoomed);
-
-var area_ = d3.area()
-    .curve(d3.curveMonotoneX)
-    .x(function (d) { return x(d.date); })
-    .y0(height)
-    .y1(function (d) { return y(d.value); });
-
-var area_2 = d3.area()
-    .curve(d3.curveMonotoneX)
-    .x(function (d) { return x2(d.date); })
-    .y0(height2)
-    .y1(function (d) { return y2(d.value); });
-
-chart2.append("defs").append("clipPath")
-    .attr("id", "clip")
-    .append("rect")
-    .attr("width", width)
-    .attr("height", height);
-
-var seg2_focus = chart2.append("g")
-    .attr("class", "focus")
-    .attr("width", width)
-    .attr("transform", "translate(" + seg2_margin.left + "," + seg2_margin.top + ")");
-
-var seg2_context = chart2.append("g")
-    .attr("class", "context")
-    .attr("transform", "translate(" + seg2_margin2.left + "," + seg2_margin2.top + ")");
-
+var xScale, yScale;
 
 d3.json('/seg2Data/seg2/company=' + companyName, function (error, data) {
-    if (error) throw error;
 
-    //data
-    var Jdata = sortByData2(data.data);
-    
-    Jdata.forEach(e => {
-        e.date = new Date(e.date);
-        e.value = Number(e.value);
-    });
-    //Jdata = Jdata.slice(1000, 2000);
+    function orderData3(data) {
 
-    //chart
-    x.domain(d3.extent(Jdata, function (d) { return d.date; }));
-    y.domain([0, d3.max(Jdata, function (d) { return d.value; })]);
-    x2.domain(x.domain());
-    y2.domain(y.domain());
+        var sData = data.sort(function (x, y) {
+            return d3.ascending(x.date, y.date);
+        })
 
-    seg2_focus.append("path")
-        .datum(Jdata)
-        .attr("class", "barea")
-        .attr("d", area_);
+        sData.forEach(d => {
+            d.date = Number(new Date(d.date).getTime());
+            if (d.value < 0) {
+                d.value = -d.value;
+            }
+        });
+        return sData;
+    }
 
-    seg2_focus.append("g")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height + ")")
-        .call(x_Axis);
+    var orderData = orderData3(data.data);
 
-    seg2_focus.append("g")
-        .attr("class", "axis axis--y")
-        .call(y_Axis);
+    setScales(orderData);
+    drawChart(orderData);
 
-    seg2_context.append("path")
-        .datum(Jdata)
-        .attr("class", "barea")
-        .attr("d", area_2);
-
-    seg2_context.append("g")
-        .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height2 + ")")
-        .call(x_Axis2);
-
-    seg2_context.append("g")
-        .attr("class", "brush")
-        .call(brush)
-        .call(brush.move, x.range());
-
-    chart2.append("rect")
-        .attr("class", "zoom")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("transform", "translate(" + seg2_margin.left + "," + seg2_margin.top + ")")
-        .call(zoom);
 });
 
-function brushed() {
-    if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return;
-    var s = d3.event.selection || x2.range();
+function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
 
-    x.domain(s.map(x2.invert, x2));
+    yProperty = yProperty || 0;
+    xProperty = xProperty || 1;
 
-    seg2_focus.select(".axis--x").call(x_Axis);
-    seg2_focus.select(".barea").attr("d", area_);
-    chart2.select(".zoom").call(zoom.transform, d3.zoomIdentity
-        .scale(width / (s[1] - s[0]))
-        .translate(-s[0], 0));
+    var m = Math.floor,
+        y = Math.abs,
+        f = data.length;
+
+    if (threshold >= f || 0 === threshold) {
+        return data;
+    }
+
+    var n = [],
+        t = 0,
+        p = (f - 2) / (threshold - 2),
+        c = 0,
+        v,
+        u,
+        w;
+
+    n[t++] = data[c];
+
+    for (var e = 0; e < threshold - 2; e++) {
+        for (var g = 0,
+            h = 0,
+            a = m((e + 1) * p) + 1,
+            d = m((e + 2) * p) + 1,
+            d = d < f ? d : f,
+            k = d - a; a < d; a++) {
+            g += +data[a][xProperty], h += +data[a][yProperty];
+        }
+
+        for (var g = g / k,
+            h = h / k,
+            a = m((e + 0) * p) + 1,
+            d = m((e + 1) * p) + 1,
+            k = +data[c][xProperty],
+            x = +data[c][yProperty],
+            c = -1; a < d; a++) {
+            "undefined" != typeof data[a] &&
+                (u = .5 * y((k - g) * (data[a][yProperty] - x) - (k - data[a][xProperty]) * (h - x)),
+                    u > c && (c = u, v = data[a], w = a));
+        }
+
+        n[t++] = v;
+        c = w;
+    }
+
+    n[t++] = data[f - 1];
+
+    return n;
+};
+
+function setScales(data) {
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
+
+    var start_date = dataSet[0].date;
+    var end_date = dataSet[dataSet.length - 1].date;
+
+    xScale = d3.scaleTime().domain(d3.extent([start_date, end_date])).range([0, svg2_width]);
+
+    yScale = d3.scaleLinear()
+        .domain([0, d3.max(dataSet, function (d) {
+            return d.value;
+        })])
+        .range([svg2_height, 0]).nice();
+
 }
 
-function zoomed() {
-    if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return;
-    var t = d3.event.transform;
 
-    x.domain(t.rescaleX(x2).domain());
-    seg2_focus.select(".axis--x").call(x_Axis);
-    seg2_focus.select(".barea").attr("d", area_);
-    seg2_ontext.select(".brush").call(brush.move, x.range().map(t.invertX, t));
-}
+function drawChart(data) {
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
 
-function sortByData2(data) {
+    var xAxis = d3.axisBottom(xScale)
 
-    var sData = data.sort(function (x, y) {
-        return d3.ascending(x.date, y.date);
-    })
+    yAxis = d3.axisLeft(yScale);
 
-    return sData;
+    // ON svg
+    var svg = d3.select('.seg2_chart')
+        .attr("width", svg2_width + 200)
+        .attr("transform", function (d, i) {
+            return "translate(100, 0)";
+        })
+
+    svg.append("text")
+        .attr("class", "log")
+        .attr("dx", 12)
+        .attr("dy", 12)
+        .text("data:" + data.length + " downsampled:" + 0);
+
+    var chartArea = svg.append("g");
+
+    chartArea.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("class", "zoom")
+        .attr("width", svg2_width)
+        .attr("height", svg2_height + svg2_margin.bottom);
+
+    var chart = chartArea.append("g")
+        .attr("class", "chart")
+        .attr("width", svg2_width)
+        .attr("height", svg2_height)
+        .attr("transform", "translate(" + svg2_margin.left + "," + svg2_margin.top + ")")
+        .attr("clip-path", "url(#clip)");
+
+    var axis = chartArea.append("g")
+        .attr("width", svg2_width)
+        .attr("height", svg2_height)
+        .attr("transform", "translate(" + svg2_margin.left + "," + svg2_margin.top + ")");
+
+    var getDate = d3.timeFormat("%Y-%m-%d %H:%M");
+
+
+    // set tool tip
+    var tip = d3.tip()
+        .attr("class", "d3-tip")
+        .offset([-10, 0])
+        .html(function (d) {
+            return "Date: <span style=\"color:yellow\">" + getDate(d.date) +
+                "</span><br>Amount of Electricity Used: " +
+                "<span style=\"color:yellow\">" + d.value + "</span>";
+        });
+
+    chartArea.call(tip);
+
+    chart.selectAll("rect")
+        .data(dataSet).enter()
+        .append("rect")
+        .attr("class", "barChart")
+        .attr("opacity", "0.6")
+        .attr("x", function (d, i, da) { return (xScale(d.date) - (svg2_width / da.length) * 0.5); })
+        .attr("y", function (d, i) {
+            return yScale(d.value);
+        })
+        .attr("width", function (d, i, da) {
+            return (svg2_width / da.length);
+        })
+        .attr("height", function (d) {
+            return svg2_height - yScale(d.value);
+        })
+        .attr("clip-path", "url(#clip)")
+        .on("mouseover", function (d) {
+            tip.show(d);
+            d3.select(this)
+                .attr("opacity", "0.9");
+        })
+        .on("mouseout", function () {
+            tip.hide();
+            d3.select(this)
+                .transition()
+                .duration(500)
+                .attr("opacity", "0.6");
+        })
+        .on("mousemove", function (d) {
+            tip.attr("x", function () {
+                return d3.event.offsetX;
+            })
+                .attr("y", function () {
+                    return d3.event.offsetY;
+                })
+        });
+
+    // set axis
+    axis.append("g")
+        .attr("class", "axis-x")
+        .attr("transform", "translate(0," + svg2_height + ")")
+        .call(xAxis);
+
+    axis.append("g")
+        .attr("class", "axis-y")
+        .call(yAxis)
+        .append("text")
+        .text("Amount of Electricity Used")
+        .attr("transform", "translate(10,123) rotate(90)")
+        .attr('fill', 'black');
+
+    d3.select(".log").text("data:" + data.length + " downsampled:" + dataSet.length);
+
 }

@@ -218,7 +218,7 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
                 else text="효율성 낮음";
 
                 tooltip.html("해당시간: " + getDate(d.date) +"</br>" + "역률: " + d.value + " " + text)
-                tooltip.style("top", 180 + "px").style("left", 220 + "px");
+                tooltip.style("top", 670 + "px").style("left", 220 + "px");
             });
 
     }
