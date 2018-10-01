@@ -47,18 +47,6 @@ var start = function (company, companyDB) {
                             el.value = (Number(element.data[index - 1].value) + Number(element.data[index + 1].value)) / 2;
                         }
                         dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + Number(el.value) + "}"));
-                        /*if (index == 0) {
-                            pre_value = Number(el.value);
-                        }
-                        else {
-                            if (el.date.indexOf("00:00:00") != -1)//하루 단위로..
-                            {
-                                var a = Number(el.value);
-
-                                dateD.push(JSON.parse("{\"date\":\"" + el.date + "\",\"" + element.meta.depart + "\":" + (Number(el.value) - pre_value) + "}"));
-                                pre_value = a;
-                            }
-                        }*/
 
                     }
 
