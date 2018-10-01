@@ -68,13 +68,6 @@ data category
 23: 전류 총고조파왜곡율
 
 */
-
-
-/*main(16, "신화개발",function(result){
-    console.log(result);
-})*/
-
-
 async function main(categoryNumber, companyName, callback) {
 
     let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");

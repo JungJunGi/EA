@@ -22,11 +22,14 @@ var databaseUrl = 'mongodb://localhost:27017';
 var database, companyDB;
 
 /** Mongo ssh-tunneling Options **/
+var mongo_info_file = fs.readFileSync('./config/mongo.json', 'utf8');
+var mongo_info = JSON.parse(mongo_info_file);
+
 var config = {
-    username: 'elec',
-    password: 'vmlab347!',
-    host: '203.252.208.247',
-    port: 22,
+    username: mongo_info['MONGO_USER'],
+    password: mongo_info['MONGO_PASS'],
+    host: mongo_info['MONGO_HOST'],
+    port: mongo_info['MONGO_PORT'],
     dstPort: 27017
 };
 
@@ -121,8 +124,8 @@ router.route('/process/login').post(function (req, res) {
 
                 // 조회 결과에서 회사명
                 var userCompany = docs[0].company;
-                var showCompany = userCompany.replace(userCompany.substring(userCompany.length-2,userCompany.length),"**");
-                
+                var showCompany = userCompany.replace(userCompany.substring(userCompany.length - 2, userCompany.length), "**");
+
                 //회사명 넘겨주기. 새 js파일 생성 작성.
                 var data = 'document.getElementById("userCompany").innerHTML =' + "'" + userCompany + "'" + ';';
                 data += 'document.getElementById("showCompany").innerHTML =' + "'" + showCompany + "'" + ';';
