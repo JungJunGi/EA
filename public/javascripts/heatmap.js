@@ -98,11 +98,11 @@ d3.json(jsonFile, function (error, data) {
     cards.exit().remove();
 
     //legend
-    const legend = m_svg.append("g").selectAll(".legend")
+    const legend = m_svg.append("g").selectAll(".heat")
         .data([0].concat(colorScale.quantiles()), (d) => d);
 
     const legend_g = legend.enter().append("g")
-        .attr("class", "legend");
+        .attr("class", "heat");
 
     legend_g.append("rect")
         .attr("x", (d, i) => legendElementWidth * i + 30)
