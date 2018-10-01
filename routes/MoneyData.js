@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var PythonShell = require('python-shell'); //python 호출
+const realData = require('../module/datacrawling').main;
 
 var start = function (company, companyDB) {
 
@@ -12,40 +12,27 @@ var start = function (company, companyDB) {
     router.get('/money/company=' + encodeURI(companyURL), (req, res) => {
         var result, dateD = [];
 
-        /** Python Options **/
-        var options = {
-            mode: 'json',
-            pythonPath: '',
-            scriptPath: './module/',
-            args: [company]
-        };
-
         var query = { "meta.item": "ELECTRIC_CHARGE" };
 
-        /** From Maria DB **/
-        PythonShell.run('test_realtime.py', options, function (err, results) {
-            if (err) throw err;
-
-            console.log("전기요금 데이터")
+        realData(10, company, function (results) {
             if (results == null)
                 return;
 
             results.forEach(element => {
 
-                if (element.meta.item ==  query["meta.item"]) {
-                    var year = new Date().getFullYear();
-                    var month = new Date().getMonth() + 1;
-                    var realtime = JSON.parse(element.data.slice(-1)[0]);
+                var year = new Date().getFullYear();
+                var month = new Date().getMonth() + 1;
+                var realtime = element.data.slice(-1)[0];
 
-                    if (month < 10)
-                        realtime.date = year + "-0" + month;
+                if (month < 10)
+                    realtime.date = year + "-0" + month;
 
-                    else
-                        realtime.date = year + "-" + month;
+                else
+                    realtime.date = year + "-" + month;
 
-                    dateD.push(realtime);
+                dateD.push(realtime);
 
-                }
+
             });
         });
 

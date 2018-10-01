@@ -148,8 +148,8 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
             })
             .enter().append("rect")
             .attr("class", "rect")
-            .attr("x", function (d) { return x(d.date); })
-            .attr("y", function (d) { return y(d.value); })
+            .attr("x", function (d) { return x(d.date) - 3.5; })
+            .attr("y", function (d) { return y(d.value) - 2; })
             .attr("width", 7)
             .attr("height", 5)
             .style("fill", function (d) {
@@ -160,14 +160,14 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
             .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
             .on("mousemove", function (d) {
                 var text;
-                if(d.value>=90) text="효율성 높음";
-                else if (60 <= d.value && d.value < 90) text="효율성 중간";
-                else text="효율성 낮음";
+                if (d.value >= 90) text = "효율성 높음";
+                else if (60 <= d.value && d.value < 90) text = "효율성 중간";
+                else text = "효율성 낮음";
 
-                tooltip.html("해당시간: " + getDate(d.date) +"</br>" + "역률: " + d.value + " " + text)
-                tooltip.style("top", 180 + "px").style("left", 220 + "px");
+                tooltip.html("해당시간: " + getDate(d.date) + "</br>" + "역률: " + d.value + " " + text)
+                tooltip.style("top", 670 + "px").style("left", 220 + "px");
             })
-           // .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });;
+        // .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });;
     }
 
     // Create initial graph
@@ -201,8 +201,8 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
             .enter()
             .append("rect")
             .attr("class", "rect")
-            .attr("x", function (d) { return x(d.date); })
-            .attr("y", function (d) { return y(d.value); })
+            .attr("x", function (d) { return x(d.date) - 3.5; })
+            .attr("y", function (d) { return y(d.value) - 2; })
             .attr("width", 7)
             .attr("height", 5)
             .style("fill", function (d) {
@@ -213,12 +213,12 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
             .on("mouseover", function () { return tooltip.style("visibility", "visible"); })
             .on("mousemove", function (d) {
                 var text;
-                if(d.value>=90) text="효율성 높음";
-                else if (60 <= d.value && d.value < 90) text="효율성 중간";
-                else text="효율성 낮음";
+                if (d.value >= 90) text = "효율성 높음";
+                else if (60 <= d.value && d.value < 90) text = "효율성 중간";
+                else text = "효율성 낮음";
 
-                tooltip.html("해당시간: " + getDate(d.date) +"</br>" + "역률: " + d.value + " " + text)
-                tooltip.style("top", 180 + "px").style("left", 220 + "px");
+                tooltip.html("해당시간: " + getDate(d.date) + "</br>" + "역률: " + d.value + " " + text)
+                tooltip.style("top", 670 + "px").style("left", 220 + "px");
             });
 
     }
