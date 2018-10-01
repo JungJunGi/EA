@@ -35,7 +35,7 @@
     <script type="text/javascript" src="/javascripts/d3-tip.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/stylesheets/seg2.css" />
-    <script type="text/javascript" src="/javascripts/seg2_.js" defer></script>
+    <script type="text/javascript" src="/javascripts/seg2_brush.js" defer></script>
     <link rel="stylesheet" type="text/css" href="/stylesheets/seg5.css" />
     <script type="text/javascript" src="/javascripts/seg5.js" defer></script>
 
@@ -51,6 +51,7 @@
 
     <link rel="stylesheet" href="/stylesheets/power_style.css">
     <script type="text/javascript" src="/javascripts/power_factor.js" defer></script>
+
 </head>
 
 <body>
@@ -77,25 +78,6 @@
             <div class="content">
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-md-12">
-                            <div class="card ">
-                                <div class="header">
-                                    <h4 class="title">전기사용 효율성</h4>
-                                    <p class="category">고객이 유지하여야 할 역률은 90%이상</p>
-                                </div>
-                                <div class="content">
-                                    <div id="departDropdown"></div>
-                                    <div id="graph"></div>
-                                    <hr>
-                                    <div class="stats">
-                                        역률: 피상전력에 대한 유효전력의 비율
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="header">
@@ -115,6 +97,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="header">
@@ -140,11 +123,30 @@
                         <div class="col-md-12">
                             <div class="card ">
                                 <div class="header">
+                                    <h4 class="title">전기사용 효율성</h4>
+                                    <p class="category">고객이 유지하여야 할 역률은 90%이상</p>
+                                </div>
+                                <div class="content">
+                                    <div id="departDropdown"></div>
+                                    <div id="graph"></div>
+                                    <hr>
+                                    <div class="stats">
+                                        역률: 피상전력에 대한 유효전력의 비율
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card ">
+                                <div class="header">
                                     <h4 class="title">회사전체 전력사용량</h4>
                                     <p class="category">최근 1년 동안 해당 시간에 회사 전체의 전력사용량</p>
                                 </div>
                                 <div class="content">
-                                    <svg class="seg2_chart" width="1800" height="630"></svg>
+                                    <svg class="seg2_chart" width="1800" height="550"></svg>
                                     <hr>
                                     <div class="stats">
                                         <details>
@@ -156,7 +158,7 @@
                                                     <p class="category">최근 1년 동안 해당 시간에 부서별 전력사용량</p>
                                                 </div>
                                                 <div class="content">
-                                                    <svg class="areaChart" width="1600" height="450"></svg>
+                                                    <svg class="areaChart" width="1800" height="450"></svg>
                                                     <hr>
                                                     <div class="stats">
                                                         위에 브러쉬를 움직여 날짜를 선택해 보세요.
@@ -188,44 +190,45 @@
                         </div>
                     </div>
                 </div>
-
-
-                <footer class="footer">
-                    <div class="container-fluid">
-                        <nav class="pull-left">
-                            <ul>
-                                <li>
-                                    <a href="#">
-                                        Home
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Company
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Portfolio
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#">
-                                        Blog
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                        <p class="copyright pull-right">
-                            &copy;
-                            <script>document.write(new Date().getFullYear())</script>
-                            <a href="#">Jung Jun Gi</a>, made with love for a better web
-                        </p>
-                    </div>
-                </footer>
-
             </div>
+
+
+            <footer class="footer">
+                <div class="container-fluid">
+                    <nav class="pull-left">
+                        <ul>
+                            <li>
+                                <a href="#">
+                                    Home
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Company
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Portfolio
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    Blog
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                    <p class="copyright pull-right">
+                        &copy;
+                        <script>document.write(new Date().getFullYear())</script>
+                        <a href="#">Jung Jun Gi</a>, made with love for a better web
+                    </p>
+                </div>
+            </footer>
+
         </div>
+    </div>
 
 
 </body>

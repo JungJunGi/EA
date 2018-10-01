@@ -21,8 +21,6 @@ const areaRouter = require('./AreaData').start,
 var databaseUrl = 'mongodb://localhost:27017';
 var database, companyDB;
 
-
-
 /** Mongo ssh-tunneling Options **/
 var config = {
     username: 'elec',
