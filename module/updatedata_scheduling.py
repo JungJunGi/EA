@@ -30,10 +30,7 @@ def job():
     dsitemDict ={}
 
     row = []
-
     companyNum = 0
-    departNum = 0
-    itemNum = 0
     dataNum = 0
 
     dsitemD = {}
@@ -57,8 +54,8 @@ def job():
 
     date = year + month
     today = year + "-" + month + "-" + mday
-    # date = "201809"
-    # today = "2018-09-30"
+    # date = "201810"
+    # today = "2018-10-01"
     print("today is ", today)
 
 
@@ -138,9 +135,6 @@ def job():
                 if(not(d)) :
                     collection.insert_one(docD)
                     d = collection.find_one(dd)
-                    print(d)
-
-                print(docD["meta"])
 
                 row = [item for item in cursor.fetchall()]
                 for r in row:
@@ -151,6 +145,8 @@ def job():
                     dsitemD["value"] = r[1]
                     collection.update({"_id":d["_id"]}, {"$push":{"data":dsitemD}})
                 
+                print(docD["meta"])
+
                 # 초기화
                 dsitemD = {}
                 docD = {}
