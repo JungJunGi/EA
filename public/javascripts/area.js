@@ -18,9 +18,8 @@ var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
 
-function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
+function largestTriangleThreeBucket(data, threshold, xProperty) {
 
-    yProperty = yProperty || 0;
     xProperty = xProperty || 1;
 
     var m = Math.floor,
@@ -48,7 +47,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             d = m((e + 2) * p) + 1,
             d = d < f ? d : f,
             k = d - a; a < d; a++) {
-            g += +data[a][xProperty], h += +data[a][yProperty];
+            g += +data[a][xProperty];
         }
 
         for (var g = g / k,
@@ -56,10 +55,9 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             a = m((e + 0) * p) + 1,
             d = m((e + 1) * p) + 1,
             k = +data[c][xProperty],
-            x = +data[c][yProperty],
             c = -1; a < d; a++) {
             "undefined" != typeof data[a] &&
-                (u = .5 * y((k - g) * (data[a][yProperty] - x) - (k - data[a][xProperty]) * (h - x)),
+                (u = .5 * y((k - g) * (k - data[a][xProperty])),
                     u > c && (c = u, v = data[a], w = a));
         }
 
@@ -83,7 +81,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         e.date = Number(new Date(e.date).getTime());
     });
 
-    var sData = largestTriangleThreeBucket(Data, area_width / 2, "date", data.depart[0]);
+    var sData = largestTriangleThreeBucket(Data, area_width / 2, "date");
 
     var series = d3.stack()
         .keys(data.depart)
@@ -263,7 +261,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             }
         });
 
-        var dataSet = largestTriangleThreeBucket(orderData, area_width / 2, "date", "value");
+        var dataSet = largestTriangleThreeBucket(orderData, area_width / 2, "date");
 
         var y3 = d3.scaleLinear()
             .domain([0, d3.max(dataSet, function (d) {
