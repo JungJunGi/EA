@@ -18,10 +18,7 @@ var category;   // data category
 var depart = new Array;     // departs name
 var myDate = new Array;     // date string
 
-let today = new Date().toISOString().slice(0,10).replace("-","").replace("-","");
-
-
-function checkCategory (categoryNumber) {
+function checkCategory(categoryNumber) {
 
     var category;   // data category
 
@@ -71,19 +68,20 @@ data category
 23: 전류 총고조파왜곡율
 
 */
+async function main(categoryNumber, companyName, callback) {
 
-async function main (categoryNumber, companyName, callback){
+    let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
 
     var maindata = [];
     var dataSet = {};
-    
+
     request("http://165.246.39.81:54231/", async (error, response, body) => {
         if (error) throw error;
 
         let $ = await cheerio.load(body);
 
         try {
-            $('a').each(function(i, e){
+            $('a').each(function (i, e) {
                 let s = e.attribs.href;
                 s = s.split("?");
                 s = s[1].split("&");
@@ -93,7 +91,7 @@ async function main (categoryNumber, companyName, callback){
                 maindata.push(s);
 
                 let company = s[0].split("=");
-                s[0] = company[1]; 
+                s[0] = company[1];
 
                 let depart = s[1].split("=");
                 s[1] = depart[1];
@@ -120,13 +118,13 @@ async function main (categoryNumber, companyName, callback){
 
         } finally {
 
-            getData(categoryNumber, companyName, today, dataSet[companyName],function(result){
+            getData(categoryNumber, companyName, today, dataSet[companyName], function (result) {
                 callback(result)
-           });
-          
+            });
+
         }
 
-    }); 
+    });
 }
 
 
@@ -135,21 +133,21 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
     var result = [];
 
-    data.forEach(function(e, index){
+    data.forEach(function (e, index) {
 
         var depart = Object.keys(e)[0];
         var id = Object.values(e)[0];
 
         var dsid = id[0];
         var distbdid = id[1];
-        
+
         //console.log(depart)
         //console.log(dsid, distbdid)
         //console.log(today)
-  
+
         url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
-        
-        var myBody, myData=[];
+
+        var myBody, myData = [];
         var jsonText;
         var myJson;
 
@@ -158,11 +156,11 @@ async function getData(categoryNumber, companyName, today, data, callback) {
             let $ = cheerio.load(body);
 
             try {
-                
+
                 var category = checkCategory(categoryNumber);   // data category
 
                 jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
-                    + "\"year\" : \"" + today.slice(0,4) + "\",\"month\" : \"" + today.slice(4,6) + "\",\"item\" : \"" + category + "\"}, "
+                    + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
                 if (myBody == "No result") { // 해당 데이터 없음 !!!
@@ -173,8 +171,8 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
                     myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
                     myBody = myBody.split("\n");
-                    
-                    myBody.forEach(function(d, i, da) {
+
+                    myBody.forEach(function (d, i, da) {
                         var a = d.split(",");
                         myData.push(a);
 
@@ -182,9 +180,9 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                         // .toISOString().replace('T',' ').replace('.000Z','')
                     });
                 }
-                
+
             } catch (error) {
-                
+
                 console.error(error);
             } finally {
 
@@ -193,12 +191,12 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                 myJson = JSON.parse(jsonText);
 
                 result.push(myJson);
-                
-                if(data.length==result.length){
+
+                if (data.length == result.length) {
                     callback(result);
                 }
             }
-            
+
         });
     });
 }
