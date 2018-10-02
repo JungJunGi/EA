@@ -37,9 +37,8 @@ d3.json('/seg2Data/seg2/company=' + companyName, function (error, data) {
 
 });
 
-function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
+function largestTriangleThreeBucket(data, threshold, xProperty) {
 
-    yProperty = yProperty || 0;
     xProperty = xProperty || 1;
 
     var m = Math.floor,
@@ -67,7 +66,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             d = m((e + 2) * p) + 1,
             d = d < f ? d : f,
             k = d - a; a < d; a++) {
-            g += +data[a][xProperty], h += +data[a][yProperty];
+            g += +data[a][xProperty];
         }
 
         for (var g = g / k,
@@ -75,10 +74,9 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             a = m((e + 0) * p) + 1,
             d = m((e + 1) * p) + 1,
             k = +data[c][xProperty],
-            x = +data[c][yProperty],
             c = -1; a < d; a++) {
             "undefined" != typeof data[a] &&
-                (u = .5 * y((k - g) * (data[a][yProperty] - x) - (k - data[a][xProperty]) * (h - x)),
+                (u = .5 * y((k - g) * (k - data[a][xProperty])),
                     u > c && (c = u, v = data[a], w = a));
         }
 
@@ -92,7 +90,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
 };
 
 function setScales(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date");
 
     var start_date = dataSet[0].date;
     var end_date = dataSet[dataSet.length - 1].date;
@@ -109,7 +107,7 @@ function setScales(data) {
 
 
 function drawChart(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date");
 
     var xAxis = d3.axisBottom(xScale)
 
@@ -174,12 +172,12 @@ function drawChart(data) {
         .append("rect")
         .attr("class", "barChart")
         .attr("opacity", "0.6")
-        .attr("x", function (d, i, da) { return (xScale(d.date) - (svg2_width / da.length) * 0.5); })
+        .attr("x", function (d, i, da) { return (xScale(d.date) - ((svg2_width / da.length) - 0.5) * 0.5); })
         .attr("y", function (d, i) {
             return yScale(d.value);
         })
         .attr("width", function (d, i, da) {
-            return (svg2_width / da.length);
+            return (svg2_width / da.length) - 0.5;
         })
         .attr("height", function (d) {
             return svg2_height - yScale(d.value);
