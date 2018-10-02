@@ -7,9 +7,9 @@ if (companyName.indexOf("(주)") != -1) {
 
 var svg2Size = d3.select('.seg2_chart');
 
-var svg2_margin = { top: 50, right: 250, bottom: 50, left: 40 },
+var svg2_margin = { top: 120, right: 250, bottom: 50, left: 40 },
     svg2_width = +svg2Size.attr("width") - svg2_margin.left - svg2_margin.right,
-    svg2_height = 450 - svg2_margin.top - svg2_margin.bottom;
+    svg2_height = +svg2Size.attr("height") - svg2_margin.top - svg2_margin.bottom;
 
 var xScale, yScale;
 
@@ -122,11 +122,7 @@ function drawChart(data) {
             return "translate(100, 0)";
         })
 
-    svg.append("text")
-        .attr("class", "log")
-        .attr("dx", 12)
-        .attr("dy", 12)
-        .text("data:" + data.length + " downsampled:" + 0);
+    /*;*/
 
     var chartArea = svg.append("g");
 
@@ -136,6 +132,15 @@ function drawChart(data) {
         .attr("class", "zoom")
         .attr("width", svg2_width)
         .attr("height", svg2_height + svg2_margin.bottom);
+
+    var infotext = chartArea.append("g")
+        .append("text")
+        .attr("class", "information")
+        .attr("dx", 12)
+        .attr("dy", 12)
+        .attr("transform", "translate(" + svg2_margin.left + "," + (svg2_margin.top - 20) + ")")
+        .text("<회사전체의 전력사용량>")
+        .style("fill", "#9A9A9A");
 
     var chart = chartArea.append("g")
         .attr("class", "chart")
@@ -215,6 +220,6 @@ function drawChart(data) {
         .attr("transform", "translate(10,123) rotate(90)")
         .attr('fill', 'black');
 
-    d3.select(".log").text("data:" + data.length + " downsampled:" + dataSet.length);
+    //d3.select(".log").text("data:" + data.length + " downsampled:" + dataSet.length);
 
 }
