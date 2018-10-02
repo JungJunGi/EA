@@ -30,7 +30,10 @@ def job():
     dsitemDict ={}
 
     row = []
+
     companyNum = 0
+    departNum = 0
+    itemNum = 0
     dataNum = 0
 
     dsitemD = {}
