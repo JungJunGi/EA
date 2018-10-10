@@ -7,9 +7,9 @@ if (companyName.indexOf("(주)") != -1) {
 
 var svg2Size = d3.select('.seg2_chart');
 
-var svg2_margin = { top: 50, right: 250, bottom: 50, left: 40 },
+var svg2_margin = { top: 120, right: 250, bottom: 50, left: 40 },
     svg2_width = +svg2Size.attr("width") - svg2_margin.left - svg2_margin.right,
-    svg2_height = 450 - svg2_margin.top - svg2_margin.bottom;
+    svg2_height = +svg2Size.attr("height") - svg2_margin.top - svg2_margin.bottom;
 
 var xScale, yScale;
 
@@ -37,9 +37,8 @@ d3.json('/seg2Data/seg2/company=' + companyName, function (error, data) {
 
 });
 
-function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
+function largestTriangleThreeBucket(data, threshold, xProperty) {
 
-    yProperty = yProperty || 0;
     xProperty = xProperty || 1;
 
     var m = Math.floor,
@@ -67,7 +66,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             d = m((e + 2) * p) + 1,
             d = d < f ? d : f,
             k = d - a; a < d; a++) {
-            g += +data[a][xProperty], h += +data[a][yProperty];
+            g += +data[a][xProperty];
         }
 
         for (var g = g / k,
@@ -75,10 +74,9 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             a = m((e + 0) * p) + 1,
             d = m((e + 1) * p) + 1,
             k = +data[c][xProperty],
-            x = +data[c][yProperty],
             c = -1; a < d; a++) {
             "undefined" != typeof data[a] &&
-                (u = .5 * y((k - g) * (data[a][yProperty] - x) - (k - data[a][xProperty]) * (h - x)),
+                (u = .5 * y((k - g) * (k - data[a][xProperty])),
                     u > c && (c = u, v = data[a], w = a));
         }
 
@@ -92,7 +90,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
 };
 
 function setScales(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date");
 
     var start_date = dataSet[0].date;
     var end_date = dataSet[dataSet.length - 1].date;
@@ -109,8 +107,8 @@ function setScales(data) {
 
 
 function drawChart(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date", "value");
-
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date");
+    var max =  d3.max(dataSet, function (d) { return d.value; });
     var xAxis = d3.axisBottom(xScale)
 
     yAxis = d3.axisLeft(yScale);
@@ -122,11 +120,7 @@ function drawChart(data) {
             return "translate(100, 0)";
         })
 
-    svg.append("text")
-        .attr("class", "log")
-        .attr("dx", 12)
-        .attr("dy", 12)
-        .text("data:" + data.length + " downsampled:" + 0);
+    /*;*/
 
     var chartArea = svg.append("g");
 
@@ -136,6 +130,15 @@ function drawChart(data) {
         .attr("class", "zoom")
         .attr("width", svg2_width)
         .attr("height", svg2_height + svg2_margin.bottom);
+
+    var infotext = chartArea.append("g")
+        .append("text")
+        .attr("class", "information")
+        .attr("dx", 12)
+        .attr("dy", 12)
+        .attr("transform", "translate(" + svg2_margin.left + "," + (svg2_margin.top - 20) + ")")
+        .text("<회사전체의 전력사용량>")
+        .style("fill", "#9A9A9A");
 
     var chart = chartArea.append("g")
         .attr("class", "chart")
@@ -169,16 +172,17 @@ function drawChart(data) {
         .append("rect")
         .attr("class", "barChart")
         .attr("opacity", "0.6")
-        .attr("x", function (d, i, da) { return (xScale(d.date) - (svg2_width / da.length) * 0.5); })
+        .attr("x", function (d, i, da) { return (xScale(d.date) - ((svg2_width / da.length) - 0.5) * 0.5); })
         .attr("y", function (d, i) {
             return yScale(d.value);
         })
         .attr("width", function (d, i, da) {
-            return (svg2_width / da.length);
+            return (svg2_width / da.length) - 0.5;
         })
         .attr("height", function (d) {
             return svg2_height - yScale(d.value);
         })
+        .style("fill", function(d){if(d.value == max){ return 'red'}})
         .attr("clip-path", "url(#clip)")
         .on("mouseover", function (d) {
             tip.show(d);
@@ -215,6 +219,6 @@ function drawChart(data) {
         .attr("transform", "translate(10,123) rotate(90)")
         .attr('fill', 'black');
 
-    d3.select(".log").text("data:" + data.length + " downsampled:" + dataSet.length);
+    //d3.select(".log").text("data:" + data.length + " downsampled:" + dataSet.length);
 
 }

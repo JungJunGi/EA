@@ -9,13 +9,6 @@ body {
         font-weight: bold;
     }
 
-    .barea {
-        stroke-width: 1;
-        fill: rgba(254, 164, 102, 0.8);
-        clip-path: url(#clip);
-    }
-
-
     .barChart {
         fill: rgba(244, 212, 140, 0.7);
     }

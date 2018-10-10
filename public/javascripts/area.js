@@ -3,7 +3,7 @@ var area_svg = d3.select(".areaChart");
 var area_svg2 = d3.select(".seg2_chart");
 
 var area_margin = { top: 20, right: 250, bottom: 30, left: 40 };
-var area_margin2 = { top: 450, right: 90, bottom: 20, left: 40 }
+var area_margin2 = { top: 10, right: 250, bottom: 390, left: 40 }
 var area_width = +area_svg.attr("width") - area_margin.left - area_margin.right;
 var area_height = +area_svg.attr("height") - area_margin.top - area_margin.bottom;
 var area_height2 = +area_svg2.attr("height") - area_margin2.top - area_margin2.bottom;
@@ -18,9 +18,8 @@ var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
 
-function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
+function largestTriangleThreeBucket(data, threshold, xProperty) {
 
-    yProperty = yProperty || 0;
     xProperty = xProperty || 1;
 
     var m = Math.floor,
@@ -48,7 +47,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             d = m((e + 2) * p) + 1,
             d = d < f ? d : f,
             k = d - a; a < d; a++) {
-            g += +data[a][xProperty], h += +data[a][yProperty];
+            g += +data[a][xProperty];
         }
 
         for (var g = g / k,
@@ -56,10 +55,9 @@ function largestTriangleThreeBucket(data, threshold, xProperty, yProperty) {
             a = m((e + 0) * p) + 1,
             d = m((e + 1) * p) + 1,
             k = +data[c][xProperty],
-            x = +data[c][yProperty],
             c = -1; a < d; a++) {
             "undefined" != typeof data[a] &&
-                (u = .5 * y((k - g) * (data[a][yProperty] - x) - (k - data[a][xProperty]) * (h - x)),
+                (u = .5 * y((k - g) * (k - data[a][xProperty])),
                     u > c && (c = u, v = data[a], w = a));
         }
 
@@ -83,7 +81,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         e.date = Number(new Date(e.date).getTime());
     });
 
-    var sData = largestTriangleThreeBucket(Data, area_width / 2, "date", data.depart[0]);
+    var sData = largestTriangleThreeBucket(Data, area_width / 2, "date");
 
     var series = d3.stack()
         .keys(data.depart)
@@ -102,6 +100,15 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
 
     var detail = area_svg.append('g')
         .attr("transform", "translate(" + area_margin.left + "," + area_margin.top + ")");
+
+    var infotext = detail.append("g")
+        .append("text")
+        .attr("class", "information")
+        .attr("dx", 12)
+        .attr("dy", 12)
+        .attr("transform", "translate(" + (area_margin2.left - 40) + "," + (area_margin2.top - 30) + ")")
+        .text("<부서별 전력사용량>")
+        .style("fill", "#9A9A9A");
 
     var overview = area_svg2.append('g')
         .attr("transform", "translate(" + area_margin2.left + "," + area_margin2.top + ")");
@@ -254,7 +261,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             }
         });
 
-        var dataSet = largestTriangleThreeBucket(orderData, area_width / 2, "date", "value");
+        var dataSet = largestTriangleThreeBucket(orderData, area_width / 2, "date");
 
         var y3 = d3.scaleLinear()
             .domain([0, d3.max(dataSet, function (d) {
@@ -417,7 +424,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         .attr("class", 'legend')
         .attr('id', function (d) { return d.key; })
         .attr("transform", function (d, i) {
-            return 'translate(' + (area_width + 60) + ',' + (((i + 18) * legendHeight) + (-45 * i)) + ')';
+            return 'translate(' + (area_width + 60) + ',' + (((i + 13) * legendHeight) + (-45 * i)) + ')';
         });
 
     legend.append('rect')
