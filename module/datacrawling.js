@@ -97,7 +97,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                     + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
-                if (myBody == "<pre>No result</pre>") { // 해당 데이터 없음 !!!
+                if (body == "<pre>No result</pre>") { // 해당 데이터 없음 !!!
 
                     jsonText = jsonText + "] }";
 
@@ -108,7 +108,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
                     myBody.forEach(function (d, i, da) {
                         var a = d.split(",");
-                        
+
                         jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
                     });
                 }
