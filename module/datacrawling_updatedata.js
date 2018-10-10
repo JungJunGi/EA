@@ -8,13 +8,15 @@ var fs = require('fs');
 
 var MongoClient = require('mongodb').MongoClient;
 var tunnel = require('tunnel-ssh');
-// var schedule = require('node-schedule');
+var schedule = require('node-schedule');
 
 
-main(3, "(주)명성금속")
+main(function(d){
+
+})
 
 
-async function main(categoryNumber, companyName) {
+async function main(callback) {
 
     let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
 
@@ -63,86 +65,83 @@ async function main(categoryNumber, companyName) {
             console.error(error);
 
         } finally {
-/*       
-            var schedule = schedule.scheduleJob({ second:50 }, function(theDate){ // second  // hour: 18, minute: 17
-                console.log('The Date is ', theDate);
 
-            });
+            schedule.scheduleJob({ second:50 }, function(theDate){ // second  // hour: 23, minute: 59
 
-            let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
-            let categories = [3,5,6,7,8,9,10,11,12,13,14,15,16,17,21,22,23];
+                let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
+                let categories = [3,5,6,7,8,9,10,11,12,13,14,15,16,17,21,22,23];
 
-            categories.forEach(function(categoryNumber){
-                dataSet.forEach(function(companyName){
-                
-                    // getData
+                for( var companyName in dataSet ) {
+                    console.log(companyName)
+                    
+                    categories.forEach(function(categoryNumber){
+                        
+                        getData(categoryNumber, companyName, today, dataSet[companyName], async function (result) {
+                                
+                            /** Mongo ssh-tunneling Options **/
+                            var databaseUrl = 'mongodb://localhost:27017';
+                            var mongo_info_file = fs.readFileSync('./config/mongo.json', 'utf8');
+                            var mongo_info = JSON.parse(mongo_info_file);
 
-                });
-            });
-*/            
-           
-            getData(categoryNumber, companyName, today, dataSet[companyName], async function (result) {
+                            var config = {
+                                username: mongo_info['MONGO_USER'],
+                                password: mongo_info['MONGO_PASS'],
+                                host: mongo_info['MONGO_HOST'],
+                                port: mongo_info['MONGO_PORT'],
+                                dstPort: 27017
+                            };
 
-                /** Mongo ssh-tunneling Options **/
-                var mongo_info_file = fs.readFileSync('./config/mongo.json', 'utf8');
-                var mongo_info = JSON.parse(mongo_info_file);
+                            /** 데이터베이스 연결 **/
+                            var server = await tunnel(config, function (error, data) {
+                                MongoClient.connect(databaseUrl, { useNewUrlParser: true }, async function (err, db) {
+                                    if (err) throw err;
 
-                var config = {
-                    username: mongo_info['MONGO_USER'],
-                    password: mongo_info['MONGO_PASS'],
-                    host: mongo_info['MONGO_HOST'],
-                    port: mongo_info['MONGO_PORT'],
-                    dstPort: 27017
-                };
+                                    console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
 
-                var databaseUrl = 'mongodb://localhost:27017';
+                                    var database = db.db(mongo_info['MONGO_DB']);
+                                    var collection = database.collection(companyName);
 
-                /** 데이터베이스 연결 **/
-                var server = await tunnel(config, function (error, data) {
-                    MongoClient.connect(databaseUrl, { useNewUrlParser: true }, async function (err, db) {
-                        if (err) throw err;
+                                    result.forEach(function (data) {
 
-                        console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
+                                        isExist(collection, { "meta": data.meta }, async function (err, docs) {
+                                            if (err) { throw err; }
 
-                        var database = db.db(mongo_info['MONGO_DB']);
-                        var collection = database.collection(companyName);
+                                            if (docs == null) {
+                                                //console.log("고로 생성한다!");
 
-                        result.forEach(function (data) {
+                                                await addData(collection, data, async function (err, doc) {
+                                                    if (err) { throw err; }
+                                                });
 
-                            isExist(collection, { "meta": data.meta }, async function (err, docs) {
-                                if (err) { throw err; }
+                                                await addData(collection, { "meta": data.meta, "data": [] }, async function (err, doc) {
+                                                    if (err) { throw err; }
+                                                });
 
-                                if (docs == null) {
-                                    console.log("고로 생성한다!");
+                                            } else {
+                                                //console.log("고로 추가한다!");
 
-                                    await addData(collection, data, async function (err, doc) {
-                                        if (err) { throw err; }
-                                    });
-/*
-                                    await addData(collection, { "meta": data.meta, "data": [] }, async function (err, doc) {
-                                        if (err) { throw err; }
-                                    });
-*/
-                                } else {
-                                    console.log("고로 추가한다!");
+                                                did = docs[0]._id;
+                                                dd = data.data;
 
-                                    did = docs[0]._id;
-                                    dd = data.data;
+                                                dd.forEach(function (d) {
+                                                    collection.updateOne({ "_id":did}, {"$push":{"data":d} });
+                                                });
+                                            }
 
-                                    dd.forEach(function (d) {
-                                        collection.updateOne({ "_id":did}, {"$push":{"data":d} });
-                                    });
-                                }
-                            });
+                                        });
 
-                        }); // result forEach
+                                    }); // result forEach
 
+                                });
+                            }); // server
+
+                        });
                     });
-                }); // server
+                }
+                console.log('The Date is ', theDate);
+            }); // scheduling
 
-            });
         } // finally
-
     });
 }
 
@@ -162,7 +161,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
         url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
 
-        var myBody, myData = [];
+        var myBody;
         var jsonText;
         var myJson;
 
@@ -178,9 +177,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                     + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
-                if (myBody == "No result") { // 해당 데이터 없음 !!!
-
-                    jsonText = jsonText + "] }";
+                if (body == "<pre>\nNo result</pre>") { // 해당 데이터 없음 !!!
 
                 } else { // 데이터 있음 !!!
 
@@ -189,11 +186,11 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
                     myBody.forEach(function (d, i, da) {
                         var a = d.split(",");
-                        myData.push(a);
 
                         jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
 
                     });
+
                 }
 
             } catch (error) {

@@ -98,11 +98,8 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                     + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
-                
-
                 if (body == "<pre>\nNo result</pre>") { // 해당 데이터 없음 !!!
-                    jsonText = jsonText + " ";
-
+                    
                 } else { // 데이터 있음 !!!
 
                     myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
