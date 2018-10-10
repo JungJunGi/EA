@@ -6,6 +6,7 @@
 const request = require('request');
 const cheerio = require('cheerio');
 
+
 async function main(categoryNumber, companyName, callback) {
 
     let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
@@ -97,9 +98,10 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                     + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
-                if (body == "<pre>No result</pre>") { // 해당 데이터 없음 !!!
+                
 
-                    jsonText = jsonText + "] }";
+                if (body == "<pre>\nNo result</pre>") { // 해당 데이터 없음 !!!
+                    jsonText = jsonText + " ";
 
                 } else { // 데이터 있음 !!!
 
@@ -120,7 +122,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
                 jsonText = jsonText.slice(0, -1) + "] }";
                 myJson = JSON.parse(jsonText);
-
+                
                 result.push(myJson);
 
                 if (data.length == result.length) {
