@@ -1,12 +1,20 @@
 
 /* 인하대학교 데이터 페이지 크롤링해오기 */
 /* 김지연 */
-// const realData = require('../module/datacrawling').main;
 
 const request = require('request');
 const cheerio = require('cheerio');
+var fs = require('fs');
 
-async function main(categoryNumber, companyName, callback) {
+var MongoClient = require('mongodb').MongoClient;
+var tunnel = require('tunnel-ssh');
+// var schedule = require('node-schedule');
+
+
+main(3, "(주)명성금속")
+
+
+async function main(categoryNumber, companyName) {
 
     let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
 
@@ -55,12 +63,85 @@ async function main(categoryNumber, companyName, callback) {
             console.error(error);
 
         } finally {
+/*       
+            var schedule = schedule.scheduleJob({ second:50 }, function(theDate){ // second  // hour: 18, minute: 17
+                console.log('The Date is ', theDate);
 
-            getData(categoryNumber, companyName, today, dataSet[companyName], function (result) {
-                callback(result)
             });
 
-        }
+            let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
+            let categories = [3,5,6,7,8,9,10,11,12,13,14,15,16,17,21,22,23];
+
+            categories.forEach(function(categoryNumber){
+                dataSet.forEach(function(companyName){
+                
+                    // getData
+
+                });
+            });
+*/            
+           
+            getData(categoryNumber, companyName, today, dataSet[companyName], async function (result) {
+
+                /** Mongo ssh-tunneling Options **/
+                var mongo_info_file = fs.readFileSync('./config/mongo.json', 'utf8');
+                var mongo_info = JSON.parse(mongo_info_file);
+
+                var config = {
+                    username: mongo_info['MONGO_USER'],
+                    password: mongo_info['MONGO_PASS'],
+                    host: mongo_info['MONGO_HOST'],
+                    port: mongo_info['MONGO_PORT'],
+                    dstPort: 27017
+                };
+
+                var databaseUrl = 'mongodb://localhost:27017';
+
+                /** 데이터베이스 연결 **/
+                var server = await tunnel(config, function (error, data) {
+                    MongoClient.connect(databaseUrl, { useNewUrlParser: true }, async function (err, db) {
+                        if (err) throw err;
+
+                        console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
+
+                        var database = db.db(mongo_info['MONGO_DB']);
+                        var collection = database.collection(companyName);
+
+                        result.forEach(function (data) {
+
+                            isExist(collection, { "meta": data.meta }, async function (err, docs) {
+                                if (err) { throw err; }
+
+                                if (docs == null) {
+                                    console.log("고로 생성한다!");
+
+                                    await addData(collection, data, async function (err, doc) {
+                                        if (err) { throw err; }
+                                    });
+/*
+                                    await addData(collection, { "meta": data.meta, "data": [] }, async function (err, doc) {
+                                        if (err) { throw err; }
+                                    });
+*/
+                                } else {
+                                    console.log("고로 추가한다!");
+
+                                    did = docs[0]._id;
+                                    dd = data.data;
+
+                                    dd.forEach(function (d) {
+                                        collection.updateOne({ "_id":did}, {"$push":{"data":d} });
+                                    });
+                                }
+                            });
+
+                        }); // result forEach
+
+                    });
+                }); // server
+
+            });
+        } // finally
 
     });
 }
@@ -71,7 +152,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
     var result = [];
 
-    data.forEach(function (e, index) {
+    data.forEach(function (e) {
 
         var depart = Object.keys(e)[0];
         var id = Object.values(e)[0];
@@ -81,7 +162,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
         url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
 
-        var myBody;
+        var myBody, myData = [];
         var jsonText;
         var myJson;
 
@@ -97,7 +178,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                     + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
-                if (myBody == "<pre>No result</pre>") { // 해당 데이터 없음 !!!
+                if (myBody == "No result") { // 해당 데이터 없음 !!!
 
                     jsonText = jsonText + "] }";
 
@@ -108,8 +189,10 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
                     myBody.forEach(function (d, i, da) {
                         var a = d.split(",");
-                        
+                        myData.push(a);
+
                         jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
+
                     });
                 }
 
@@ -126,6 +209,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                 if (data.length == result.length) {
                     callback(result);
                 }
+
             }
 
         });
@@ -133,9 +217,11 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 }
 
 
+
+/** data category **/
 function checkCategory(categoryNumber) {
 
-    var category;   // data category
+    var category;
 
     switch (categoryNumber) {
         case 3: category = 'ACCUMULATE_POWER_CONSUMPTION'; break;
@@ -183,5 +269,39 @@ data category
 23: 전류 총고조파왜곡율
 
 */
+
+
+/** 데이터 존재 여부 확인 함수 **/
+var isExist = function (collection, query, callback) {
+
+    collection.find(query).toArray(function (err, docs) {
+        if (err) {
+            callback(err, null);
+            return;
+        }
+
+        if (docs.length > 0) {
+            console.log("존재한다 !!!");
+            callback(null, docs);
+        } else {
+            console.log("존재하지 않는다 !!!");
+            callback(null, null);
+        }
+    });
+
+}
+
+/** 데이터 추가 함수 **/
+var addData = function (collection, data, callback) {
+
+    collection.insertOne(data, function (err, result) {
+        if (err) {
+            callback(err, null);
+            return;
+        }
+
+        callback(null, result);
+    });
+}
 
 module.exports.main = main;
