@@ -66,79 +66,96 @@ async function main(callback) {
 
         } finally {
 
-            schedule.scheduleJob({ second:50 }, function(theDate){ // second  // hour: 23, minute: 59
+            schedule.scheduleJob({ second:20 }, async function(theDate){ // second  // hour: 23, minute: 59
 
                 let today = new Date().toISOString().slice(0, 10).replace("-", "").replace("-", "");
                 let categories = [3,5,6,7,8,9,10,11,12,13,14,15,16,17,21,22,23];
 
-                for( var companyName in dataSet ) {
+                console.log(dataSet.keys())
+
+                dataSet.forEach(function(companyName){
+                // for( var companyName in dataSet ) {
                     console.log(companyName)
-                    
-                    categories.forEach(function(categoryNumber){
+
+                    categories.forEach(async function(categoryNumber){
+                    // for( var n in categories ) {
+                        // console.log(n)
                         
-                        getData(categoryNumber, companyName, today, dataSet[companyName], async function (result) {
+                        await getData(categoryNumber, companyName, today, dataSet[companyName], async function (result) {
+
+                            if (result == null) {
+                                console.log(categoryNumber, companyName, dataSet[companyName], today)
+                                console.log("result is null");
+                                return;
+                            } else {
+
+                                /** Mongo ssh-tunneling Options **/
+                                var databaseUrl = 'mongodb://localhost:27017';
+                                var mongo_info_file = fs.readFileSync('./config/mongo.json', 'utf8');
+                                var mongo_info = JSON.parse(mongo_info_file);
+
+                                var config = {
+                                    username: mongo_info['MONGO_USER'],
+                                    password: mongo_info['MONGO_PASS'],
+                                    host: mongo_info['MONGO_HOST'],
+                                    port: mongo_info['MONGO_PORT'],
+                                    dstPort: 27017
+                                };
+
+                                console.log(categoryNumber, companyName, dataSet[companyName], today)
+                                console.log(result[0].meta)
+
+                                /** 데이터베이스 연결 **/
+    /*
+                                var server = await tunnel(config, function (error, data) {
+                                    MongoClient.connect(databaseUrl, { useNewUrlParser: true }, async function (err, db) {
+                                        if (err) throw err;
+
+                                        console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
+
+                                        var database = db.db(mongo_info['MONGO_DB']);
+                                        var collection = database.collection(companyName);
+
+                                        result.forEach(function (data) {
+
+                                            isExist(collection, { "meta": data.meta }, async function (err, docs) {
+                                                if (err) { throw err; }
+
+                                                if (docs == null) {
+                                                    //console.log("고로 생성한다!");
+
+                                                    await addData(collection, data, async function (err, doc) {
+                                                        if (err) { throw err; }
+                                                    });
+
+                                                    await addData(collection, { "meta": data.meta, "data": [] }, async function (err, doc) {
+                                                        if (err) { throw err; }
+                                                    });
+
+                                                } else {
+                                                    //console.log("고로 추가한다!");
+
+                                                    did = docs[0]._id;
+                                                    dd = data.data;
+
+                                                    dd.forEach(function (d) {
+                                                        collection.updateOne({ "_id":did}, {"$push":{"data":d} });
+                                                    });
+                                                }
+
+                                            });
+
+                                        }); // result forEach
+
+                                    });
+                                }); // server
+    */
+                            }
                                 
-                            /** Mongo ssh-tunneling Options **/
-                            var databaseUrl = 'mongodb://localhost:27017';
-                            var mongo_info_file = fs.readFileSync('./config/mongo.json', 'utf8');
-                            var mongo_info = JSON.parse(mongo_info_file);
-
-                            var config = {
-                                username: mongo_info['MONGO_USER'],
-                                password: mongo_info['MONGO_PASS'],
-                                host: mongo_info['MONGO_HOST'],
-                                port: mongo_info['MONGO_PORT'],
-                                dstPort: 27017
-                            };
-
-                            /** 데이터베이스 연결 **/
-                            var server = await tunnel(config, function (error, data) {
-                                MongoClient.connect(databaseUrl, { useNewUrlParser: true }, async function (err, db) {
-                                    if (err) throw err;
-
-                                    console.log('데이터베이스에 연결되었습니다. : ' + databaseUrl);
-
-                                    var database = db.db(mongo_info['MONGO_DB']);
-                                    var collection = database.collection(companyName);
-
-                                    result.forEach(function (data) {
-
-                                        isExist(collection, { "meta": data.meta }, async function (err, docs) {
-                                            if (err) { throw err; }
-
-                                            if (docs == null) {
-                                                //console.log("고로 생성한다!");
-
-                                                await addData(collection, data, async function (err, doc) {
-                                                    if (err) { throw err; }
-                                                });
-
-                                                await addData(collection, { "meta": data.meta, "data": [] }, async function (err, doc) {
-                                                    if (err) { throw err; }
-                                                });
-
-                                            } else {
-                                                //console.log("고로 추가한다!");
-
-                                                did = docs[0]._id;
-                                                dd = data.data;
-
-                                                dd.forEach(function (d) {
-                                                    collection.updateOne({ "_id":did}, {"$push":{"data":d} });
-                                                });
-                                            }
-
-                                        });
-
-                                    }); // result forEach
-
-                                });
-                            }); // server
-
+                            console.log('The Date is ', theDate);
                         });
                     });
-                }
-                console.log('The Date is ', theDate);
+                });
             }); // scheduling
 
         } // finally
@@ -151,6 +168,7 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
     var result = [];
 
+    // for( var e in data ) {
     data.forEach(function (e) {
 
         var depart = Object.keys(e)[0];
@@ -161,23 +179,24 @@ async function getData(categoryNumber, companyName, today, data, callback) {
 
         url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
 
+        // console.log(url)
         var myBody;
-        var jsonText;
+        var jsonText = "";
         var myJson;
 
-        request(url, (error, response, body) => {
-            if (error) throw error
-            let $ = cheerio.load(body);
+        request("http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid, (error, response, body) => {
 
             try {
+                let $ = cheerio.load(body);
 
                 var category = checkCategory(categoryNumber);   // data category
 
-                jsonText = " { \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
+                jsonText = "{ \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
                     + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
                     + "\"data\" : [ ";
 
                 if (body == "<pre>\nNo result</pre>") { // 해당 데이터 없음 !!!
+                    jsonText = jsonText + "] }";
 
                 } else { // 데이터 있음 !!!
 
@@ -190,23 +209,33 @@ async function getData(categoryNumber, companyName, today, data, callback) {
                         jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
 
                     });
-
+                    
+                    jsonText = jsonText.slice(0, -1) + "] }";
+                    
                 }
 
-            } catch (error) {
-
-                console.error(error);
-            } finally {
-
-                jsonText = jsonText.slice(0, -1) + "] }";
                 myJson = JSON.parse(jsonText);
 
+                console.log(myJson.meta)
                 result.push(myJson);
 
                 if (data.length == result.length) {
                     callback(result);
                 }
 
+            } catch (error) {
+                
+                // console.error(error);
+            } finally {
+
+                callback(null);
+/*
+                result.push(myJson);
+
+                if (data.length == result.length) {
+                    callback(result);
+                }
+*/
             }
 
         });
