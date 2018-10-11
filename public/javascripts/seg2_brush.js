@@ -115,7 +115,7 @@ function setScales(data) {
 
 function drawChart(data) {
     var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "key");
-
+  
     var xAxis = d3.axisBottom(xScale)
 
     yAxis = d3.axisLeft(yScale);
@@ -189,6 +189,7 @@ function drawChart(data) {
         .attr("height", function (d) {
             return svg2_height - yScale(d.value);
         })
+        .style("fill", function(d){if(d.value == max){ return 'red'}})
         .attr("clip-path", "url(#clip)")
         .on("mouseover", function (d) {
             tip.show(d);

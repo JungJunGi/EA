@@ -57,8 +57,8 @@ def job():
 
     date = year + month
     today = year + "-" + month + "-" + mday
-    # date = "201810"
-    # today = "2018-10-01"
+    date = "201810"
+    today = "2018-10-09"
     print("today is ", today)
 
 
@@ -105,6 +105,10 @@ def job():
     db = client[MONGO_DB]
 
     for com in companyDict.keys():
+
+        print(com)
+        if com <= 79:
+            continue
 
         MONGO_COLLECTION = comNameDict.get(com)
         collection = db[MONGO_COLLECTION]
@@ -182,7 +186,7 @@ server = SSHTunnelForwarder(
 ### Start ssh tunnel ###
 server.start()
 
-schedule.every().day.at("23:59").do(job)
+schedule.every().day.at("19:14").do(job)
 
 while True:
     schedule.run_pending()
