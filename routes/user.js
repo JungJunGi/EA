@@ -17,7 +17,6 @@ const areaRouter = require('./AreaData').start,
     DonutData = require('./DonutCh').start,
     power_factor = require('./power_factor').start;
 
-
 var databaseUrl = 'mongodb://localhost:27017';
 var database, companyDB;
 
@@ -42,10 +41,16 @@ var server = tunnel(config, function (error, data) {
 
         database = db.db('local');
         companyDB = db.db('companyData');
+
+        //api생성.
+        moneyLine(database, companyDB);
+        areaRouter(database, companyDB);
+        heatmapRouter(database, companyDB);
+        seg2(database, companyDB);
+        DonutData(database, companyDB);
+        power_factor(database, companyDB);
     });
 });
-
-
 
 /** 회사명 가져오기 **/
 var maindata = new Set(); // 회사명 중복 제거.
@@ -134,14 +139,6 @@ router.route('/process/login').post(function (req, res) {
 
                 });
 
-                // 로그인된 회사명 넘기기.
-                moneyLine(userCompany, companyDB);
-                areaRouter(userCompany, companyDB);
-                heatmapRouter(userCompany, companyDB);
-                seg2(userCompany, companyDB);
-                DonutData(userCompany, companyDB);
-                power_factor(userCompany, companyDB);
-
                 res.render('ourindex', { title: 'home page' });
 
             } else {  // 조회된 레코드가 없는 경우 실패 응답 전송
@@ -226,12 +223,12 @@ router.route('/process/adduser').post(function (req, res) {
                 res.write('<head><script type="text/javascript">alert("가입을 축하드립니다. 로그인하세요."); window.location="/login/#signin"</script></head>');
                 res.end();
 
-                /*
-                moneyLine(userCompany, companyDB);
-                areaRouter(userCompany, companyDB);
-                heatmapRouter(userCompany, companyDB);
-                seg2(userCompany, companyDB);
-                DonutData(userCompany, companyDB);*/
+                moneyLine(database, companyDB, userCompany);
+                areaRouter(database, companyDB, userCompany);
+                heatmapRouter(database, companyDB, userCompany);
+                seg2(database, companyDB, userCompany);
+                DonutData(database, companyDB, userCompany);
+                power_factor(database, companyDB, userCompany);
 
             } else {  // 결과 객체가 없으면 실패 응답 전송
                 res.writeHead('200', { 'Content-Type': 'text/html;charset=utf8' });

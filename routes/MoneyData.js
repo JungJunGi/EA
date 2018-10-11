@@ -3,67 +3,82 @@ var router = express.Router();
 
 const realData = require('../module/datacrawling').main;
 
-var start = function (company, companyDB) {
+var start = function (database, companyDB, company) {
 
-    var companyURL = company;
-    if (companyURL.indexOf("(주)") != -1)
-        companyURL = companyURL.replace("(주)", "")
+    var user_query = {};
 
-    router.get('/money/company=' + encodeURI(companyURL), (req, res) => {
-        var result, dateD = [];
+    var pre_date = new Date();
+    pre_date.setDate(pre_date.getDate() - 365)//현재로부터 일년 전
 
-        var query = { "meta.item": "ELECTRIC_CHARGE" };
+    var query = { "meta.item": "ELECTRIC_CHARGE" };
+    var users = database.collection('users');
 
-        realData(10, company, function (results) {
-            if (results == null)
-                return;
+    if (company != null) {
 
-            results.forEach(element => {
+        user_query = { "company": company };
+    }
 
-                var year = new Date().getFullYear();
-                var month = new Date().getMonth() + 1;
-                var realtime = element.data.slice(-1)[0];
+    users.find(user_query).toArray(function (err, docs) {
+        docs.forEach(element2 => {
+            var result, dateD = [];
 
-                if (month < 10)
-                    realtime.date = year + "-0" + month;
+            var companyURL = element2.company;
+            if (companyURL.indexOf("(주)") != -1)
+                companyURL = companyURL.replace("(주)", "")
 
-                else
-                    realtime.date = year + "-" + month;
+            companyDB.collection(element2.company).find(query).toArray(function (findErr, data) {
 
-                dateD.push(realtime);
+                if (findErr) throw findErr;
 
+                data.forEach(function (element) {
 
-            });
-        });
+                    var jsonD = element.data[0];
+                    var d = new Date(jsonD.date);
 
-        /** From Mongo DB **/
-        companyDB.collection(company).find(query).toArray(function (findErr, data) {
-            if (findErr) throw findErr;
-            data.forEach(function (element) {
-
-                var jsonD = element.data[0];
-                var d = new Date(jsonD.date);
-                var year = new Date().getFullYear();
-                var month = new Date().getMonth() + 1;
-
-                if (element.meta.year == year && element.meta.month == month) { }
-                else { //다음달 1일이 전달 전기요금.
-
-                    if (d.getMonth() == 0) { //1월이면
+                    //다음달 1일이 전달 전기요금.
+                    if (d.getMonth() == 0) {//1월이면
                         jsonD.date = (d.getFullYear() - 1) + "-12";
                     }
                     else if (d.getMonth() < 10) {
                         jsonD.date = d.getFullYear() + "-0" + d.getMonth();
                     }
-                    else { //1월이 아니면
+                    else {
                         jsonD.date = d.getFullYear() + "-" + d.getMonth();
                     }
                     dateD.push(jsonD);
-                }
+
+                });
 
             });
-            result = { "data": JSON.parse(JSON.stringify(groupBy(dateD, 'date', 'value'))) };
-            return res.json(result);
+
+            router.get('/money/company=' + encodeURI(companyURL), (req, res) => {
+
+                var year = new Date().getFullYear();
+                var month = new Date().getMonth() + 1;
+
+                var dateD2 = [];
+
+                realData(10, element2.company, function (results) {
+                    results.forEach(element => {
+                        var realtime = element.data.slice(-1)[0];
+
+                        if (month < 10)
+                            realtime.date = year + "-0" + month;
+
+                        else
+                            realtime.date = year + "-" + month;
+
+                        dateD2.push(realtime);
+
+                    });
+
+                    dateD2 = dateD2.concat(dateD); //배열 병합.
+                    result = { "data": JSON.parse(JSON.stringify(groupBy(dateD2, 'date', 'value'))) };
+
+                    return res.json(result);
+                })
+
+            });
         });
     });
 }
