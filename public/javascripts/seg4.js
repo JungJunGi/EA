@@ -2,6 +2,8 @@
 var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
+var seg4_color = ["#90A5C1", "#EFA561", "#B8B19E", "#748F63", "#F0DFA7",
+"#C3F09A", "#D56365", "#B1D5C3", "#8F6B84", "#F59F8E"];
 
 var tooltip = d3.select("body")
     .append("div")
@@ -16,10 +18,10 @@ var tooltip = d3.select("body")
 
 var svg_1 = d3.select('.seg4_chart_1') //d3.select("body").select("svg")
     //.attr("width", 1500).attr("height", 350)
-    .attr("transform", "translate(90, 30)")
+    .attr("transform", "translate(120, 30)")
     .append('g');
 var svg_2 = d3.select('.seg4_chart_2') //d3.select("body").select("svg")
-    .attr("transform", "translate(90, 30)")
+    .attr("transform", "translate(50,  30)")
     .append('g');
 
 //pie chart
@@ -55,14 +57,16 @@ function pie(fileName, label, mysvg) {
 
     d3.json(fileName, function (error, data) {
         if (error) throw error;
-
+        console.log(data);
         var root = d3.hierarchy(classes_4(data, label))
             .sum(function (d) {
                 return d.value;
             })
             .sort(function (a, b) {
-                return b.value - a.value;
+                return a.data.siteName.localeCompare(b.data.siteName);
             });
+
+        //console.log(root)
 
         var arc = d3.arc()
             .innerRadius(innerRadius)
@@ -74,9 +78,7 @@ function pie(fileName, label, mysvg) {
             })
             .padAngle(.01);
 
-        var color = d3.scaleOrdinal(d3.schemeCategory10);
-
-        var sData = root.children.slice(0, 10);
+        var sData = root.children;
 
         var arcs = mysvg.append('g')
             //.attr("transform", "translate(" + 180 * num + ", 10)")
@@ -93,7 +95,7 @@ function pie(fileName, label, mysvg) {
             .on("mouseout", function () { tooltip.style("visibility", "hidden"); });
 
         var path = arcs.append("path")
-            .attr("fill", function (d, i) { return color(i); })
+            .attr("fill", function (d, i) { return seg4_color[i]; })
             .attr("d", arc);
 
         //transition
@@ -118,7 +120,7 @@ function pie(fileName, label, mysvg) {
                 .attr("dy", ".4em")
                 .attr("text-anchor", "middle")
                 .text(function (d) { return d.data.value; });
-
+            if (label == '금일 피상전력'){
             //legend
             var legendRectSize = 20;
             var legendSpacing = 1;
@@ -132,12 +134,12 @@ function pie(fileName, label, mysvg) {
             })*/
 
             var legend = mysvg.append('g')
-                // .attr("transform", "translate(" + (180 * num) + ", 10)")
+                .attr("transform", "translate(0, 20)")
                 .selectAll('.legend')
                 .data(sData).enter().append('g')
                 .attr("class", 'legend')
                 .attr("transform", function (d, i) {
-                    return 'translate(270,' + (((i + 1) * legendHeight) + (3 * i)) + ')';
+                    return 'translate(290,' + (((i + 1) * legendHeight) + (3 * i)) + ')';
                 })
                 .on("mouseover", function (d) { mouseOver(d); })
                 .on("mousemove", function () {
@@ -151,13 +153,13 @@ function pie(fileName, label, mysvg) {
             legend.append('rect')
                 .attr("width", legendRectSize).attr("height", legendHeight)
                 .attr("rx", 20).attr("ry", 20)
-                .style("fill", function (d, i) { return color(i); });
+                .style("fill", function (d, i) { return seg4_color[i]; });
 
             legend.append('text')
                 .attr("x", 30).attr("y", 15)
                 .text(function (d) { return d.data.siteName; })
                 .style("fill", 'black').style("font_size", '14px');
-
+            }
             //var lx = (180 * num) + 150;
             mysvg.append('text')
                 .attr("transform", function (d, i) {

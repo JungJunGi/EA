@@ -3,14 +3,14 @@ body{
 }
 
 .tooltip2 {
-    fill: white;
-    stroke: #000;
+    fill: rgba(0, 0, 0, 0.75);
 }
 
 text {
     fill: black;
 }
 
-.tooltip-date, .tooltip-money {
+.tooltip-date, .tooltip-value {
     font-weight: bold;
+    fill: white;
 }
