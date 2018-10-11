@@ -32,8 +32,15 @@ d3.json('/seg2Data/seg2/company=' + companyName, function (error, data) {
 
     var orderData = orderData3(data.data);
 
-    setScales(orderData);
-    drawChart(orderData);
+    var sumValue = d3.nest()
+        .key(function (d) {
+            return d.date;
+        })
+        .rollup(function (v) { return d3.sum(v, function (d) { return d.value; }); })
+        .entries(orderData);
+
+    setScales(sumValue);
+    drawChart(sumValue);
 
 });
 
@@ -90,10 +97,10 @@ function largestTriangleThreeBucket(data, threshold, xProperty) {
 };
 
 function setScales(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date");
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "key");
 
-    var start_date = dataSet[0].date;
-    var end_date = dataSet[dataSet.length - 1].date;
+    var start_date = dataSet[0].key;
+    var end_date = dataSet[dataSet.length - 1].key;
 
     xScale = d3.scaleTime().domain(d3.extent([start_date, end_date])).range([0, svg2_width]);
 
@@ -107,7 +114,7 @@ function setScales(data) {
 
 
 function drawChart(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "date");
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "key");
 
     var xAxis = d3.axisBottom(xScale)
 
@@ -137,7 +144,7 @@ function drawChart(data) {
         .attr("dx", 12)
         .attr("dy", 12)
         .attr("transform", "translate(" + svg2_margin.left + "," + (svg2_margin.top - 20) + ")")
-        .text("<회사전체의 전력사용량>")
+        .text("<회사전체 전력사용량>")
         .style("fill", "#9A9A9A");
 
     var chart = chartArea.append("g")
@@ -160,7 +167,7 @@ function drawChart(data) {
         .attr("class", "d3-tip")
         .offset([-10, 0])
         .html(function (d) {
-            return "Date: <span style=\"color:yellow\">" + getDate(d.date) +
+            return "Date: <span style=\"color:yellow\">" + getDate(d.key) +
                 "</span><br>Amount of Electricity Used: " +
                 "<span style=\"color:yellow\">" + d.value + "</span>";
         });
@@ -172,7 +179,7 @@ function drawChart(data) {
         .append("rect")
         .attr("class", "barChart")
         .attr("opacity", "0.6")
-        .attr("x", function (d, i, da) { return (xScale(d.date) - ((svg2_width / da.length) - 0.5) * 0.5); })
+        .attr("x", function (d, i, da) { return (xScale(d.key) - ((svg2_width / da.length) - 0.5) * 0.5); })
         .attr("y", function (d, i) {
             return yScale(d.value);
         })
