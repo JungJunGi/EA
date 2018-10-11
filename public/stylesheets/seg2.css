@@ -10,11 +10,11 @@ body {
     }
 
     .barChart {
-        fill: rgba(244, 212, 140, 0.7);
+        fill: rgba(239,165,97, 0.7);
     }
 
         .barChart:hover {
-            fill: rgb(254, 224, 159);
+            fill: rgb(239,165,97);
         }
 
 
@@ -23,7 +23,7 @@ body {
         font-size: 10px;
         font-weight: bold;
         padding: 12px;
-        background: rgba(11, 121, 3, 0.8);
+        background: rgba(0, 0, 0, 0.75);
         color: #fff;
         border-radius: 2px;
     }

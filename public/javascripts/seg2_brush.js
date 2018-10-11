@@ -97,7 +97,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty) {
 };
 
 function setScales(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "key");
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 3, "key");
 
     var start_date = dataSet[0].key;
     var end_date = dataSet[dataSet.length - 1].key;
@@ -114,7 +114,7 @@ function setScales(data) {
 
 
 function drawChart(data) {
-    var dataSet = largestTriangleThreeBucket(data, svg2_width / 2, "key");
+    var dataSet = largestTriangleThreeBucket(data, svg2_width / 3, "key");
   
     var xAxis = d3.axisBottom(xScale)
 
@@ -189,7 +189,6 @@ function drawChart(data) {
         .attr("height", function (d) {
             return svg2_height - yScale(d.value);
         })
-        .style("fill", function(d){if(d.value == max){ return 'red'}})
         .attr("clip-path", "url(#clip)")
         .on("mouseover", function (d) {
             tip.show(d);

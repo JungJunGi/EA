@@ -24,7 +24,7 @@ d3.json('/moneyData/money/company=' + companyName, function (error, data) {
 
 function Line_chart(meta, sData) {
 
-    
+
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
 
@@ -33,7 +33,7 @@ function Line_chart(meta, sData) {
     var xScale = d3.scaleTime()
         .domain([newD, x_max])
         .range([0, svg5_width]);
-
+        
     var y_max = d3.max(sData, function (d) { return d.value; });
 
     var yScale = d3.scaleLinear()
@@ -41,8 +41,7 @@ function Line_chart(meta, sData) {
         .range([svg5_height, 0]).nice();
 
     var xAxis = d3.axisBottom(xScale)
-        .tickFormat(my_format) //표시할 형태를 포메팅한다.
-        .ticks(d3.timeMonth);
+        .tickFormat(my_format); //표시할 형태를 포메팅한다.
 
     var yAxis = d3.axisLeft(yScale);
 
@@ -83,7 +82,7 @@ function Line_chart(meta, sData) {
     var path = g.append("path");
 
     path.attr("d", lineFunction(sData))
-        .attr("stroke", "blue")
+        .attr("stroke", "#333")
         .attr("stroke-width", 2)
         .attr("fill", "none");
 
@@ -99,17 +98,20 @@ function Line_chart(meta, sData) {
             return yScale(d.value);
         })
         .attr('r', 5)
-        .style("fill", "blue");
+        .style("fill", "#333");
+
     //money text
     g.append("g")
         .attr("class", "circle_text")
         .selectAll('.circle_text')
         .data(sData).enter().append('text')
         .attr('x', function (d) {
-            return xScale(d.date) + 10;
+            return xScale(d.date);
         })
-        .attr('y', function (d) {
-            return yScale(d.value) + 10;
+        .attr('y', function (d, i) {
+            var num = 15;
+            if (i % 2 == 0) { num = - 10; }
+            return yScale(d.value) + num;
         })
         .text(function (d) { return Money_format(Math.floor(d.value / 10) * 10) + "원" })
         .style("fill", 'black').style("font_size", '14px');
@@ -121,7 +123,7 @@ function Line_chart(meta, sData) {
 
     focus.append("line")
         .attr("class", "x")
-        .style("stroke", "blue")
+        .style("stroke", "#333")
         .style("stroke-dasharray", "3,3")
         .style("opacity", 0.5)
         .attr("y1", 0)
@@ -129,7 +131,7 @@ function Line_chart(meta, sData) {
 
     focus.append("rect")
         .attr("class", "tooltip2")
-        .attr("width", 180)
+        .attr("width", 160)
         .attr("height", 50)
         .attr("x", 10)
         .attr("y", -22)
@@ -140,21 +142,21 @@ function Line_chart(meta, sData) {
         .attr("class", "tooltip-date")
         .attr("x", 18)
         .attr("y", -2)
-        .style("font", "18px sans-serif")
+        .style("font", "12px sans-serif")
         .style("font-weight", "bold");
 
     focus.append("text")
-        .attr("x", 13)
+        .attr("x", 18)
         .attr("y", 18)
         .text("전기요금:")
-        .style("font", "18px sans-serif");
-
+        .style("font", "12px sans-serif")
+        .style("fill","white");
 
     focus.append("text")
         .attr("class", "tooltip-value")
-        .attr("x", 90)
+        .attr("x", 75)
         .attr("y", 18)
-        .style("font", "18px sans-serif")
+        .style("font", "12px sans-serif")
         .style("font-weight", "bold");
 
     svg5.append("rect")
@@ -172,13 +174,15 @@ function Line_chart(meta, sData) {
             i = bisectDate2(sData, x0, 1),
             d0 = sData[i - 1],
             d1 = sData[i],
-            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+            d = x0- d0.date > d1.date - x0 ? d1 : d0;
 
         var LineX = xScale(d.date) + 60;
         var LineY = yScale(d.value) + 20;
 
+        var seg5_format = d3.timeFormat("%Y년 %m월");
+
         focus.attr("transform", "translate(" + LineX + "," + LineY + ")");
-        focus.select(".tooltip-date").text(my_format(d.date));
+        focus.select(".tooltip-date").text(seg5_format(d.date));
         focus.select(".tooltip-value").text(Money_format(Math.round(d.value / 10) * 10) + "원"); //일의 자리 버림
         focus.select(".x").attr("y2", svg5_height - yScale(d.value));
         focus.select(".y").attr("x2", svg5_width + svg5_width);

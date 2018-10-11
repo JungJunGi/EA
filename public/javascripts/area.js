@@ -17,6 +17,9 @@ var bisectDate = d3.bisector(function (d) {
     return d.date;
 }).left;
 
+var area_color = ["#90A5C1", "#EFA561", "#B8B19E", "#748F63", "#F0DFA7",
+    "#C3F09A", "#D56365", "#B1D5C3", "#8F6B84", "#F59F8E"];
+
 var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
@@ -85,13 +88,21 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             e.date = Number(new Date(e.date).getTime());
         });
 
-        var sData = largestTriangleThreeBucket(AreaData, area_width / 2, "date");
+        var sData = largestTriangleThreeBucket(AreaData, area_width / 3, "date");
+
+        data.depart.sort(function (a, b) {
+            return b.localeCompare(a);
+        })
 
         var series = d3.stack()
             .keys(data.depart)
             //.order(d3.stackOrderDescending)
             .offset(d3.stackOffsetNone)
             (sData);
+
+        series.sort(function (a, b) {
+            return a.key.localeCompare(b.key);
+        });
 
         var startD = d3.min(sData, function (d) { return d.date; });//시작시간
         var lastD = d3.max(sData, function (d) { return d.date; });//끝시간
@@ -185,7 +196,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .selectAll("g")
             .data(series)
             .enter().append("g")
-            .attr("fill", function (d) { return z(d.key); })
+            .attr("fill", function (d, i) { return area_color[i]; })
             .append('path')
             .attr('class', "area")
             .attr("clip-path", "url(#clip)")
@@ -254,7 +265,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .rollup(function (v) { return d3.sum(v, function (d) { return d.value; }); })
             .entries(orderData);
 
-        var dataSet = largestTriangleThreeBucket(sumValue, area_width / 2, "key");
+        var dataSet = largestTriangleThreeBucket(sumValue, area_width / 3, "key");
 
         var yScale = d3.scaleLinear()
             .domain([0, d3.max(dataSet, function (d) {
@@ -279,11 +290,16 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .attr("height", function (d) {
                 return area_height2 - y3(d.value);
             })
-            .attr("fill", " rgb(254, 164, 102)")
+            .attr("fill", " rgb(239,165,97)")
 
         function sum(d, key) {
             var sumd = 0;
-            for (var i = 0; i < data.depart.length; i++) {
+
+            data.depart.sort(function (a, b) {
+                return a.localeCompare(b);
+            })
+
+            for (var i = data.depart.length - 1; i >= 0; i--) {
                 if (d[data.depart[i]] > 0) {
                     if (key == data.depart[i]) {
                         sumd += d[data.depart[i]];
@@ -298,10 +314,15 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         function text(d, key) {
             var text = "";
             var sum = 0;
-            for (var i = data.depart.length - 1; i >= 0; i--) {
+
+            data.depart.sort(function (a, b) {
+                return a.localeCompare(b);
+            })
+
+            for (var i = 0; i < data.depart.length; i++) {
                 if (d[data.depart[i]] > 0) {
                     if (key == data.depart[i]) {
-                        text += "<font color=" + z(key) + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";
+                        text += "<font color=" + area_color[i] + ">" + data.depart[i] + "=" + d[data.depart[i]] + "</font></br>";
                     }
                     else {
                         text += data.depart[i] + "=" + d[data.depart[i]] + "</br>";
@@ -411,12 +432,22 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         //area다시 그리기
         function resize(date) {
 
-            var reData = largestTriangleThreeBucket(date, area_width / 2, "date");
+            var reData = largestTriangleThreeBucket(date, area_width / 3, "date");
+
+            data.depart.sort(function (a, b) {
+                return b.localeCompare(a);
+            })
+
             var series2 = d3.stack()
                 .keys(data.depart)
                 //.order(d3.stackOrderDescending)
                 .offset(d3.stackOffsetNone)
                 (reData);
+
+            series2.sort(function (a, b) {
+                return a.key.localeCompare(b.key);
+            });
+
 
             //y축 갱신
             y.domain([0, d3.max(series2, stackMax)]).nice();
@@ -426,7 +457,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 .remove().exit()
                 .data(series2)
                 .enter().append("g")
-                .attr("fill", function (d) { return z(d.key); })
+                .attr("fill", function (d, i) { return area_color[i]; })
                 .append('path')
                 .attr('class', "area")
                 .attr("clip-path", "url(#clip)")
@@ -500,7 +531,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
         //bar다시 그리기
         function resize2(data) {
 
-            var dataSet = largestTriangleThreeBucket(data, area_width / 2, "key");
+            var dataSet = largestTriangleThreeBucket(data, area_width / 3, "key");
 
             var tip = d3.tip()
                 .attr("class", "d3-tip")
@@ -531,7 +562,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 .attr("opacity", "0.6")
                 .style("fill", function (d, i, da) {
                     if (d.value == d3.max(dataSet, function (d) { return d.value; })) {
-                        return "red";
+                        return "#C33325";
                     }
                 })
                 .attr("x", function (d, i, da) { return (x(d.key) - ((area_width / da.length) - 0.5) * 0.5); })
@@ -605,6 +636,10 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 }
             });
 
+            peak.sort(function (a, b) {
+                return a.depart.localeCompare(b.depart);
+            });
+
             var peakY = d3.scaleBand()
                 .range([250, 0])
                 .domain(peak.map(function (d) { return d.depart; }))
@@ -627,7 +662,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 .attr("y", function (d) { return peakY(d.depart); })
                 .attr("width", function (d) { return peakX(d.value); })
                 .attr("height", peakY.bandwidth())
-                .style("fill", "steelblue")
+                .style("fill", function (d, i) { return area_color[i]; })
 
             g.selectAll(".peakText")
                 .data(peak)
@@ -659,13 +694,13 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .attr("class", 'legend')
             .attr('id', function (d) { return d.key; })
             .attr("transform", function (d, i) {
-                return 'translate(' + (area_width + 60) + ',' + (((i + 13) * legendHeight) + (-45 * i)) + ')';
+                return 'translate(' + (area_width + 60) + ',' + (((i + 8) * legendHeight) + (3 * i)) + ')';
             });
 
         legend.append('rect')
             .attr("width", legendRectSize).attr("height", legendHeight)
             .attr("rx", 20).attr("ry", 20)
-            .style("fill", function (d) { return z(d.key); });
+            .style("fill", function (d, i) { return area_color[i]; });
 
         legend.append('text')
             .attr("class", "areaTx")
@@ -683,7 +718,7 @@ function sortByData(data) {
 
     var sData = data.sort(function (x, y) {
         return d3.ascending(x.date, y.date);
-    })
+    });
 
     return sData;
 }
