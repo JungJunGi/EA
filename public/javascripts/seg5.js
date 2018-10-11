@@ -169,7 +169,7 @@ function Line_chart(meta, sData) {
 
     function mousemove(d) {
         var x0 = xScale.invert(d3.mouse(this)[0]),
-            i = bisectDate2(sData, x0, 1), //date를 찾지 못함
+            i = bisectDate2(sData, x0, 1),
             d0 = sData[i - 1],
             d1 = sData[i],
             d = x0 - d0.date > d1.date - x0 ? d1 : d0;

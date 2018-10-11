@@ -67,14 +67,6 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
         .style("font", "11px open-sans")
         .text("power_factor(%)");
 
-    //기준역률:90
-    /*svg.append("line")          // attach a line
-    .style("stroke", "#BDBDBD")  // colour the line
-    .attr("x1", 0)     // x position of the first end of the line
-    .attr("y1", y(90))      // y position of the first end of the line
-    .attr("x2", width)     // x position of the second end of the line
-    .attr("y2", y(90));    // y position of the second end of the line*/
-
     var tooltip = d3.select("body")
         .append("div")
         .style("position", "absolute")

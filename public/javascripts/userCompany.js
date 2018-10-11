@@ -1,1 +1,1 @@
-document.getElementById("userCompany").innerHTML ='신화개발';document.getElementById("showCompany").innerHTML ='신화**';
+document.getElementById("userCompany").innerHTML ='골든팰리스';document.getElementById("showCompany").innerHTML ='골든팰**';
