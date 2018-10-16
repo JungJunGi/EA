@@ -103,6 +103,7 @@ async function main(callback) {
                         company.forEach(async function(companyName){
 
                             // var collection = database.collection(companyName);
+                            console.log(companyName)
 
                             categories.forEach(async function(categoryNumber){
 
@@ -161,7 +162,6 @@ async function main(callback) {
                 }); // server
 
             }); // scheduling
-
         } // finally
     });
 }
@@ -173,10 +173,10 @@ async function getData(categoryNumber, companyName, today, data, collection, cal
     var result = [];
     var category = checkCategory(categoryNumber);   // data category
 
-    console.log(category, companyName)
-    console.log(data)
+    // console.log(category, companyName)
+    // console.log(data)
     
-    data.forEach(function (e) {
+    data.forEach(function (e, i) {
 
         var depart = Object.keys(e)[0];
         var id = Object.values(e)[0];
@@ -190,73 +190,70 @@ async function getData(categoryNumber, companyName, today, data, collection, cal
 
         var url = "http://165.246.39.81:54231/demandList?date=" + today + "&category=" + categoryNumber + "&DSID=" + dsid + "&DISTBDID=" + distbdid;
         
-        request(url, (error, response, body) => {
+        request(url, (error, response) => {
 
             try {
 
                 if (response != undefined){
+                    //console.log(response)
 
-                    let $ = cheerio.load(response.body);
-
+                    console.log(response.body.length)
+                    
                     jsonText = "{ \"meta\" : { \"company\" : \"" + companyName + "\", \"depart\" : \"" + depart + "\", "
                         + "\"year\" : \"" + today.slice(0, 4) + "\",\"month\" : \"" + today.slice(4, 6) + "\",\"item\" : \"" + category + "\"}, "
-                        + "\"data\" : [";
-    
-                    if (response.body.length > 100){
-                        
-                        myBody = body.replace("<pre>\n", "").replace("\n</pre>", "");
+                        + "\"data\" : [ ";
+                    
+                    if (response.body.length > 21){
+                        let $ = cheerio.load(response.body);
+
+                        myBody = response.body.replace("<pre>\n", "").replace("\n</pre>", "");
                         myBody = myBody.split("\n");
-    
+
                         myBody.forEach(function (d, i, da) {
                             var a = d.split(",");
-    
+
                             jsonText = jsonText + "{ \"date\" : \"" + new Date(a[0]) + "\", \"value\" : \"" + a[1] + "\" },";
-    
+
                         });
-                        
-                        jsonText = jsonText.slice(0, -1) + "] }";
-                        
-                    } else {
-                        jsonText = jsonText + "] }";
+
                     }
-    
+                                      
+                    jsonText = jsonText.slice(0, -1) + "] }";
+                       
                     myJson = JSON.parse(jsonText);
         
                     result.push(myJson);
     
+                } else {
+                    // console.log("=========================", url)
                 }
             } catch (error) {
 
-                console.log(error)
+                console.error(error)
                 // callback(null);
                 
             } finally {
 
-                console.log("result :::", data.length, result.length)
-
+                // console.log(data.length, i+1)
                 if (data.length == result.length) {
                     result.forEach(function (data) {
 
-                        // console.log(data.meta)
+                        console.log(data.meta)
 
                         isExist(collection, { "meta": data.meta }, async function (err, docs) {
                             if (err) { throw err; }
 
-                            console.log("뭐라도 해보자")
+                            // console.log("뭐라도 해보자")
     
                             if (docs == null) {
-                                console.log("고로 생성한다!");
+                                // console.log("고로 생성한다!");
 
                                 await addData(collection, data, async function (err, doc) {
                                     if (err) { throw err; }
                                 });
 
-                                // await addData(collection, { "meta": data.meta, "data": [] }, async function (err, doc) {
-                                //     if (err) { throw err; }
-                                // });
-
                             } else {
-                                console.log("고로 추가한다!");
+                                // console.log("고로 추가한다!");
 
                                 did = docs[0]._id;
                                 dd = data.data;
@@ -306,31 +303,6 @@ function checkCategory(categoryNumber) {
 
     return category
 }
-
-/* 
-
-data category
-
-3: 누적전력량
-5: 주파수
-6: 선간전압
-7: 상전류
-8: 상전압
-9: 부스바온도
-10: 전기요금
-11: 인버터효율
-12: RS간 선간전압
-13: ST간 선간전압
-14: TR간 선간전압
-15: 역률
-16: 유효전력
-17: 피상전력
-21: 무효전력 
-22: 전압 총고조파왜곡율
-23: 전류 총고조파왜곡율
-
-*/
-
 
 /** 데이터 존재 여부 확인 함수 **/
 var isExist = function (collection, query, callback) {
