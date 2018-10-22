@@ -58,7 +58,7 @@ def job():
     date = year + month
     today = year + "-" + month + "-" + mday
     # date = "201810"
-    # today = "2018-10-10"
+    # today = "2018-10-15"
     print("today is ", today)
 
 
