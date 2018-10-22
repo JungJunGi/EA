@@ -6,25 +6,6 @@ var router = express.Router();
 
 const realData = require('../module/datacrawling').main;
 
-function groupBy(array, col, value) {
-
-    var r = [], o = {};
-
-    array.forEach(function (d) {
-        if (d[col]) {
-            if (!o[d[col]]) {
-                o[d[col]] = {};
-                o[d[col]][col] = d[col];
-                o[d[col]][value] = 0;
-                r.push(o[d[col]]);
-            }
-            o[d[col]][value] += +d[value];
-        }
-    });
-    return r;
-};
-
-
 var start = function (database, companyDB, company) {
 
     var user_query = {};

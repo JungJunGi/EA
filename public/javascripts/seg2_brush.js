@@ -127,8 +127,6 @@ function drawChart(data) {
             return "translate(100, 0)";
         })
 
-    /*;*/
-
     var chartArea = svg.append("g");
 
     chartArea.append("defs").append("clipPath")
@@ -161,19 +159,6 @@ function drawChart(data) {
 
     var getDate = d3.timeFormat("%Y-%m-%d %H:%M");
 
-
-    // set tool tip
-    var tip = d3.tip()
-        .attr("class", "d3-tip")
-        .offset([-10, 0])
-        .html(function (d) {
-            return "Date: <span style=\"color:yellow\">" + getDate(d.key) +
-                "</span><br>Amount of Electricity Used: " +
-                "<span style=\"color:yellow\">" + d.value + "</span>";
-        });
-
-    chartArea.call(tip);
-
     chart.selectAll("rect")
         .data(dataSet).enter()
         .append("rect")
@@ -191,25 +176,15 @@ function drawChart(data) {
         })
         .attr("clip-path", "url(#clip)")
         .on("mouseover", function (d) {
-            tip.show(d);
             d3.select(this)
                 .attr("opacity", "0.9");
         })
         .on("mouseout", function () {
-            tip.hide();
             d3.select(this)
                 .transition()
                 .duration(500)
                 .attr("opacity", "0.6");
         })
-        .on("mousemove", function (d) {
-            tip.attr("x", function () {
-                return d3.event.offsetX;
-            })
-                .attr("y", function () {
-                    return d3.event.offsetY;
-                })
-        });
 
     // set axis
     axis.append("g")
@@ -224,7 +199,5 @@ function drawChart(data) {
         .text("Amount of Electricity Used")
         .attr("transform", "translate(10,123) rotate(90)")
         .attr('fill', 'black');
-
-    //d3.select(".log").text("data:" + data.length + " downsampled:" + dataSet.length);
 
 }

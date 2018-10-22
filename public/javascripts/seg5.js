@@ -1,4 +1,4 @@
-var svg5 = d3.select('.seg5_chart');//.attr("transform", "translate(400, 10)");
+var svg5 = d3.select('.seg5_chart');
 var svg5_margin = { top: 10, right: 200, bottom: 20, left: 60 };
 
 var svg5_width = +svg5.attr("width") - svg5_margin.left - svg5_margin.right,
@@ -24,7 +24,6 @@ d3.json('/moneyData/money/company=' + companyName, function (error, data) {
 
 function Line_chart(meta, sData) {
 
-
     var x_min = d3.min(sData, function (d) { return d.date; });
     var x_max = d3.max(sData, function (d) { return d.date; });
 
@@ -33,7 +32,7 @@ function Line_chart(meta, sData) {
     var xScale = d3.scaleTime()
         .domain([newD, x_max])
         .range([0, svg5_width]);
-        
+
     var y_max = d3.max(sData, function (d) { return d.value; });
 
     var yScale = d3.scaleLinear()
@@ -150,7 +149,7 @@ function Line_chart(meta, sData) {
         .attr("y", 18)
         .text("전기요금:")
         .style("font", "12px sans-serif")
-        .style("fill","white");
+        .style("fill", "white");
 
     focus.append("text")
         .attr("class", "tooltip-value")
@@ -170,14 +169,14 @@ function Line_chart(meta, sData) {
         .on("mousemove", mousemove);
 
     function mousemove(d) {
-        var x0 = xScale.invert(d3.mouse(this)[0]),
+        var x0 = xScale.invert(d3.mouse(this)[0] - 60),
             i = bisectDate2(sData, x0, 1),
             d0 = sData[i - 1],
             d1 = sData[i],
-            d = x0- d0.date > d1.date - x0 ? d1 : d0;
+            d = x0 - d0.date > d1.date - x0 ? d1 : d0;
 
         var LineX = xScale(d.date) + 60;
-        var LineY = yScale(d.value) + 20;
+        var LineY = yScale(d.value) + 5;
 
         var seg5_format = d3.timeFormat("%Y년 %m월");
 

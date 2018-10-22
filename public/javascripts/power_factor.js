@@ -1,11 +1,10 @@
-// Set the margins
+
 var margin = { top: 60, right: 100, bottom: 20, left: 80 },
     width = 1800 - margin.left - margin.right,
     height = 370 - margin.top - margin.bottom;
 
 var getDate = d3.timeFormat("%Y-%m-%d %H:%M");
 
-// Create the svg canvas in the "graph" div
 var svg = d3.select("#graph")
     .append("svg")
     .style("width", width + margin.left + margin.right + "px")
@@ -20,7 +19,6 @@ var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
 
-// Import the json data
 d3.json("/segData/power/company=" + companyName, function (error, data) {
     if (error) throw error;
 
@@ -111,10 +109,10 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
             return d.key;
         })
 
-    // Function to create the initial graph
+    //처음 그려지는 차트
     var initialGraph = function (depart) {
 
-        // Filter the data to include only fruit of interest
+        // Filter Depart
         var selectDepart = nest.filter(function (d) {
             return d.key == depart;
         })
@@ -156,28 +154,24 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
                 else if (60 <= d.value && d.value < 90) text = "효율성 중간";
                 else text = "효율성 낮음";
 
-                tooltip.html("해당시간: " + getDate(d.date) + "</br>" + "역률: " + d.value + " " + text)
+                tooltip.html("해당시간: " + getDate(d.date) + "</br>" + Math.floor(d.value) + "%로 " + text)
                 tooltip.style("top", 670 + "px").style("left", 220 + "px");
             })
         // .on("mouseout", function () { return tooltip.style("visibility", "hidden"); });;
     }
 
-    // Create initial graph
     initialGraph(dataSet[0].depart)
 
-    // Update the data
+    //data update
     var updateGraph = function (depart) {
 
-        // Filter the data to include only fruit of interest
         var selectDepart = nest.filter(function (d) {
             return d.key == depart;
         })
 
-        // Select all of the grouped elements and update the data
         var selectDepartGroups = svg.selectAll(".departGroups")
             .data(selectDepart)
 
-        // Select all the lines and transition to new positions
         selectDepartGroups.select("path.line")
             .transition()
             .duration(1000)
@@ -209,22 +203,22 @@ d3.json("/segData/power/company=" + companyName, function (error, data) {
                 else if (60 <= d.value && d.value < 90) text = "효율성 중간";
                 else text = "효율성 낮음";
 
-                tooltip.html("해당시간: " + getDate(d.date) + "</br>" + "역률: " + d.value + " " + text)
+                tooltip.html("해당시간: " + getDate(d.date) + "</br>" + Math.floor(d.value) + "%로 " + text)
                 tooltip.style("top", 670 + "px").style("left", 220 + "px");
             });
 
     }
 
 
-    // Run update function when dropdown selection changes
+    //dropdown menu
     popupMenu.on('change', function () {
 
-        // Find which fruit was selected from the dropdown
+        //선택한 부서 찾기
         var selectedDepart = d3.select(this)
             .select("select")
             .property("value")
 
-        // Run update function with the selected fruit
+        //부서 update
         updateGraph(selectedDepart)
 
     });
@@ -238,11 +232,6 @@ function sortByData4(data) {
     var sData = data.sort(function (x, y) {
         return d3.ascending(x.date, y.date);
     })
-    /*sData = sData.slice(0, 1000);
-
-    sData = sData.sort(function (x, y) {
-        return d3.ascending(x.date, y.date);
-    })*/
 
     return sData;
 }

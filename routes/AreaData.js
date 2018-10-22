@@ -21,7 +21,6 @@ var start = function (database, companyDB, company) {
     users.find(user_query).toArray(function (err, docs) {
         docs.forEach(element2 => {
             var dateD = [];
-            var departD = [];
 
             //api만들때 (), 괄호가 들어가면 오류...그래서 ()떼고 만들기. 
             var companyURL = element2.company;
@@ -34,8 +33,6 @@ var start = function (database, companyDB, company) {
                 if (findErr) throw findErr;
 
                 data.forEach(function (element) {
-
-                    departD.push(element.meta.depart);
 
                     element.data.forEach(function (el, index) {
                         if (new Date(el.date) > pre_date) {
@@ -55,10 +52,12 @@ var start = function (database, companyDB, company) {
             router.get('/area/company=' + encodeURI(companyURL), (req, res) => {
 
                 var dateD2 = [];
+                var departD = [];
 
                 realData(16, element2.company, function (results) {
                     results.forEach(element => {
 
+                        departD.push(element.meta.depart);
                         element.data.forEach(function (el, index) {
                             
                             if (el.value == 'None') {
@@ -71,13 +70,7 @@ var start = function (database, companyDB, company) {
                     });
                     
                     dateD2 = dateD2.concat(dateD);
-
-                    //부서명 중복 제거.
-                    var uniq = departD.reduce(function (a, b) {
-                        if (a.indexOf(b) < 0) a.push(b);
-                        return a;
-                    }, []);
-
+                    
                     //같은 날짜의 데이터끼리 groupBy
                     const mergedArray = Array.from(
                         dateD2.reduce(
@@ -86,7 +79,7 @@ var start = function (database, companyDB, company) {
                         ).values()
                     );
 
-                    return res.json({ "depart": uniq, "data": mergedArray });
+                    return res.json({ "depart": departD, "data": mergedArray });
                 });
 
 
