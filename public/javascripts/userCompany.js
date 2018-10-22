@@ -1,1 +1,1 @@
-document.getElementById("userCompany").innerHTML ='(주)명성금속';document.getElementById("showCompany").innerHTML ='(주)명성**';
+document.getElementById("userCompany").innerHTML ='골든팰리스';document.getElementById("showCompany").innerHTML ='골든팰**';
