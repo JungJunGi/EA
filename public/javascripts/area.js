@@ -1,6 +1,6 @@
 
-var area_svg = d3.select(".areaChart");
-var area_svg2 = d3.select(".seg2_chart");
+var area_svg = d3.select(".areaChart"); //staked area svg
+var area_svg2 = d3.select(".seg2_chart"); //bar svg
 
 var area_margin = { top: 20, right: 250, bottom: 30, left: 40 };
 var area_margin2 = { top: 10, right: 250, bottom: 390, left: 40 }
@@ -8,15 +8,17 @@ var area_width = +area_svg.attr("width") - area_margin.left - area_margin.right;
 var area_height = +area_svg.attr("height") - area_margin.top - area_margin.bottom;
 var area_height2 = +area_svg2.attr("height") - area_margin2.top - area_margin2.bottom;
 
-var format = d3.timeFormat("%Y-%m-%d %H:%M");
+var format = d3.timeFormat("%Y-%m-%d %H:%M"); //date format
 
 var svg2_margin = { top: 120, right: 250, bottom: 50, left: 40 },
     svg2_height = +area_svg2.attr("height") - svg2_margin.top - svg2_margin.bottom;
 
+//date focus
 var bisectDate = d3.bisector(function (d) {
     return d.date;
 }).left;
 
+//chart 색상 지정
 var area_color = ["#90A5C1", "#EFA561", "#B8B19E", "#748F63", "#F0DFA7",
     "#C3F09A", "#D56365", "#B1D5C3", "#8F6B84", "#F59F8E"];
 
@@ -24,8 +26,36 @@ var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
 
+//https://bl.ocks.org/FraserChapman/649f1aba28f6bc941d5c
+//https://blog.scottlogic.com/2015/11/16/sampling-large-data-in-d3fc.html
 function largestTriangleThreeBucket(data, threshold, xProperty) {
-
+         /**
+         * This method is adapted from the 
+         * "Largest Triangle Three Bucket" algorithm by Sveinn Steinarsson
+         * In his 2013 Masters Thesis - "Downsampling Time Series for Visual Representation"
+         * http://skemman.is/handle/1946/15343
+         *
+         * The MIT License
+         *  
+         * Copyright (c) 2013 by Sveinn Steinarsson
+         *
+         * Permission is hereby granted, free of charge, to any person obtaining a copy
+         * of this software and associated documentation files (the "Software"), to deal
+         * in the Software without restriction, including without limitation the rights
+         * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+         * copies of the Software, and to permit persons to whom the Software is
+         * furnished to do so, subject to the following conditions:
+         * The above copyright notice and this permission notice shall be included in
+         * all copies or substantial portions of the Software.
+         * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+         * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+         * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+         * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+         * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+         * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+         * THE SOFTWARE.
+         * --------------------------------------------------------------------------------------------------------
+         */
     xProperty = xProperty || 1;
 
     var m = Math.floor,
@@ -76,6 +106,7 @@ function largestTriangleThreeBucket(data, threshold, xProperty) {
     return n;
 };
 
+//chart 그리기
 d3.json('/segData/area/company=' + companyName, function (error, data) {
     d3.json('/seg2Data/seg2/company=' + companyName, function (error, data2) {
 
@@ -94,6 +125,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             return b.localeCompare(a);
         })
 
+        //area data stack
         var series = d3.stack()
             .keys(data.depart)
             //.order(d3.stackOrderDescending)
@@ -104,8 +136,8 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             return a.key.localeCompare(b.key);
         });
 
-        var startD = d3.min(sData, function (d) { return d.date; });//시작시간
-        var lastD = d3.max(sData, function (d) { return d.date; });//끝시간
+        var startD = d3.min(sData, function (d) { return d.date; }); //시작시간
+        var lastD = d3.max(sData, function (d) { return d.date; }); //끝시간
 
         var zoom = d3.zoom()
             .scaleExtent([1, Infinity])
@@ -113,6 +145,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .extent([[0, 0], [area_width, area_height]])
         //.on("zoom", zoomed);
 
+        //실제 chart 그리기 위한 공간.
         var detail = area_svg.append('g')
             .attr("transform", "translate(" + area_margin.left + "," + area_margin.top + ")");
 
@@ -126,26 +159,29 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .text("<부서별 전력사용량>")
             .style("fill", "#9A9A9A");
 
+        //brush 그리기 위한 공간.
         var overview = area_svg2.append('g')
             .attr("transform", "translate(" + area_margin2.left + "," + area_margin2.top + ")");
 
+        //x축
         var x = d3.scaleTime()
             .range([0, area_width])
             .domain([startD, lastD]);
 
+        //brush x축
         var x2 = d3.scaleTime()
             .range(x.range())
             .domain(x.domain());
 
+        //y축
         var y = d3.scaleLinear()
             .range([area_height, 0])
             .domain([0, d3.max(series, stackMax)]).nice();
 
+        //brush y축
         var y3 = d3.scaleLinear()
             .range([area_height2, 0])
             .domain(y.domain());
-
-        var z = d3.scaleOrdinal(d3.schemeCategory10);
 
         var area_detail = d3.area()
             .x(function (d) { return x(d.data.date); })
@@ -180,10 +216,12 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .attr("transform", "translate(10,123) rotate(90)")
             .attr('fill', 'black');
 
+        //brush x축
         overview.append("g")
             .attr("transform", "translate(0," + area_height2 + ")")
             .call(xAxis2);
 
+        //brush 적용 공간
         area_svg.append("defs").append("clipPath")
             .attr("id", "clip")
             .append("rect")
@@ -219,8 +257,8 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 d3.select(getname)
                     .attr("class", "legend-select");
 
-                focus.style("display", null);
-                tooltip.style("visibility", "visible");
+                focus.style("display", null); //focus 보여짐.
+                tooltip.style("visibility", "visible"); //tooltip 보여짐.
 
             }).on("mouseout", function (d) {
                 d3.select(this)
@@ -240,14 +278,14 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 d3.select(getname)
                     .attr("class", "legend");
 
-                focus.style("display", "none");
-                tooltip.style("visibility", "hidden");
+                focus.style("display", "none"); //focus 사라짐.
+                tooltip.style("visibility", "hidden"); //tooltip 사라짐.
 
             })
             .on("mousemove", mousemove)
             .call(zoom);
 
-        //brush bar
+        //brush bar data
         var orderData = sortByData(data2.data);
 
         orderData.forEach(d => {
@@ -259,7 +297,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             }
         });
 
-        //회사전체 전력사용량 총 합계
+        //회사전체 전력사용량 총 합계 -> bar chart data
         var sumValue = d3.nest()
             .key(function (d) { return d.date; })
             .rollup(function (v) { return d3.sum(v, function (d) { return d.value; }); })
@@ -267,6 +305,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
 
         var dataSet = largestTriangleThreeBucket(sumValue, area_width / 3, "key");
 
+        //bar chart y축
         var yScale = d3.scaleLinear()
             .domain([0, d3.max(dataSet, function (d) {
                 return d.value;
@@ -292,6 +331,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             })
             .attr("fill", " rgb(239,165,97)")
 
+        //tooltip - mouseover시 해당 차트 y축
         function sum(d, key) {
             var sumd = 0;
 
@@ -311,6 +351,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             return sumd;
         }
 
+        //tooltip - 부서별 데이터 텍스트 표현
         function text(d, key) {
             var text = "";
             var sum = 0;
@@ -336,6 +377,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             return text;
         }
 
+        //brush
         var brush = d3.brushX()
             .extent([[0, 0], [area_width, area_height2]])
             .on("brush end", brushed);
@@ -345,6 +387,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .call(brush)
             .call(brush.move, x.range());
 
+        //mouseover시
         function mousemove(d) {
             var key = d.key;
 
@@ -352,13 +395,13 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 i = bisectDate(sData, x0, 1),
                 d0 = sData[i - 1],
                 d1 = sData[i],
-                d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+                d = x0 - d0.date > d1.date - x0 ? d1 : d0; //마우스 가까운 x축에 focus
 
-            focus.attr("transform", "translate(" + (x(d.date) + 40) + "," + (y(sum(d, key)) + 22) + ")");
+            focus.attr("transform", "translate(" + (x(d.date) + 40) + "," + (y(sum(d, key)) + 22) + ")"); //위치
             focus.select(".x").attr("y2", area_height - y(sum(d, key)) + 5);
 
             //tooltip.style("top", (y(sum(d, key)) + 1100) + "px").style("left", x(d.date) + "px");
-            tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
+            tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px"); //위치
             tooltip.html("Date: " + format(d.date) + "<hr>" + text(d, key));
 
         }
@@ -398,7 +441,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
 
             x.domain(s.map(x2.invert)); //x2.invert: 치역의 값을 받았을 때 정의역의 값을 반환
 
-            var date = [];
+            var date = []; //사용자가 정한 날짜안에서 data.
             AreaData.forEach(e => {
                 if ((x.domain()[0] < e.date) && (x.domain()[1] > e.date)) {
                     e.date = Number(new Date(e.date).getTime());
@@ -407,7 +450,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             });
 
 
-            var date2 = [];
+            var date2 = []; //사용자가 정한 날짜안에서 data.
             sumValue.forEach(d => {
                 if ((x.domain()[0] < d.key) && (x.domain()[1] > d.key)) {
                     date2.push(d);
@@ -418,12 +461,12 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             resize(date);
             resize2(date2);
 
-            detail.select(".axis--x").call(xAxis);
+            detail.select(".axis--x").call(xAxis); //x축 수정.
             area_svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
                 .scale(area_width / (s[1] - s[0])).translate(-s[0], 0));
 
             //bar chart brush
-            area_svg2.select(".axis-x").call(xAxis);
+            area_svg2.select(".axis-x").call(xAxis); //x축 수정.
             area_svg2.select(".zoom").call(zoom.transform, d3.zoomIdentity
                 .scale(area_width / (s[1] - s[0]))
                 .translate(-s[0], 0));
@@ -453,8 +496,10 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             y.domain([0, d3.max(series2, stackMax)]).nice();
             detail.select(".axis--y").call(yAxis);
 
+            //기존의 그려진 chart삭제후 다시 그림
+            //그리는 code 동일.
             detail.selectAll(".area")
-                .remove().exit()
+                .remove().exit() 
                 .data(series2)
                 .enter().append("g")
                 .attr("fill", function (d, i) { return area_color[i]; })
@@ -554,6 +599,8 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 })])
                 .range([svg2_height, 0]).nice();
 
+            //기존의 그려진 chart삭제후 다시 그림
+            //그리는 code 동일.
             chart.selectAll(".barChart")
                 .remove().exit()
                 .data(dataSet).enter()
@@ -580,10 +627,12 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                     tip.show(d);
                     d3.select(this)
                         .attr("opacity", "0.9");
+
+                    //피크전력 표시
                     if (d.value == d3.max(dataSet, function (d) { return d.value; })) {
                         tooltip2.style("visibility", "visible");
                         tooltip2.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
-                        Peak(d.key);
+                        Peak(d.key); //피크전력 tooltip 나타냄.
                     }
                 })
                 .on("mouseout", function () {
@@ -606,7 +655,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
 
         }
 
-        //피크전력 tool
+        //피크전력 tooltip
         var tooltip2 = d3.select("body")
             .append("div")
             .style("position", "absolute")
@@ -625,6 +674,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
             .append("g")
             .attr("class", "peak")
 
+        //피크전력 tooltip생성.
         function Peak(date) {
             d3.select(".peak").select("*").remove();
 
@@ -640,11 +690,13 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 return a.depart.localeCompare(b.depart);
             });
 
+            //y축
             var peakY = d3.scaleBand()
                 .range([250, 0])
                 .domain(peak.map(function (d) { return d.depart; }))
                 .padding(0.1);
 
+            //x축
             var peakX = d3.scaleLinear()
                 .range([0, 170])
                 .domain([0, d3.max(peak, function (d) { return d.value; })]).nice();
@@ -654,6 +706,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 .attr("transform",
                     "translate(50,10)");
 
+            //부서별 누운 bar chart 그리기.
             g.selectAll(".pbar")
                 .data(peak)
                 .enter().append("rect")
@@ -664,6 +717,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 .attr("height", peakY.bandwidth())
                 .style("fill", function (d, i) { return area_color[i]; })
 
+            //bar chart 옆에 사용량 text 표현.
             g.selectAll(".peakText")
                 .data(peak)
                 .enter().append("text")
@@ -710,10 +764,12 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
     });
 });
 
+//최대치 사용량.
 function stackMax(serie) {
     return d3.max(serie, function (d) { return d[1]; });
 }
 
+//date별 data sort
 function sortByData(data) {
 
     var sData = data.sort(function (x, y) {

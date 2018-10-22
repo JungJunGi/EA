@@ -1,1 +1,1 @@
-document.getElementById("userCompany").innerHTML ='골든팰리스';document.getElementById("showCompany").innerHTML ='골든팰**';
+document.getElementById("userCompany").innerHTML ='카리스요양원';document.getElementById("showCompany").innerHTML ='카리스요**';

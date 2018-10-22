@@ -58,7 +58,7 @@ def job():
     date = year + month
     today = year + "-" + month + "-" + mday
     date = "201810"
-    today = "2018-10-16"
+    today = "2018-10-19"
     print("today is ", today)
 
 
@@ -182,7 +182,7 @@ server = SSHTunnelForwarder(
 ### Start ssh tunnel ###
 server.start()
 
-schedule.every().day.at("12:57").do(job)
+schedule.every().day.at("16:19").do(job)
 
 while True:
     schedule.run_pending()
