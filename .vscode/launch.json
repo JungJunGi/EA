@@ -8,12 +8,6 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Current File",
-            "program": "${workspaceFolder}\\module\\datacrawling"
-        },
-        {
-            "type": "node",
-            "request": "launch",
             "name": "Launch Project",
             "program": "${workspaceFolder}\\bin\\www"
         },

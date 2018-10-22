@@ -3,7 +3,7 @@ var companyName = document.getElementById("userCompany").innerHTML;
 if (companyName.indexOf("(주)") != -1)
     companyName = companyName.replace("(주)", "")
 var seg4_color = ["#90A5C1", "#EFA561", "#B8B19E", "#748F63", "#F0DFA7",
-"#C3F09A", "#D56365", "#B1D5C3", "#8F6B84", "#F59F8E"];
+    "#C3F09A", "#D56365", "#B1D5C3", "#8F6B84", "#F59F8E"];
 
 var tooltip = d3.select("body")
     .append("div")
@@ -18,7 +18,7 @@ var tooltip = d3.select("body")
 
 var svg_1 = d3.select('.seg4_chart_1') //d3.select("body").select("svg")
     //.attr("width", 1500).attr("height", 350)
-    .attr("transform", "translate(120, 30)")
+    .attr("transform", "translate(50, 30)")
     .append('g');
 var svg_2 = d3.select('.seg4_chart_2') //d3.select("body").select("svg")
     .attr("transform", "translate(50,  30)")
@@ -57,7 +57,7 @@ function pie(fileName, label, mysvg) {
 
     d3.json(fileName, function (error, data) {
         if (error) throw error;
-        console.log(data);
+
         var root = d3.hierarchy(classes_4(data, label))
             .sum(function (d) {
                 return d.value;
@@ -120,45 +120,31 @@ function pie(fileName, label, mysvg) {
                 .attr("dy", ".4em")
                 .attr("text-anchor", "middle")
                 .text(function (d) { return d.data.value; });
-            if (label == '금일 피상전력'){
-            //legend
-            var legendRectSize = 20;
-            var legendSpacing = 1;
-            var legendHeight = legendRectSize + legendSpacing;
 
-            /*sData.sort(function(a, b){
-            console.log(a.data.siteName);
-            if(a.data.siteName < b.data.siteName) return -1;
-            if(a.data.siteName > b.data.siteName) return 1;
-            return 0;
-            })*/
+            if (label == '금일 피상전력') {
+                //legend
+                var legendRectSize = 20;
+                var legendSpacing = 1;
+                var legendHeight = legendRectSize + legendSpacing;
 
-            var legend = mysvg.append('g')
-                .attr("transform", "translate(0, 20)")
-                .selectAll('.legend')
-                .data(sData).enter().append('g')
-                .attr("class", 'legend')
-                .attr("transform", function (d, i) {
-                    return 'translate(290,' + (((i + 1) * legendHeight) + (3 * i)) + ')';
-                })
-                .on("mouseover", function (d) { mouseOver(d); })
-                .on("mousemove", function () {
-                    return tooltip.style("top", (d3.event.pageY - 10) + "px")
-                        .style("left", (d3.event.pageX + 10) + "px");
-                })
-                .on("mouseout", function () {
-                    tooltip.style("visibility", "hidden");
-                });
+                var legend = mysvg.append('g')
+                    .attr("transform", "translate(0, 20)")
+                    .selectAll('.legend')
+                    .data(sData).enter().append('g')
+                    .attr("class", 'legend')
+                    .attr("transform", function (d, i) {
+                        return 'translate(270,' + (((i + 1) * legendHeight) + (3 * i)) + ')';
+                    });
 
-            legend.append('rect')
-                .attr("width", legendRectSize).attr("height", legendHeight)
-                .attr("rx", 20).attr("ry", 20)
-                .style("fill", function (d, i) { return seg4_color[i]; });
+                legend.append('rect')
+                    .attr("width", legendRectSize).attr("height", legendHeight)
+                    .attr("rx", 20).attr("ry", 20)
+                    .style("fill", function (d, i) { return seg4_color[i]; });
 
-            legend.append('text')
-                .attr("x", 30).attr("y", 15)
-                .text(function (d) { return d.data.siteName; })
-                .style("fill", 'black').style("font_size", '14px');
+                legend.append('text')
+                    .attr("x", 30).attr("y", 15)
+                    .text(function (d) { return d.data.siteName; })
+                    .style("fill", 'black').style("font_size", '14px');
             }
             //var lx = (180 * num) + 150;
             mysvg.append('text')

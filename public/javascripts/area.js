@@ -646,7 +646,7 @@ d3.json('/segData/area/company=' + companyName, function (error, data) {
                 .padding(0.1);
 
             var peakX = d3.scaleLinear()
-                .range([0, 250])
+                .range([0, 170])
                 .domain([0, d3.max(peak, function (d) { return d.value; })]).nice();
 
             var g = d3.select(".peak")
