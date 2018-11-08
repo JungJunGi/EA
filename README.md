@@ -1,6 +1,6 @@
 ![EA](./public/images/EA2.png)
 
-<br><br><br>
+<br>
 
 # EA (Energy Assistant)
 
@@ -14,7 +14,7 @@
 
 [Kim Ji Yeon](https://www.github.com/jiyeonkim7) & [Kim Min Joo](https://www.github.com/minjooda) & [Kim Ji Eun](https://www.github.com/sliveryy)
 
-<br><br>
+<br>
 
 ---
 
@@ -29,27 +29,29 @@
  공개 DB에서 크롤링한 데이터를 json 형태로 가공하여 mongoDB에 저장합니다.
  저장된 데이터를 기반으로 javascript 라이브러리인 D3.js를 사용하여 총 7개의 차트를 제작했습니다. 시계열 그래프를 사용하여 시간의 흐름에 따른 데이터 변화를 보여주고 donut, bubble chart와 같은 분포 그래프 사용하여 부서별 사용량을 비교할 수 있도록 하였습니다.
 
-<br><br>
+<br>
 
 ## 작품 설명
 
- * **금일 데이터 그래프 (donut chart) / 전기요금 그래프 (line chart)**
+ * **금일 데이터 그래프 (donut chart) / 전기요금 그래프 (line chart)** <br>
 ![donut chart](./public/images/donut.png)
 ![line chart](./public/images/line.png)
 
 <br>
 
- * **역률 그래프 (step line chart)**
+ * **역률 그래프 (step line chart)** <br>
 ![step line chart](./public/images/stepLine.png)
 
 <br>
 
- * **전력 사용량 그래프 (bar chart + stacked area chart)**
+ * **전력 사용량 그래프 (bar chart + stacked area chart)** <br>
 ![bar chart + stacked area chart](./public/images/bar&stackedArea.png)
 ![bar chart + stacked area chart](./public/images/bar&stackedArea2.png)
 
 <br>
 
- * **요일/시간별 전력 소비 패턴 그래프 (heatmap chart + bubble chart)**
+ * **요일/시간별 전력 소비 패턴 그래프 (heatmap chart + bubble chart)** <br>
 ![heatmap chart + bubble chart](./public/images/heatmap.png)
+
+<br>
 
