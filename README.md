@@ -6,9 +6,12 @@
 
 > 덕성여자대학교 2018 IT미디어공학과 졸업작품 
 
+<br>
 
 :zap: 정전기 팀 :zap:
 [Kim Ji Yeon](https://www.github.com/jiyeonkim7) & [Kim Min Joo](https://www.github.com/minjooda) & [Kim Ji Eun](https://www.github.com/sliveryy)
+
+<br>
 
 ---
 
@@ -27,10 +30,16 @@
 # 작품 설명
 
  * 금일 데이터 그래프 (donut chart) / 전기요금 그래프 (line chart)
+![donut chart](./public/images/donut.png)
+![line chart](./public/images/line.png)
 
  * 역률 그래프 (step line chart)
+![step line chart](./public/images/stepLine.png)
 
  * 전력 사용량 그래프 (bar chart + stacked area chart)
+![bar chart + stacked area chart](./public/images/bar&stackedArea.png)
+![bar chart + stacked area chart](./public/images/bar&stackedArea2.png)
 
  * 요일/시간별 전력 소비 패턴 그래프 (heatmap chart + bubble chart)
+![heatmap chart + bubble chart](./public/images/heatmap.png)
 
