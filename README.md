@@ -1,4 +1,4 @@
-![EA](./public/images/workflow.jpeg)
+![EA](./public/images/EA.jpeg)
 
 # EA (Energy Assistant)
 
