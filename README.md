@@ -7,10 +7,10 @@
 > 덕성여자대학교 2018 IT미디어공학과 졸업작품 
 
 
-## 정전기 팀
+:zap: 정전기 팀 :zap:
 [Kim Ji Yeon](https://www.github.com/jiyeonkim7) & [Kim Min Joo](https://www.github.com/minjooda) & [Kim Ji Eun](https://www.github.com/sliveryy)
 
---
+---
 
 # 작품 소개
 
