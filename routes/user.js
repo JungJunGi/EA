@@ -14,7 +14,7 @@ const areaRouter = require('./AreaData').start,
     moneyLine = require('./MoneyData').start,
     heatmapRouter = require('./HeatmapData').start,
     seg2 = require('./seg2Data').start,
-    DonutData = require('./DonutCh').start;
+    DonutData = require('./DonutChart').start;
     power_factor = require('./power_factor').start;
 
 var databaseUrl = 'mongodb://localhost:27017';

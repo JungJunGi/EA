@@ -4,16 +4,13 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var userRouter = require('./routes/user'); //signin / signup
-
-var areaRouter = require('./routes/AreaData').router; //stacked area chart
-var moneyLine = require('./routes/MoneyData').router; // 전기요금 - line chart
-var heatmapRouter = require('./routes/HeatmapData').router; //heatmap
-
-var seg2Data = require('./routes/seg2Data').router;// for seg2 chart
-
-var DonutData = require('./routes/DonutCh').router;// 도넛차트
-var power_factor = require('./routes/power_factor').router;// 역률차트
+var userRouter = require('./routes/user'); // signin & signup
+var areaRouter = require('./routes/AreaData').router; // stacked area chart
+var moneyLine = require('./routes/MoneyData').router; // line chart
+var heatmapRouter = require('./routes/HeatmapData').router; // heatmap
+var seg2Data = require('./routes/seg2Data').router; // seg2 chart
+var DonutData = require('./routes/DonutChart').router; // 도넛차트
+var power_factor = require('./routes/power_factor').router; // 역률차트
 
 var app = express();
 
